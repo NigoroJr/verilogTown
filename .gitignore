@@ -1,6 +1,14 @@
 *.class
+*.~
+*.swp
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# For Eclipse
+.classpath
+.metadata
+.project
+.settings
