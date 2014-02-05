@@ -1,4 +1,4 @@
-verilog_town
+Verilog Town
 ============
 
-TODO
+A game written in Java that helps you learn how to use Verilog.
