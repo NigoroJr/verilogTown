@@ -1,5 +1,9 @@
 Created by http://www.gitignore.io
 
+# Windows Thumbs.db and Macintosh .DS_Store files
+Thumbs.db
+.DS_Store
+
 ### vim ###
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
