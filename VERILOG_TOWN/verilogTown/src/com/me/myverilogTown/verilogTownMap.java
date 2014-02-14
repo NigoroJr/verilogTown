@@ -1,15 +1,22 @@
 package com.me.myverilogTown;
 
+import java.util.*;
+
 public class verilogTownMap 
 {
 	/* Assume grid size is 1 larger on all edges to accomodate invisible starting points */
 	private int grid_x;
 	private int grid_y; 
 	private verilogTownGridNode grid[][];
+	private int markPathCount; // used as a count for a mark path idetifier
 
 	/* Constructor */
 	verilogTownMap(int size_x, int size_y) 
 	{
+		this.grid_x = size_x+2;
+		this.grid_y = size_y+2;
+		this.markPathCount = 0;
+
 		this.grid = new verilogTownGridNode [size_x+2][size_y+2];
 
 		for (int i = 0; i < size_x+2; i++)
@@ -22,8 +29,93 @@ public class verilogTownMap
 		}
 	}
 
-	/* hard code initialization of firts_map.png */
-	void verilogTownMapHardCode()
+	void initFindPathMarker()
+	{
+		markPathCount ++;
+	}
+
+
+	Stack<verilogTownGridNode> backTraversePath(verilogTownGridNode end, verilogTownGridNode start, verilogTownGridNode current)
+	{
+		Stack<verilogTownGridNode> path = new Stack<verilogTownGridNode>();
+		path.push(end);
+		verilogTownGridNode traverse = current;
+
+		/* push the current element onto the stack */
+		path.push(traverse);
+		while (traverse != start)
+		{
+			traverse = traverse.getVisitedBy();
+		}
+
+		return path;
+	}
+
+	/* given a start and end finds path between two in the form of a stack */
+	Stack<verilogTownGridNode> findPath(verilogTownGridNode start, verilogTownGridNode end)
+	{
+		Queue<verilogTownGridNode> queue = new LinkedList<verilogTownGridNode>();
+		verilogTownGridNode current;
+
+		/* initialize QUEUE with start for BFS and get a new marker */	
+		queue.add(start);
+		this.initFindPathMarker();
+
+		/* while QUEUE not empty */
+		while ((current = queue.poll()) != null)
+		{
+			/* special case if destination/end if end then start adding path back to stack */
+			if (current.getNorth() == end)
+			{
+				return backTraversePath(end, start, current);
+			}
+			else if (current.getSouth() == end)
+			{
+				return backTraversePath(end, start, current);
+			}
+			else if (current.getEast() == end)
+			{
+				return backTraversePath(end, start, current);
+			}
+			else if (current.getWest() == end)
+			{
+				return backTraversePath(end, start, current);
+			}
+
+			/* add all children to QUEUE and mark as to be visited (because wave based then this will be the shortest path) */
+			if (current.getNorth() == null && current.isAlreadyVisited(markPathCount))
+			{
+				queue.add(current.getNorth());
+				current.getNorth().setVisited(markPathCount, current);
+
+			}
+			else if (current.getSouth() == null && current.isAlreadyVisited(markPathCount))
+			{
+				queue.add(current.getSouth());
+				current.getSouth().setVisited(markPathCount, current);
+			}
+			else if (current.getEast() == null && current.isAlreadyVisited(markPathCount))
+			{
+				queue.add(current.getEast());
+				current.getEast().setVisited(markPathCount, current);
+			}
+			else if (current.getWest() == null && current.isAlreadyVisited(markPathCount))
+			{
+				queue.add(current.getWest());
+				current.getWest().setVisited(markPathCount, current);
+			}
+		}
+
+		/* Error in that it never found the start */
+		return null;
+
+
+
+
+	}
+
+	/* hard code initialization of firt_map.png */
+	void verilogTownMapHardCode_first_map()
 	{
 		/* Tiles are 64x64 */
 		/* Map is 20x20 */
@@ -192,7 +284,7 @@ public class verilogTownMap
 		this.grid[10][8].set_STRAIGHT_ROAD_E2E(this.grid[11][8]);
 		this.grid[11][8].set_STRAIGHT_ROAD_E2E(this.grid[12][8]);
 		this.grid[12][8].set_INTER_TURN_E2SE(this.grid[12][7], this.grid[13][8]);
-		this.grid[13][8].set_INTER_N2EN(this.grid[14][13], this.grid[13][9]);
+		this.grid[13][8].set_INTER_TURN_N2EN(this.grid[14][13], this.grid[13][9]);
 		this.grid[14][8].set_STRAIGHT_ROAD_E2E(this.grid[15][8]);
 		this.grid[15][8].set_STRAIGHT_ROAD_E2E(this.grid[16][8]);
 		this.grid[16][8].set_STRAIGHT_ROAD_E2E(this.grid[17][8]);

@@ -1,6 +1,6 @@
 package com.me.myverilogTown;
 
-import java.util.Iterator;
+import java.util.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
