@@ -15,9 +15,13 @@ public class LevelScreen implements Screen
 	private OrthographicCamera camera;
 	private Texture level_map;
 	private SpriteBatch thebatch;
+	private LevelLogic levelLogic;
 	 
 	public LevelScreen(final verilogTown gam) 
 	{
+		/* initialize the level logic control */
+		levelLogic = new LevelLogic();
+
 		this.game = gam;
 
 		thebatch = new SpriteBatch();
@@ -32,6 +36,8 @@ public class LevelScreen implements Screen
 	@Override
 	public void render(float delta) 
 	{
+		levelLogic.update();
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 	 

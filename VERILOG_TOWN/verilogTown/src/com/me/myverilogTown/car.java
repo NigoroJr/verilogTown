@@ -1,6 +1,9 @@
 package com.me.myverilogTown;
 
-public class car
+import java.util.*;
+import com.badlogic.gdx.Gdx;
+
+public class Car
 {
 	private verilogTownGridNode start_point;
 	private verilogTownGridNode end_point;
@@ -9,15 +12,31 @@ public class car
 	private verilogTownGridNode location;
 	private int x;
 	private int y;
-	private verilogTownGridNode next_
-	private Stack detination;
+	private verilogTownGridNode next_spot;
+	private Stack<verilogTownGridNode> path;
 
-	void verilogTownMapHardCode(verilogTownGridNode start, verilogTownGridNode end)
+	public Car(verilogTownGridNode start, verilogTownGridNode end, int starting_time, verilogTownMap level)
 	{
-		start_point = start;
-		end_point = end;
-		is_crashed = false;
-		start_time = -1;
+		this.start_point = start;
+		this.end_point = end;
+		this.is_crashed = false;
+		this.start_time = starting_time;
+
+		/* intialize path */
+		this.path = level.findPath(this.start_point, this.end_point);
+
+		while(!path.empty())
+		{
+			int x;
+			int y;
+
+			next_spot = path.pop();
+		       	y = next_spot.get_y();
+		       	x = next_spot.get_x();
+
+			Gdx.app.log("MyTag", "Stack x="+ x +" y="+ y);
+		}
+
 	}
 
 }

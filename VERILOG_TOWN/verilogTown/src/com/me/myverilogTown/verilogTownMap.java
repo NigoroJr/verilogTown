@@ -7,11 +7,11 @@ public class verilogTownMap
 	/* Assume grid size is 1 larger on all edges to accomodate invisible starting points */
 	private int grid_x;
 	private int grid_y; 
-	private verilogTownGridNode grid[][];
+	public verilogTownGridNode grid[][];
 	private int markPathCount; // used as a count for a mark path idetifier
 
 	/* Constructor */
-	verilogTownMap(int size_x, int size_y) 
+	public verilogTownMap(int size_x, int size_y) 
 	{
 		this.grid_x = size_x+2;
 		this.grid_y = size_y+2;
@@ -21,7 +21,7 @@ public class verilogTownMap
 
 		for (int i = 0; i < size_x+2; i++)
 		{
-			for (int j = 0; i < size_y+2; j++)
+			for (int j = 0; j < size_y+2; j++)
 			{
 				/* Initalize to Non roads */
 				this.grid[i][j] = new verilogTownGridNode(i, j, GridType.NON_ROAD);
@@ -34,7 +34,6 @@ public class verilogTownMap
 		markPathCount ++;
 	}
 
-
 	Stack<verilogTownGridNode> backTraversePath(verilogTownGridNode end, verilogTownGridNode start, verilogTownGridNode current)
 	{
 		Stack<verilogTownGridNode> path = new Stack<verilogTownGridNode>();
@@ -46,6 +45,7 @@ public class verilogTownMap
 		while (traverse != start)
 		{
 			traverse = traverse.getVisitedBy();
+			path.push(traverse);
 		}
 
 		return path;
@@ -82,24 +82,24 @@ public class verilogTownMap
 				return backTraversePath(end, start, current);
 			}
 
-			/* add all children to QUEUE and mark as to be visited (because wave based then this will be the shortest path) */
-			if (current.getNorth() == null && current.isAlreadyVisited(markPathCount))
+			/* add all children (that's why no else if) to QUEUE and mark as to be visited (because wave based then this will be the shortest path) */
+			if (current.getNorth() != null && !current.getNorth().isAlreadyVisited(markPathCount))
 			{
 				queue.add(current.getNorth());
 				current.getNorth().setVisited(markPathCount, current);
 
 			}
-			else if (current.getSouth() == null && current.isAlreadyVisited(markPathCount))
+			if (current.getSouth() != null && !current.getSouth().isAlreadyVisited(markPathCount))
 			{
 				queue.add(current.getSouth());
 				current.getSouth().setVisited(markPathCount, current);
 			}
-			else if (current.getEast() == null && current.isAlreadyVisited(markPathCount))
+			if (current.getEast() != null && !current.getEast().isAlreadyVisited(markPathCount))
 			{
 				queue.add(current.getEast());
 				current.getEast().setVisited(markPathCount, current);
 			}
-			else if (current.getWest() == null && current.isAlreadyVisited(markPathCount))
+			if (current.getWest() != null && !current.getWest().isAlreadyVisited(markPathCount))
 			{
 				queue.add(current.getWest());
 				current.getWest().setVisited(markPathCount, current);

@@ -26,6 +26,15 @@ public class verilogTownGridNode
 		this.visited_by = null; // initalize to 0, but will always be greater than
 	}
 
+	int get_x()
+	{
+		return this.x;
+	}
+	int get_y()
+	{
+		return this.y;
+	}
+
 	int getVisitedCount()
 	{
 		return this.visited_mark;
