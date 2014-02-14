@@ -22,21 +22,9 @@ public class Car
 		this.is_crashed = false;
 		this.start_time = starting_time;
 
-		/* intialize path */
+		/* intialize path from start to finish */
 		this.path = level.findPath(this.start_point, this.end_point);
-
-		while(!path.empty())
-		{
-			int x;
-			int y;
-
-			next_spot = path.pop();
-		       	y = next_spot.get_y();
-		       	x = next_spot.get_x();
-
-			Gdx.app.log("MyTag", "Stack x="+ x +" y="+ y);
-		}
-
+		/* debugging to see if path is good */
+		level.showPath(this.path);
 	}
-
 }

@@ -1,6 +1,7 @@
 package com.me.myverilogTown;
 
 import java.util.*;
+import com.badlogic.gdx.Gdx;
 
 public class verilogTownMap 
 {
@@ -32,6 +33,24 @@ public class verilogTownMap
 	void initFindPathMarker()
 	{
 		markPathCount ++;
+	}
+
+	void showPath(Stack<verilogTownGridNode> path)
+	{
+		verilogTownGridNode traverse;
+
+		/* debugging to see if path is good */
+		while(!path.empty())
+		{
+			int x;
+			int y;
+
+			traverse = path.pop();
+		       	y = traverse.get_y();
+		       	x = traverse.get_x();
+
+			Gdx.app.log("verilogTownMap-showPath", "Stack x="+ x +" y="+ y);
+		}
 	}
 
 	Stack<verilogTownGridNode> backTraversePath(verilogTownGridNode end, verilogTownGridNode start, verilogTownGridNode current)
