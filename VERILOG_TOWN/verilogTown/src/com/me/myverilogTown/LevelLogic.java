@@ -2,6 +2,8 @@ package com.me.myverilogTown;
 
 import java.util.*;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class LevelLogic
 {
 	private verilogTownMap clevel;
@@ -24,7 +26,7 @@ public class LevelLogic
 		/* initialize cars */
 		for (int i = 0; i < num_cars; i++)
 		{
-			cars[i] = new Car(clevel.grid[7][0], clevel.grid[4][21], -1, clevel);
+			cars[i] = new Car(clevel.grid[7][0], clevel.grid[4][21], -1, clevel,null,0,0,0,0);
 		}
 	}
 

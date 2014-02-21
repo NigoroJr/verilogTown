@@ -11,6 +11,8 @@ public class verilogTownGridNode
 	private verilogTownGridNode west;
 	private int visited_mark; // mark for BFS marking
 	private verilogTownGridNode visited_by; // node that visited this node for reverse traversal
+	private TrafficControl signal;
+	private int signal_index;
 
 	/* Constructor */
 	verilogTownGridNode(int x, int y, GridType type) 
@@ -24,6 +26,9 @@ public class verilogTownGridNode
 		this.west = null;
 		this.visited_mark = 0; // initalize to 0, but will always be greater than
 		this.visited_by = null; // initalize to 0, but will always be greater than
+
+		this.signal = null;
+		this.signal_index = -1;
 	}
 
 	int get_x()
@@ -200,5 +205,12 @@ public class verilogTownGridNode
 	verilogTownGridNode getWest()
 	{
 		return this.west;
+	}
+
+	/* hooks up the associated traffic signal */
+	public void add_traffic_signal(TrafficControl traffic_signal, int index)
+	{
+		this.signal = traffic_signal;
+		this.signal_index = index;
 	}
 }

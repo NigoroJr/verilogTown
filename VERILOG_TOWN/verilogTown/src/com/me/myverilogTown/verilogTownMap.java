@@ -10,6 +10,8 @@ public class verilogTownMap
 	private int grid_y; 
 	public verilogTownGridNode grid[][];
 	private int markPathCount; // used as a count for a mark path idetifier
+	public TrafficControl traffic_signals[];
+	public int num_traffic_signals;
 
 	/* Constructor */
 	public verilogTownMap(int size_x, int size_y) 
@@ -127,15 +129,38 @@ public class verilogTownMap
 
 		/* Error in that it never found the start */
 		return null;
+	}
 
+	void initTrafficSignals(int number)
+	{
+		int i;
 
+		this.traffic_signals = new TrafficControl[number];
+		this.num_traffic_signals = number;
 
-
+		for (i = 0; i < number; i++)
+		{
+			this.traffic_signals[i] = new TrafficControl();
+		}
 	}
 
 	/* hard code initialization of firt_map.png */
 	void verilogTownMapHardCode_first_map()
 	{
+		this.initTrafficSignals(11);
+		/* Traffic signals in order of top left down to bottom right - the current organization is where a grid point is going to... */
+		this.traffic_signals[0].init_esw_traffic_signal(this.grid[3][21], this.grid[5][20], this.grid[2][19]);
+		this.traffic_signals[1].init_wne_traffic_signal(this.grid[9][18], this.grid[10][20], this.grid[7][19]);
+		this.traffic_signals[2].init_swn_traffic_signal(this.grid[18][18], this.grid[17][21], this.grid[16][19]);
+		this.traffic_signals[3].init_nes_traffic_signal(this.grid[2][12], this.grid[1][15], this.grid[3][13]);
+		this.traffic_signals[4].init_esw_traffic_signal(this.grid[8][14], this.grid[10][14], this.grid[7][13]);
+		this.traffic_signals[5].init_fourway_traffic_signal(this.grid[18][12], this.grid[17][15], this.grid[19][14], this.grid[16][13]);
+		this.traffic_signals[6].init_nes_traffic_signal(this.grid[2][7], this.grid[1][10], this.grid[3][9]);
+		this.traffic_signals[7].init_wne_traffic_signal(this.grid[13][7], this.grid[14][9], this.grid[11][8]);
+		this.traffic_signals[8].init_esw_traffic_signal(this.grid[17][10], this.grid[18][9], this.grid[16][8]);
+		this.traffic_signals[9].init_nes_traffic_signal(this.grid[13][4], this.grid[12][7], this.grid[14][6]);
+		this.traffic_signals[10].init_wne_traffic_signal(this.grid[7][2], this.grid[8][4], this.grid[5][3]);
+
 		/* Tiles are 64x64 */
 		/* Map is 20x20 */
 		/* top row - 21 */

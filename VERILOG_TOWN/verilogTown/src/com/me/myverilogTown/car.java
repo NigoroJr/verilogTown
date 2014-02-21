@@ -43,8 +43,14 @@ public class Car
 	protected float rotation;
 
 
-	public Car(verilogTownGridNode start, verilogTownGridNode end, int starting_time, verilogTownMap level,
-				Vector2 position, float width, float height, float rotation,
+	public Car(verilogTownGridNode start, 
+				verilogTownGridNode end, 
+				int starting_time, 
+				verilogTownMap level,
+				Vector2 position, 
+				float width, 
+				float height, 
+				float rotation,
 				float speed)
 	{
 		this.start_point = start;

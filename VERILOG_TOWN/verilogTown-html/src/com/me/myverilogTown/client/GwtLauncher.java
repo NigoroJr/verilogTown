@@ -1,6 +1,6 @@
 package com.me.myverilogTown.client;
 
-import com.me.myverilogTown.verilogTown;
+import com.me.myverilogTown.myverilogTown;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
@@ -14,6 +14,6 @@ public class GwtLauncher extends GwtApplication {
 
 	@Override
 	public ApplicationListener getApplicationListener () {
-		return new verilogTown();
+		return new myverilogTown();
 	}
 }

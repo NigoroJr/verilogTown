@@ -3,6 +3,7 @@ package com.me.myverilogTown;
 import java.util.*;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.*;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.me.myverilogTown.Car;
+
 
 public class LevelScreen implements Screen 
 {
@@ -35,19 +37,18 @@ public class LevelScreen implements Screen
 
 		thebatch = new SpriteBatch();
 		/* initialize the map */
-		level_map = new Texture("asset_resources/tiled_maps/first_map.png");
+		// Josh's level_map = new Texture("asset_resources/tiled_maps/first_map.png");
+		level_map = new Texture("data/first_map.png"); // mine
 
 		// create the camera for the SpriteBatch
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1280, 1280);
 
-		tmp = new Texture("asset_resources/cars/CAR_BLUE_WHITE_STRIPE_SINGLE.png");
+		tmp = new Texture("data/CAR_BLUE_WHITE_STRIPE_SINGLE.png");
 
 		tmp.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		testCar = new Car(new Vector2(640,640), 64, 64, 0, 100f, tmp);
-		Gdx.input.setInputProcessor(new InputHandler(this));
-
-
+		// paj commented: Gdx.input.setInputProcessor(new InputHandler(this));
 	}
 
 	@Override
@@ -129,7 +130,4 @@ public class LevelScreen implements Screen
 		return testCar;
 		// TODO Auto-generated method stub
 	}
-	
-
-
 }
