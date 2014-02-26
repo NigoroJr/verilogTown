@@ -6,14 +6,14 @@
 ####################################
 
 # The place where your project is...can be hard or relative
-dest1="VERILOG_TOWN/verilogTown/src/com/me/myverilogTown/*.java"
-dest2="VERILOG_TOWN/verilogTown-desktop/src/com/me/myverilogTown/*.java"
-dest3="VERILOG_TOWN/verilogTown-android/assets/data/*.png"
+dest1="VERILOG_TOWN/verilogTown/src/com/me/myverilogTown/"
+dest2="VERILOG_TOWN/verilogTown-desktop/src/com/me/myverilogTown/"
+dest3="VERILOG_TOWN/verilogTown-android/assets/data/"
 
 # What to backup. 
-backup_files1="../WORKING_DIR/verilogTown/src/com/me/myverilogTown/"
-backup_files2="../WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/"
-backup_files3="../WORKING_DIR/verilogTown-android/assets/data/"
+backup_files1="../WORKING_DIR/verilogTown/src/com/me/myverilogTown/*.java"
+backup_files2="../WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/*.java"
+backup_files3="../WORKING_DIR/verilogTown-android/assets/data/*.png"
 
 # Where to backup to.
 back_dest="LOCAL_BACKUPS"
