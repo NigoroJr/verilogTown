@@ -1,19 +1,20 @@
 #!/bin/sh
 ####################################
 #
-# Move GIT files to your project
+# See the other copy script for details
 #
 ####################################
 
+WORKING_DIR="../WORKING_DIR" # peter's working DIR is a relative address just one directory below the GIT repository
 # The place where your project is...can be hard or relative
 dest1="VERILOG_TOWN/verilogTown/src/com/me/myverilogTown/"
 dest2="VERILOG_TOWN/verilogTown-desktop/src/com/me/myverilogTown/"
 dest3="VERILOG_TOWN/verilogTown-android/assets/data/"
 
 # What to backup. 
-backup_files1="../WORKING_DIR/verilogTown/src/com/me/myverilogTown/*.java"
-backup_files2="../WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/*.java"
-backup_files3="../WORKING_DIR/verilogTown-android/assets/data/*.png"
+backup_files1="$WORKING_DIR/verilogTown/src/com/me/myverilogTown/*.java"
+backup_files2="$WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/*.java"
+backup_files3="$WORKING_DIR/verilogTown-android/assets/data/*.png"
 
 # Where to backup to.
 back_dest="LOCAL_BACKUPS"

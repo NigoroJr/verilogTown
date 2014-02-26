@@ -1,14 +1,16 @@
 #!/bin/sh
 ####################################
 #
-# Move GIT files to your project
+# This file moves files from the GIT repository structure into your project.  You will, however, have to change the WORKING_DIR
+# Also, note that backups are made each time the script is run with the dates.  You might have to delete these after a while.
 #
 ####################################
 
+WORKING_DIR="../WORKING_DIR" # peter's working DIR is a relative address just one directory below the GIT repository
 # The place where your project is...can be hard or relative
-dest1="../WORKING_DIR/verilogTown/src/com/me/myverilogTown/"
-dest2="../WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/"
-dest3="../WORKING_DIR/verilogTown-android/assets/data/"
+dest1="$WORKING_DIR/verilogTown/src/com/me/myverilogTown/"
+dest2="$WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/"
+dest3="$WORKING_DIR/verilogTown-android/assets/data/"
 
 # What to backup. 
 backup_files1="VERILOG_TOWN/verilogTown/src/com/me/myverilogTown/*.java"
