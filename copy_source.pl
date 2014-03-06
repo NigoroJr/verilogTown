@@ -56,13 +56,8 @@ die "Can't find source directory $from" unless -d $from;
 foreach my $postposition (@postpositions) {
     foreach my $subdirectory (@subdirectories) {
         # e.g. verilogTown-android/src/com/me/myverilogTown
-        my $dir_name = "";
-        if ($subdirectory eq "src") {
-            $dir_name = $NAME . $postposition . "/$subdirectory/" . ($PACKAGE_NAME =~ s/\./\//gr);
-        }
-        else {
-            $dir_name = $NAME . $postposition . "/$subdirectory/";
-        }
+        my $dir_name = $NAME . $postposition . "/$subdirectory/";
+        $dir_name .= $PACKAGE_NAME =~ s/\./\//gr if $subdirectory eq "src";
 
         next unless -d "$from/$dir_name";
 
