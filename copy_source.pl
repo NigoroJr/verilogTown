@@ -27,16 +27,7 @@ my @postpositions = ( "", "-desktop", "-android", "-html" );
 my @subdirectories = qw( src assets res );
 my @extensions = qw( java png );
 
-# The path (relative or absolute) right above the projects
-# VERILOG_TOWN <-- this path!
-#   |
-#   +-- verilogTown
-#   |
-#   +-- verilogTown-android
-#   |
-#   +-- verilogTown-desktop
-#   |
-#   +-- verilogTown-html
+my @files_to_copy;
 
 # Check for validity of arguments
 unless (@ARGV == 2) {
@@ -46,9 +37,6 @@ unless (@ARGV == 2) {
 
 my $from = shift;
 my $to = shift;
-# Make the path absolute if relative
-$from = "$ENV{PWD}/$from" unless $from =~ /^\//;
-$to = "$ENV{PWD}/$to" unless $to =~ /^\//;
 
 # Die if source directory can't be found
 die "Can't find source directory $from" unless -d $from;
@@ -61,33 +49,52 @@ foreach my $postposition (@postpositions) {
 
         next unless -d "$from/$dir_name";
 
-        # Create "to" if it doesn't exist
-        mkpath "$to/$dir_name" unless -d "$to/$dir_name";
-
-        find(sub { copy_file($dir_name) }, "$from/$dir_name");
+        find(sub { add_files_to_copy($dir_name) }, "$from/$dir_name");
     }
 }
 
-sub copy_file {
+copy_files();
+
+sub add_files_to_copy {
     my $file_name = $_;
     my $dir_name = shift;
 
     # Return if the file name doesn't end with the extension
     return unless $file_name =~ m/\.@{[ join "|", @extensions ]}$/;
 
-    # TODO: Explain how this works
-    my $diff = $File::Find::name =~ s/$from\/$dir_name//r;
+    # "Subtract" the "from" part
+    # For example, if $File::Find::name is
+    #   verilog_town/VERILOG_TOWN/verilogTown-html/src/com/me/myverilogTown/client/Foo.java
+    # subtracting
+    #   verilog_town/VERILOG_TOWN/
+    # becomes
+    #                             verilogTown-html/src/com/me/myverilogTown/client/Foo.java
+    my $diff = $File::Find::name =~ s#$from##r;
 
-    my $from_path = "$from/$dir_name/$diff";
-    my $to_path = "$to/$dir_name/$diff";
+    # Add to files that will be archived
+    push @files_to_copy, $diff;
+}
 
-    mkpath dirname $to_path unless -d dirname $to_path;
+sub copy_files {
+    for (my $i = 0; $i < scalar @files_to_copy; $i++) {
+        # Note: Can't shift because this will be used later to create tar
+        my $diff = $files_to_copy[$i];
+        my $from_path = "$from/$diff";
+        my $to_path = "$to/$diff";
 
-    if (copy $from_path, $to_path) {
-        print "Copied $from_path\n\t=> $to_path\n";
-    }
-    else {
-        die "Couldn't copy $from_path: $!";
+        # Remove duplication of slashes
+        trim_slashes(\$from_path);
+        trim_slashes(\$to_path);
+
+        # Create directory if it doesn't exist
+        mkpath dirname $to_path unless -d dirname $to_path;
+
+        if (copy $from_path, $to_path) {
+            print "Copied $from_path\n\t=> $to_path\n";
+        }
+        else {
+            die "Couldn't copy $from_path to $to_path: $!";
+        }
     }
 }
 
