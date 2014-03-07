@@ -26,18 +26,18 @@ my $NAME = "verilogTown";
 my @postpositions = ( "", "-desktop", "-android", "-html" );
 my @subdirectories = qw( src assets res );
 my @extensions = qw( java png );
-my $LOCAL_BACKUP_DIR = "$ENV{HOME}/verilogTownArchives";
+my $backup_dest = "$ENV{HOME}/verilogTownArchives";
 
 my @files_to_copy;
-my $backup_from;
-my $backup_to;
+my $backup_prefix_from;
+my $backup_prefix_to;
 my $help;
 
 # Parse options
 GetOptions(
-    "backup-from|bf=s" => \$backup_from,
-    "backup-to|bt=s" => \$backup_to,
-    "dest|d=s" => \$LOCAL_BACKUP_DIR,
+    "backup-from|bf=s" => \$backup_prefix_from,
+    "backup-to|bt=s" => \$backup_prefix_to,
+    "dest|d=s" => \$backup_dest,
     "help|h" => \$help,
 );
 
@@ -69,7 +69,7 @@ foreach my $postposition (@postpositions) {
 copy_files();
 
 # Create tars if specified
-create_tars() if $backup_from or $backup_to;
+create_tars() if $backup_prefix_from or $backup_prefix_to;
 
 sub add_files_to_copy {
     my $file_name = $_;
@@ -182,16 +182,16 @@ sub create_tars {
         push @tar_for_to, "$to/$file";
     }
 
-    if ($backup_from) {
+    if ($backup_prefix_from) {
         my $tar = Archive::Tar->new();
         $tar->add_files(@tar_for_from);
-        my $tar_file_path = get_archive_file_path($LOCAL_BACKUP_DIR, $backup_from);
+        my $tar_file_path = get_archive_file_path($backup_dest, $backup_prefix_from);
         print "tar created as $tar_file_path\n" if $tar->write($tar_file_path, COMPRESS_GZIP);
     }
-    if ($backup_to) {
+    if ($backup_prefix_to) {
         my $tar = Archive::Tar->new();
         $tar->add_files(@tar_for_to);
-        my $tar_file_path = get_archive_file_path($LOCAL_BACKUP_DIR, $backup_to);
+        my $tar_file_path = get_archive_file_path($backup_dest, $backup_prefix_to);
         print "tar created as $tar_file_path\n" if $tar->write($tar_file_path, COMPRESS_GZIP);
     }
 }
