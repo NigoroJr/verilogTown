@@ -8,6 +8,7 @@ use File::Path;
 use File::Copy;
 use File::Basename;
 use Archive::Tar;
+use Getopt::Long qw(:config no_ignore_case);
 
 # This Perl script copies source codes and resources such as image files back
 # and forth between the local project directory and the git repository.
@@ -17,7 +18,6 @@ use Archive::Tar;
 # Written by Naoki Mizuno
 
 # TODO: Read config file
-# TODO: Backup feature
 
 my $PACKAGE_NAME = "com.me.myverilogTown";
 
@@ -26,11 +26,23 @@ my $NAME = "verilogTown";
 my @postpositions = ( "", "-desktop", "-android", "-html" );
 my @subdirectories = qw( src assets res );
 my @extensions = qw( java png );
+my $LOCAL_BACKUP_DIR = "$ENV{HOME}/verilogTownArchives";
 
 my @files_to_copy;
+my $backup_from;
+my $backup_to;
+my $help;
+
+# Parse options
+GetOptions(
+    "backup-from|bf=s" => \$backup_from,
+    "backup-to|bt=s" => \$backup_to,
+    "dest|d=s" => \$LOCAL_BACKUP_DIR,
+    "help|h" => \$help,
+);
 
 # Check for validity of arguments
-unless (@ARGV == 2) {
+if ($help or @ARGV < 2) {
     print_help();
     exit;
 }
@@ -54,6 +66,9 @@ foreach my $postposition (@postpositions) {
 }
 
 copy_files();
+
+# Create tars if specified
+create_tars() if $backup_from or $backup_to;
 
 sub add_files_to_copy {
     my $file_name = $_;
@@ -98,12 +113,14 @@ sub copy_files {
     }
 }
 
-# Returns the file name for the tar file in the format of %Y%m%d%H%M%S.tar.gz
-sub get_archive_file_name {
+# Returns the path to the tar file in the format of foo/bar/baz/PREFIX_%Y%m%d%H%M%S.tar.gz
+sub get_archive_file_path {
+    my $dir = shift;
+    my $file_name_prefix = shift;
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
 
-    return sprintf "%4d%02d%02d%02d%02d%02d.tar.gz",
-        1900 + $year, 1 + $mon, $mday, $hour, $min, $sec;
+    return sprintf "%s/%s_%4d%02d%02d%02d%02d%02d.tar.gz",
+        $dir, $file_name_prefix, 1900 + $year, 1 + $mon, $mday, $hour, $min, $sec;
 }
 
 sub print_help {
@@ -130,4 +147,32 @@ Usage: @{[basename $0]} [from dir] [to dir]
 
     "VERILOG_TOWN" must be the argument.
 EOF
+}
+
+# Create tar ball if option is specified
+sub create_tars {
+    my @tar_for_from;
+    my @tar_for_to;
+    foreach my $file (@files_to_copy) {
+        push @tar_for_from, "$from/$file";
+        push @tar_for_to, "$to/$file";
+    }
+
+    if ($backup_from) {
+        my $tar = Archive::Tar->new();
+        $tar->add_files(@tar_for_from);
+        my $tar_file_path = get_archive_file_path($LOCAL_BACKUP_DIR, $backup_from);
+        print "tar created as $tar_file_path\n" if $tar->write($tar_file_path, COMPRESS_GZIP);
+    }
+    if ($backup_to) {
+        my $tar = Archive::Tar->new();
+        $tar->add_files(@tar_for_to);
+        my $tar_file_path = get_archive_file_path($LOCAL_BACKUP_DIR, $backup_to);
+        print "tar created as $tar_file_path\n" if $tar->write($tar_file_path, COMPRESS_GZIP);
+    }
+}
+
+sub trim_slashes {
+    my $path_ref = shift;
+    $$path_ref =~ s#/+#/#g;
 }
