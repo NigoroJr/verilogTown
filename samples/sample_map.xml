@@ -1,0 +1,50 @@
+<map size_x="4" size_y="4">
+    <grid x="0" y="0">
+        <type>STRAIGHT_ROAD_N2N</type>
+    </grid>
+    <grid x="1" y="0">
+        <type>CORNER_ROAD_E2S</type>
+    </grid>
+    <grid x="2" y="0">
+        <type>INTER_TURN_S2WS</type>
+    </grid>
+    <grid x="3" y="0">
+        <type>NON_ROAD</type>
+    </grid>
+    <grid x="0" y="1">
+        <type>CORNER_ROAD_E2N</type>
+    </grid>
+    <grid x="1" y="1">
+        <type>INTER_TURN_E2SE</type>
+    </grid>
+    <grid x="2" y="1">
+        <type>ENT_W2WEDGE</type>
+    </grid>
+    <grid x="3" y="1">
+        <type>START_WEDGE2E</type>
+    </grid>
+    <grid x="0" y="2">
+        <type>STRAIGHT_ROAD_S2S</type>
+    </grid>
+    <grid x="1" y="2">
+        <type>CORNER_ROAD_N2W</type>
+    </grid>
+    <grid x="2" y="2">
+        <type>INTER_TURN_N2EN</type>
+    </grid>
+    <grid x="3" y="2">
+        <type>START_EEDGE2W</type>
+    </grid>
+    <grid x="0" y="3">
+        <type>NON_ROAD</type>
+    </grid>
+    <grid x="1" y="3">
+        <type>CORNER_ROAD_S2W</type>
+    </grid>
+    <grid x="2" y="3">
+        <type>END_N2NEDGE</type>
+    </grid>
+    <grid x="3" y="3">
+        <type>STRAIGHT_ROAD_E2E</type>
+    </grid>
+</map>
