@@ -144,7 +144,7 @@ Usage: @{[basename $0]} [--backup-from|-bf PREFIX] [--backup-to|-bt PREFIX] [--d
 
     --dest          -d
             The directory in which the tar file will be created. Defaults to
-            $HOME/verilogTownArchives if not specified.
+            \$HOME/verilogTownArchives if not specified.
 
     --help
             Show this help.
