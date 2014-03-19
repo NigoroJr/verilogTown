@@ -1,4 +1,4 @@
-package com.me.myverilogtown;
+package com.me.myverilogTown;
 
 public enum TrafficType 
 {

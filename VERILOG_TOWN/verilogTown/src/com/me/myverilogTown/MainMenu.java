@@ -1,4 +1,4 @@
-package com.me.myverilogtown;
+package com.me.myverilogTown;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
