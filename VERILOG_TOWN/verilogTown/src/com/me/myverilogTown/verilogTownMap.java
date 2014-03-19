@@ -370,7 +370,7 @@ public class verilogTownMap
 		this.grid[11][4].set_STRAIGHT_ROAD_W2W(this.grid[10][4]);
 		this.grid[12][4].set_CORNER_ROAD_S2W(this.grid[11][4]);
 		this.grid[13][4].set_STRAIGHT_ROAD_N2N(this.grid[13][5]);
-		this.grid[14][4].set_STRAIGHT_ROAD_S2S(this.grid[13][3]);
+		this.grid[14][4].set_STRAIGHT_ROAD_S2S(this.grid[14][3]);
 		this.grid[15][4].set_STRAIGHT_ROAD_N2N(this.grid[15][5]);
 		/* row 3 */
 		this.grid[1][3].set_CORNER_ROAD_S2E(this.grid[2][3]);
@@ -386,7 +386,7 @@ public class verilogTownMap
 		this.grid[11][3].set_STRAIGHT_ROAD_E2E(this.grid[12][3]);
 		this.grid[12][3].set_STRAIGHT_ROAD_E2E(this.grid[13][3]);
 		this.grid[13][3].set_CORNER_ROAD_E2N(this.grid[13][4]);
-		this.grid[14][3].set_STRAIGHT_ROAD_S2S(this.grid[13][2]);
+		this.grid[14][3].set_STRAIGHT_ROAD_S2S(this.grid[14][2]);
 		this.grid[15][3].set_STRAIGHT_ROAD_N2N(this.grid[15][4]);
 		/* row 2 */
 		this.grid[6][2].set_STRAIGHT_ROAD_S2S(this.grid[6][1]);

@@ -13,8 +13,6 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.me.myverilogTown.Car;
-
 
 public class LevelScreen implements Screen 
 {
@@ -27,9 +25,13 @@ public class LevelScreen implements Screen
 	private Car testCar;
 	private Sprite carSprite;
 	private Texture tmp;
+	int toggle;
+
+	float Time; // Game clock of passed time
 
 	public LevelScreen(final verilogTown gam) 
 	{
+		toggle = 0;
 		/* initialize the level logic control */
 		levelLogic = new LevelLogic();
 
@@ -49,12 +51,25 @@ public class LevelScreen implements Screen
 		tmp.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		testCar = new Car(new Vector2(640,640), 64, 64, 0, 100f, tmp);
 		// paj commented: Gdx.input.setInputProcessor(new InputHandler(this));
+
+		/* initialize the time */
+		Time = 0f;
 	}
 
 	@Override
 	public void render(float delta) 
 	{
-		levelLogic.update();
+		// prints out delta time	Gdx.app.log("Time:", "="+ Time);
+		Time += Gdx.graphics.getDeltaTime();
+
+		// Simulation step alternate left and right 
+		if((Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && toggle == 1) || Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && toggle == 0) 
+		{
+			toggle = (toggle+1) % 2;
+			Gdx.app.log("Time Since last simulation:", "="+ Time);
+			levelLogic.update();
+		}
+
 
 		/*
 		 * Below is the test code for redrawing, rotating, and moving the sprite about the map
@@ -131,3 +146,5 @@ public class LevelScreen implements Screen
 		// TODO Auto-generated method stub
 	}
 }
+
+

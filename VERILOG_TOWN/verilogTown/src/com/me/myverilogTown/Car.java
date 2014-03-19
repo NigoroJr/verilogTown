@@ -13,8 +13,10 @@ public class Car
 {
 	private verilogTownGridNode start_point;
 	private verilogTownGridNode end_point;
+	private verilogTownGridNode current_point;
 	private int start_time;
 	private boolean is_crashed;
+	private boolean is_done_path;
 	private verilogTownGridNode location;
 	private int x;
 	private int y;
@@ -42,7 +44,6 @@ public class Car
 	protected float speed;
 	protected float rotation;
 
-
 	public Car(verilogTownGridNode start, 
 				verilogTownGridNode end, 
 				int starting_time, 
@@ -53,9 +54,12 @@ public class Car
 				float rotation,
 				float speed)
 	{
+		// how do I assert(start >= 1)
 		this.start_point = start;
 		this.end_point = end;
+		this.current_point = null;
 		this.is_crashed = false;
+		this.is_done_path = false;
 		this.start_time = starting_time;
 		this.position = position;
 		this.width = width;
@@ -64,11 +68,8 @@ public class Car
 		this.rotation = rotation;
 		velocity = new Vector2(0, 0);
 
-
 		/* intialize path from start to finish */
-		this.path = level.findPath(this.start_point, this.end_point);
-		/* debugging to see if path is good */
-		level.showPath(this.path);
+		// not needed if done at set_current_point	this.path = level.findPath(this.start_point, this.end_point);
 	}
 	
 	/* For graphics rendering, could be merged with the constructor above */
@@ -89,9 +90,6 @@ public class Car
 		carSprite.setSize(width, height);
 	}
 	
-	/* Auto generated getters and setters below */
-		
-	 
 	/**
 	 * @return the position
 	 */
@@ -191,5 +189,56 @@ public class Car
 		bounds.x = position.x;
 		bounds.y = position.y;
 	}
+
+	public void set_current_point(verilogTownGridNode grid, verilogTownMap level) {
+		this.current_point = grid;
+		/* recalculate the path ... this might be computationaly expensive */
+		this.path = level.findPath(grid, this.end_point);
+		if (this.path == null)
+		{
+			/* Couldn't find a path */
+			Gdx.app.log("Car", "Couldn't find a path");
+		}
+	}
+	public verilogTownGridNode get_current_point() {
+		return this.current_point;
+	}
+
+	public verilogTownGridNode get_start_point() {
+		return this.start_point;
+	}
+
+	public verilogTownGridNode get_end_point() {
+		return this.end_point;
+	}
+
+	public verilogTownGridNode get_next_point_on_path() {
+		return this.path.pop();
+	}
+
+	public int get_start_time() {
+		return this.start_time;
+	}
+
+	public void set_is_crashed() {
+		this.is_crashed = true;
+	}
+	public boolean get_is_crashed() {
+		this.current_point = null;
+		return this.is_crashed;
+	}
+
+	public void set_is_done_path() {
+		this.is_done_path = true;
+		this.current_point = null;
+	}
+	public boolean get_is_done_path() {
+		return this.is_done_path;
+	}
+
+
+
 }
+
+
 

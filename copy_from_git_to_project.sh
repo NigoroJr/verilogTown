@@ -16,22 +16,29 @@ dest3="$WORKING_DIR/verilogTown-android/assets/data/"
 backup_files1="VERILOG_TOWN/verilogTown/src/com/me/myverilogTown/*.java"
 backup_files2="VERILOG_TOWN/verilogTown-desktop/src/com/me/myverilogTown/*.java"
 backup_files3="VERILOG_TOWN/verilogTown-android/assets/data/*.png"
+backup2_files1="$WORKING_DIR/verilogTown/src/com/me/myverilogTown/*.java"
+backup2_files2="$WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/*.java"
+backup2_files3="$WORKING_DIR/verilogTown-android/assets/data/*.png"
 
 # Where to backup to.
 back_dest="LOCAL_BACKUPS"
 
 # Create archive filename.
 day=$(date +%Y%m%d%H%M%S)
-archive_file="copy_from_git_to_working_$day.tgz"
+archive_file="copy_from_git_$day.tgz"
+archive_file2="copy_from_working_$day.tgz"
 
 # Print start status message.
 echo "Backing up to $back_dest/$archive_file"
+echo "Backing up to $back_dest/$archive_file2"
 date
 echo
 
 # Backup the files using tar.
 echo "tar -czf $back_dest/$archive_file $backup_files1 $backup_files2 $backup_files3"
 `tar -czf $back_dest/$archive_file $backup_files1 $backup_files2 $backup_files3`
+echo "tar -czf $back_dest/$archive_file2 $backup2_files1 $backup2_files2 $backup2_files3"
+`tar -czf $back_dest/$archive_file2 $backup2_files1 $backup2_files2 $backup2_files3`
 
 # Print end status message.
 echo
@@ -42,7 +49,7 @@ date
 ls -lh $back_dest
 
 # now copy to detination
-echo "cp $backup_files1 $dest1"
+echo "cp $backup2_files1 $dest1"
 `cp $backup_files1 $dest1`
 echo "cp $backup_files2 $dest2"
 `cp $backup_files2 $dest2`
