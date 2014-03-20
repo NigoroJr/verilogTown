@@ -8,7 +8,7 @@ and then copy the source codes/resources TO that project.
 
 ## Required software/plugins
 * JDK 1.7.0 or later (Google Plugin for Eclipse supports only >1.7.0)
-* Android SDK
+* Android SDK (API 15 is currently required)
 * GWT Designer
 * Google Plugin for Eclipse
 * SDKs
@@ -35,3 +35,16 @@ have GWT Designer installed.
 ## Error regarding GWT
 Refer to
 [http://stackoverflow.com/questions/16699301/unresolved-gwt-error-in-libgdx-html-project](http://stackoverflow.com/questions/16699301/unresolved-gwt-error-in-libgdx-html-project)
+
+## Other issues
+It seems like you cannot start the setup UI with `java -jar gdx-setup-ui.jar`
+if you're using JDK 7. Couldn't start on Gentoo Linux with:
+
+    java version "1.7.0_45"
+    OpenJDK Runtime Environment (IcedTea 2.4.3) (Gentoo build 1.7.0_45-b31)
+    OpenJDK 64-Bit Server VM (build 24.45-b08, mixed mode)
+
+Changing the java version can be done with
+
+    sudo java-config --set-system-vm icedtea-bin-6
+

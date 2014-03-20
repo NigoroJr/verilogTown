@@ -126,9 +126,9 @@ sub get_archive_file_path {
 
 sub print_help {
     print <<EOF;
-Usage: @{[basename $0]} [--backup-from|-bf PREFIX] [--backup-to|-bt PREFIX] [--dest|-d BACKUP_DESTINATION] [from dir] [to dir]
+Usage: @{[basename $0]} [--backup-from|-bf PREFIX] [--backup-to|-bt PREFIX] [--dest|-d BACKUP_DESTINATION] FROM_DIR TO_DIR
 
-    --backup-from   -bf
+    -bf, --backup-from PREFIX
             Add this option if you want to backup the source directory of
             where you're copying from. PREFIX is the prefix of the tar file
             name. For example, if you specify
@@ -138,13 +138,13 @@ Usage: @{[basename $0]} [--backup-from|-bf PREFIX] [--backup-to|-bt PREFIX] [--d
             where the numbers represent the date and time when the archive
             was created.
 
-    --backup-to     -bt
+    -bt, --backup-to PREFIX
             Same as --backup-from but use this to backup the source directory
             of the destination.
 
-    --dest          -d
+    -d, --dest BACKUP_DESTINATION
             The directory in which the tar file will be created. Defaults to
-            $HOME/verilogTownArchives if not specified.
+            \$HOME/verilogTownArchives if not specified.
 
     --help
             Show this help.
