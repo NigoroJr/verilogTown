@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 package com.me.myverilogTown;
 
+=======
+>>>>>>> 8d9a1e6b36609d9348f03211e92893bbac347dd0
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class MapParser {
+<<<<<<< HEAD
     /*
      * The CWD is...
      * 
@@ -27,6 +31,9 @@ public class MapParser {
      * +-- ...
      */
     public static final String fileName = "../../samples/sample_map.xml";
+=======
+    public static final String fileName = "test.xml";
+>>>>>>> 8d9a1e6b36609d9348f03211e92893bbac347dd0
 
     private verilogTownGridNode gridArray[][];
 
