@@ -47,7 +47,7 @@ public class Car
     public Car(verilogTownGridNode start,
             verilogTownGridNode end,
             int starting_time,
-            verilogTownMap level,
+            VerilogTownMap level,
             Vector2 position,
             float width,
             float height,
@@ -196,7 +196,7 @@ public class Car
         bounds.y = position.y;
     }
 
-    public void set_current_point(verilogTownGridNode grid, verilogTownMap level) {
+    public void set_current_point(verilogTownGridNode grid, VerilogTownMap level) {
         this.current_point = grid;
         /* recalculate the path ... this might be computationaly expensive */
         this.path = level.findPath(grid, this.end_point);

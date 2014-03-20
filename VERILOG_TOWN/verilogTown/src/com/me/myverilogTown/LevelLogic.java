@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx;
 
 public class LevelLogic
 {
-    private verilogTownMap clevel;
+    private VerilogTownMap clevel;
     private Car cars[];
     private int num_cars;
     private int time_step;
@@ -15,7 +15,7 @@ public class LevelLogic
     public LevelLogic()
     {
         /* init current level map data structure */
-        this.clevel = new verilogTownMap(20, 20); // firts_map
+        this.clevel = new VerilogTownMap(20, 20); // firts_map
 
         /*
          * init a simple time step where a unit is the maximum time it takes a
