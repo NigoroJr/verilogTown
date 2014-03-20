@@ -13,6 +13,7 @@ public class verilogTownGridNode
 	private verilogTownGridNode visited_by; // node that visited this node for reverse traversal
 	private TrafficControl signal;
 	private int signal_index;
+	private Car the_car;
 
 	/* Constructor */
 	verilogTownGridNode(int x, int y, GridType type) 
@@ -26,6 +27,7 @@ public class verilogTownGridNode
 		this.west = null;
 		this.visited_mark = 0; // initalize to 0, but will always be greater than
 		this.visited_by = null; // initalize to 0, but will always be greater than
+		this.the_car = null;
 
 		this.signal = null;
 		this.signal_index = -1;
@@ -60,7 +62,6 @@ public class verilogTownGridNode
 		else
 			return false;
 	}
-
 
 	/* Functions for initializing the pointing of different grid points */
 	/* Starting Points */
@@ -188,6 +189,10 @@ public class verilogTownGridNode
 		this.north = dest1;
 		this.west = dest2;
 	}
+	public GridType get_grid_type()
+	{
+		return this.grid_type;
+	}
 
 	/* grabing destinations */
 	verilogTownGridNode getNorth()
@@ -212,5 +217,26 @@ public class verilogTownGridNode
 	{
 		this.signal = traffic_signal;
 		this.signal_index = index;
+	}
+	public boolean is_traffic_signal()
+	{
+		return (this.signal != null);
+	}
+	public TrafficSignal get_traffic_signal()
+	{
+		if (this.signal_index != -1)
+			return (this.signal.get_signal(this.signal_index));
+		else
+			return TrafficSignal.NO_SIGNAL;
+	}
+
+	/* stores Cars */
+	public void set_car(Car the_car)
+	{
+		this.the_car = the_car;
+	}
+	public Car get_car()
+	{
+		return this.the_car;
 	}
 }

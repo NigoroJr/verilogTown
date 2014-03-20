@@ -6,6 +6,7 @@ public enum TrafficSignal
 	GO,
 	GO_FORWARD,
 	GO_LEFT,
-	GO_RIGHT
+	GO_RIGHT,
+	NO_SIGNAL
 }
 

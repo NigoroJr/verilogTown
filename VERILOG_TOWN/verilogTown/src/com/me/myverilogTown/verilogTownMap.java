@@ -55,28 +55,57 @@ public class verilogTownMap
 		}
 	}
 
-	Stack<verilogTownGridNode> backTraversePath(verilogTownGridNode end, verilogTownGridNode start, verilogTownGridNode current)
+	Stack<verilogTownGridNode> backTraversePath(Stack<verilogTownGridNode> existing_path, verilogTownGridNode end, verilogTownGridNode start, verilogTownGridNode current)
 	{
-		Stack<verilogTownGridNode> path = new Stack<verilogTownGridNode>();
+		Stack<verilogTownGridNode> path; 
+
+		if (existing_path == null)
+		{
+			path = new Stack<verilogTownGridNode>();
+		}
+		else
+		{
+			path = existing_path;
+		}
+
 		path.push(end);
 		verilogTownGridNode traverse = current;
 
-		/* push the current element onto the stack */
-		path.push(traverse);
-		while (traverse != start)
+		if (current != start)
 		{
-			traverse = traverse.getVisitedBy();
+			/* push the current element onto the stack */
 			path.push(traverse);
+			/* get the next spot so that we don't push the start onto the stack */
+			traverse = traverse.getVisitedBy();
+			while (traverse != start)
+			{
+				path.push(traverse);
+				traverse = traverse.getVisitedBy();
+			}
 		}
 
 		return path;
 	}
 
+	void path_clean(Stack<verilogTownGridNode> path)
+	{
+		if (path == null)
+		{
+			return;
+		}
+
+		while (!path.isEmpty())
+		{
+			path.pop();
+		}
+	}
+
 	/* given a start and end finds path between two in the form of a stack */
-	Stack<verilogTownGridNode> findPath(verilogTownGridNode start, verilogTownGridNode end)
+	Stack<verilogTownGridNode> findPath(Stack<verilogTownGridNode> existing_path, verilogTownGridNode start, verilogTownGridNode end, Car the_car)
 	{
 		Queue<verilogTownGridNode> queue = new LinkedList<verilogTownGridNode>();
 		verilogTownGridNode current;
+		verilogTownGridNode possible_end = null;
 
 		/* initialize QUEUE with start for BFS and get a new marker */	
 		queue.add(start);
@@ -85,22 +114,41 @@ public class verilogTownMap
 		/* while QUEUE not empty */
 		while ((current = queue.poll()) != null)
 		{
+			if (possible_end == null && 
+					(current.get_grid_type() == GridType.END_S2SEDGE || 
+					 current.get_grid_type() == GridType.END_N2NEDGE || 
+					 current.get_grid_type() == GridType.END_E2EEDGE || 
+					 current.get_grid_type() == GridType.END_W2WEDGE)
+				)
+			{
+				/* IF - you find a possible end path from here then record just in case we can't find */
+				possible_end = current;
+			}
+
 			/* special case if destination/end if end then start adding path back to stack */
 			if (current.getNorth() == end)
 			{
-				return backTraversePath(end, start, current);
+				while(!queue.isEmpty())
+					queue.remove();
+				return backTraversePath(existing_path, end, start, current);
 			}
 			else if (current.getSouth() == end)
 			{
-				return backTraversePath(end, start, current);
+				while(!queue.isEmpty())
+					queue.remove();
+				return backTraversePath(existing_path, end, start, current);
 			}
 			else if (current.getEast() == end)
 			{
-				return backTraversePath(end, start, current);
+				while(!queue.isEmpty())
+					queue.remove();
+				return backTraversePath(existing_path, end, start, current);
 			}
 			else if (current.getWest() == end)
 			{
-				return backTraversePath(end, start, current);
+				while(!queue.isEmpty())
+					queue.remove();
+				return backTraversePath(existing_path, end, start, current);
 			}
 
 			/* add all children (that's why no else if) to QUEUE and mark as to be visited (because wave based then this will be the shortest path) */
@@ -108,7 +156,6 @@ public class verilogTownMap
 			{
 				queue.add(current.getNorth());
 				current.getNorth().setVisited(markPathCount, current);
-
 			}
 			if (current.getSouth() != null && !current.getSouth().isAlreadyVisited(markPathCount))
 			{
@@ -127,7 +174,78 @@ public class verilogTownMap
 			}
 		}
 
-		/* Error in that it never found the start */
+		/* Error in that it can't find a path */
+		/* update cars end point */
+		the_car.set_end_point_and_fail_on_getting_car_accross(possible_end);
+		Gdx.app.log("verilogTownMap-findPath", "Car couldn't find path so forcing to new end");
+
+		while(!queue.isEmpty())
+			queue.remove();
+		/* refind the path based on the new forced end */ 
+		return findPath(existing_path, start, possible_end, the_car);
+	}
+
+	/* returns the grid point through the intersection for a given turn */
+	verilogTownGridNode get_turn(verilogTownGridNode current, TrafficSignal signal, Direction direction)
+	{
+		if (signal == TrafficSignal.GO_FORWARD)
+		{
+			if (direction == Direction.N)
+			{
+				return current.getNorth().getNorth().getNorth();
+			}
+			else if (direction == Direction.S)
+			{
+				return current.getSouth().getSouth().getSouth();
+			}
+			else if (direction == Direction.E)
+			{
+				return current.getEast().getEast().getEast();
+			}
+			else if (direction == Direction.W)
+			{
+				return current.getWest().getWest().getWest();
+			}
+		}
+		else if (signal == TrafficSignal.GO_LEFT)
+		{
+			if (direction == Direction.N)
+			{
+				return current.getNorth().getNorth().getWest().getWest();
+			}
+			else if (direction == Direction.S)
+			{
+				return current.getSouth().getSouth().getEast().getEast();
+			}
+			else if (direction == Direction.E)
+			{
+				return current.getEast().getEast().getNorth().getNorth();
+			}
+			else if (direction == Direction.W)
+			{
+				return current.getWest().getWest().getSouth().getSouth();
+			}
+		}
+		else if (signal == TrafficSignal.GO_RIGHT)
+		{
+			if (direction == Direction.N)
+			{
+				return current.getNorth().getEast();
+			}
+			else if (direction == Direction.S)
+			{
+				return current.getSouth().getWest();
+			}
+			else if (direction == Direction.E)
+			{
+				return current.getEast().getSouth();
+			}
+			else if (direction == Direction.W)
+			{
+				return current.getWest().getNorth();
+			}
+		}
+
 		return null;
 	}
 
@@ -143,31 +261,48 @@ public class verilogTownMap
 			this.traffic_signals[i] = new TrafficControl();
 		}
 	}
+	int get_num_traffic_signals()
+	{
+		return this.num_traffic_signals;
+	}
+	
 
+	void display_traffic_lights()
+	{
+		for (int i = 0; i < this.num_traffic_signals ; i++)
+		{
+			Gdx.app.log("verilogTownMap-Traffic Light", " N="+ traffic_signals[i].get_signal(0) +" S="+ traffic_signals[i].get_signal(1) +" E="+ traffic_signals[i].get_signal(2) +" W="+ traffic_signals[i].get_signal(3));
+		}
+	}
 	/* hard code initialization of firt_map.png */
 	void verilogTownMapHardCode_first_map()
 	{
 		this.initTrafficSignals(11);
 		/* Traffic signals in order of top left down to bottom right - the current organization is where a grid point is going to... */
-		this.traffic_signals[0].init_esw_traffic_signal(this.grid[3][21], this.grid[5][20], this.grid[2][19]);
-		this.traffic_signals[1].init_wne_traffic_signal(this.grid[9][18], this.grid[10][20], this.grid[7][19]);
-		this.traffic_signals[2].init_swn_traffic_signal(this.grid[18][18], this.grid[17][21], this.grid[16][19]);
-		this.traffic_signals[3].init_nes_traffic_signal(this.grid[2][12], this.grid[1][15], this.grid[3][13]);
-		this.traffic_signals[4].init_esw_traffic_signal(this.grid[8][14], this.grid[10][14], this.grid[7][13]);
+		this.traffic_signals[0].init_sew2_traffic_signal(this.grid[3][21], this.grid[5][20], this.grid[2][19]);
+		this.traffic_signals[1].init_new2_traffic_signal(this.grid[9][18], this.grid[10][20], this.grid[7][19]);
+		this.traffic_signals[2].init_nsw2_traffic_signal(this.grid[18][18], this.grid[17][21], this.grid[16][19]);
+		this.traffic_signals[3].init_nse2_traffic_signal(this.grid[2][12], this.grid[1][15], this.grid[3][14]);
+		this.traffic_signals[4].init_sew2_traffic_signal(this.grid[8][15], this.grid[10][14], this.grid[7][13]);
 		this.traffic_signals[5].init_fourway_traffic_signal(this.grid[18][12], this.grid[17][15], this.grid[19][14], this.grid[16][13]);
-		this.traffic_signals[6].init_nes_traffic_signal(this.grid[2][7], this.grid[1][10], this.grid[3][9]);
-		this.traffic_signals[7].init_wne_traffic_signal(this.grid[13][7], this.grid[14][9], this.grid[11][8]);
-		this.traffic_signals[8].init_esw_traffic_signal(this.grid[17][10], this.grid[18][9], this.grid[16][8]);
-		this.traffic_signals[9].init_nes_traffic_signal(this.grid[13][4], this.grid[12][7], this.grid[14][6]);
-		this.traffic_signals[10].init_wne_traffic_signal(this.grid[7][2], this.grid[8][4], this.grid[5][3]);
+		this.traffic_signals[6].init_nse2_traffic_signal(this.grid[2][7], this.grid[1][10], this.grid[3][9]);
+		this.traffic_signals[7].init_new2_traffic_signal(this.grid[13][7], this.grid[14][9], this.grid[11][8]);
+		this.traffic_signals[8].init_sew2_traffic_signal(this.grid[17][10], this.grid[19][9], this.grid[16][8]);
+		this.traffic_signals[9].init_nse2_traffic_signal(this.grid[13][4], this.grid[12][7], this.grid[14][6]);
+		this.traffic_signals[10].init_new2_traffic_signal(this.grid[7][2], this.grid[8][4], this.grid[5][3]);
 
 		/* Tiles are 64x64 */
 		/* Map is 20x20 */
-		/* top row - 21 */
-		this.grid[3][21].set_START_NEDGE2S(this.grid[3][20]);
-		this.grid[4][21].set_END_N2NEDGE();
-		this.grid[17][21].set_START_NEDGE2S(this.grid[17][20]);
-		this.grid[18][21].set_END_N2NEDGE();
+		/* top row - 22 */
+		this.grid[3][22].set_START_NEDGE2S(this.grid[3][21]);
+		this.grid[4][22].set_END_N2NEDGE();
+		this.grid[17][22].set_START_NEDGE2S(this.grid[17][21]);
+		this.grid[18][22].set_END_N2NEDGE();
+		/* row 21 */
+		this.grid[3][21].set_STRAIGHT_ROAD_S2S(this.grid[3][20]);
+		this.grid[4][21].set_STRAIGHT_ROAD_N2N(this.grid[4][22]);
+		this.grid[17][21].set_STRAIGHT_ROAD_S2S(this.grid[17][20]);
+		this.grid[18][21].set_STRAIGHT_ROAD_N2N(this.grid[18][22]);
 		/* row 20 */
 		this.grid[1][20].set_CORNER_ROAD_W2S(this.grid[1][19]);
 		this.grid[2][20].set_STRAIGHT_ROAD_W2W(this.grid[1][20]);
@@ -176,7 +311,7 @@ public class verilogTownMap
 		this.grid[5][20].set_STRAIGHT_ROAD_W2W(this.grid[4][20]);
 		this.grid[6][20].set_STRAIGHT_ROAD_W2W(this.grid[5][20]);
 		this.grid[7][20].set_STRAIGHT_ROAD_W2W(this.grid[6][20]);
-		this.grid[8][20].set_STRAIGHT_ROAD_W2W(this.grid[7][20]);
+		this.grid[8][20].set_INTER_TURN_S2WS(this.grid[7][20], this.grid[8][19]);
 		this.grid[9][20].set_STRAIGHT_ROAD_W2W(this.grid[8][20]);
 		this.grid[10][20].set_STRAIGHT_ROAD_W2W(this.grid[9][20]);
 		this.grid[11][20].set_STRAIGHT_ROAD_W2W(this.grid[10][20]);
@@ -324,11 +459,11 @@ public class verilogTownMap
 		this.grid[6][8].set_STRAIGHT_ROAD_E2E(this.grid[7][8]);
 		this.grid[7][8].set_STRAIGHT_ROAD_E2E(this.grid[8][8]);
 		this.grid[8][8].set_STRAIGHT_ROAD_E2E(this.grid[9][8]);
-		this.grid[9][8].set_INTER_TURN_N2EN(this.grid[10][8], this.grid[9][9]);
+		this.grid[9][8].set_STRAIGHT_ROAD_E2E(this.grid[10][8]);
 		this.grid[10][8].set_STRAIGHT_ROAD_E2E(this.grid[11][8]);
 		this.grid[11][8].set_STRAIGHT_ROAD_E2E(this.grid[12][8]);
 		this.grid[12][8].set_INTER_TURN_E2SE(this.grid[12][7], this.grid[13][8]);
-		this.grid[13][8].set_INTER_TURN_N2EN(this.grid[14][13], this.grid[13][9]);
+		this.grid[13][8].set_INTER_TURN_N2EN(this.grid[14][8], this.grid[13][9]);
 		this.grid[14][8].set_STRAIGHT_ROAD_E2E(this.grid[15][8]);
 		this.grid[15][8].set_STRAIGHT_ROAD_E2E(this.grid[16][8]);
 		this.grid[16][8].set_STRAIGHT_ROAD_E2E(this.grid[17][8]);
@@ -347,7 +482,7 @@ public class verilogTownMap
 		this.grid[2][6].set_STRAIGHT_ROAD_N2N(this.grid[2][7]);
 		this.grid[12][6].set_STRAIGHT_ROAD_S2S(this.grid[12][5]);
 		this.grid[13][6].set_INTER_TURN_W2NW(this.grid[13][7], this.grid[12][6]);
-		this.grid[14][6].set_STRAIGHT_ROAD_E2E(this.grid[13][6]);
+		this.grid[14][6].set_STRAIGHT_ROAD_W2W(this.grid[13][6]);
 		this.grid[15][6].set_CORNER_ROAD_N2W(this.grid[14][6]);
 		/* row 5 */
 		this.grid[1][5].set_STRAIGHT_ROAD_S2S(this.grid[1][4]);
@@ -403,5 +538,120 @@ public class verilogTownMap
 		this.grid[7][0].set_START_SEDGE2N(this.grid[7][1]);
 		this.grid[14][0].set_END_E2EEDGE();
 		this.grid[15][0].set_START_SEDGE2N(this.grid[15][1]);
+	}
+
+	void cycle_signal(int light_index, int which)
+	{
+		if (which == 0)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 1)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 2)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+		else if (which == 3)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO);
+	}
+
+	void cycle_signal_2(int light_index, int which)
+	{
+		if (which == 0)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 1)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 2)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+		else if (which == 3)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO);
+		else if (which == 4)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 5)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 6)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP);
+		else if (which == 7)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT);
+		else if (which == 8)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 9)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 10)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+		else if (which == 11)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+		else if (which == 12)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 13)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 14)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+		else if (which == 15)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+	}
+	void cycle_signal_3(int light_index, int which)
+	{
+		if (which == 0)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 1)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 2)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+		else if (which == 3)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO);
+		else if (which == 4)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 5)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 6)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP);
+		else if (which == 7)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT);
+		else if (which == 8)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 9)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 10)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+		else if (which == 11)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+		else if (which == 12)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 13)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 14)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+		else if (which == 15)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+		else if (which == 16)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_FORWARD, TrafficSignal.STOP);
+		else if (which == 17)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_RIGHT);
+		else if (which == 18)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 19)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 20)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 21)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.GO_LEFT, TrafficSignal.GO_LEFT, TrafficSignal.GO_LEFT);
+		else if (which == 22)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_RIGHT);
+		else if (which == 23)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+		else if (which == 24)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO_LEFT, TrafficSignal.GO, TrafficSignal.STOP);
+		else if (which == 25)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+		else if (which == 26)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+		else if (which == 27)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+		else if (which == 28)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.GO_RIGHT, TrafficSignal.STOP);
+		else if (which == 29)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.GO);
+		else if (which == 30)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_LEFT);
+		else if (which == 31)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.GO, TrafficSignal.GO_LEFT);
 	}
 }

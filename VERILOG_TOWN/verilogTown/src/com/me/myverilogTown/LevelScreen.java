@@ -18,24 +18,33 @@ public class LevelScreen implements Screen
 {
 	final verilogTown game;
 
+	private Car cars[];
+	private int num_cars;
+
 	private OrthographicCamera camera;
 	private Texture level_map;
 	private SpriteBatch thebatch;
 	private LevelLogic levelLogic;
 	private Car testCar;
 	private Sprite carSprite;
-	private Texture tmp;
+	private Texture car_texture;
 	int toggle;
 
 	float Time; // Game clock of passed time
 
+	private verilogTownMap clevel;
+
 	public LevelScreen(final verilogTown gam) 
 	{
 		toggle = 0;
-		/* initialize the level logic control */
-		levelLogic = new LevelLogic();
 
 		this.game = gam;
+
+		/* init current level map data structure */
+		this.clevel = new verilogTownMap(20, 21); // firts_map
+		/* this might be where the XML read map goes */
+		/* hard coded */
+		clevel.verilogTownMapHardCode_first_map();
 
 		thebatch = new SpriteBatch();
 		/* initialize the map */
@@ -46,11 +55,28 @@ public class LevelScreen implements Screen
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1280, 1280);
 
-		tmp = new Texture("data/CAR_BLUE_WHITE_STRIPE_SINGLE.png");
+		car_texture = new Texture("data/CAR_BLUE_WHITE_STRIPE_SINGLE.png");
+		car_texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+	//	testCar = new Car(new Vector2(640,640), 64, 64, 0, 100f, tmp);
 
-		tmp.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		testCar = new Car(new Vector2(640,640), 64, 64, 0, 100f, tmp);
-		// paj commented: Gdx.input.setInputProcessor(new InputHandler(this));
+		/* after reading the number of cars from level */
+		num_cars = 10; // hard coded
+		cars = new Car[num_cars];
+
+		/* initialize cars */
+		cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][22], 1, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][22], 1, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][22], 1, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 2, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 2, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 2, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 3, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 3, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 4, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 4, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+
+		/* initialize the level logic control */
+		levelLogic = new LevelLogic();
 
 		/* initialize the time */
 		Time = 0f;
@@ -67,35 +93,8 @@ public class LevelScreen implements Screen
 		{
 			toggle = (toggle+1) % 2;
 			Gdx.app.log("Time Since last simulation:", "="+ Time);
-			levelLogic.update();
+			levelLogic.update(this.cars, this.num_cars, clevel);
 		}
-
-
-		/*
-		 * Below is the test code for redrawing, rotating, and moving the sprite about the map
-		 * 
-		if(Gdx.input.isKeyPressed(Keys.DPAD_LEFT)) {
-			testCar.getCarSprite().setRotation(-180);
-			testCar.getCarSprite().setX(testCar.getCarSprite().getX()-(Gdx.graphics.getDeltaTime() * testCar.speed));
-		}
-		if(Gdx.input.isKeyPressed(Keys.DPAD_RIGHT)) {
-			testCar.getCarSprite().setRotation(0);
-			testCar.getCarSprite().setX(testCar.getCarSprite().getX() + (Gdx.graphics.getDeltaTime() * testCar.speed));
-		}
-		
-		//For some reason, north/south movement is slower than east/west. Probably due to widescreen screen resolutions. Multiplying
-		//Velocity by 1.5 seems to make it look at least similar, speed wise - that's why it's cast as a float. 
-
-		if(Gdx.input.isKeyPressed(Keys.DPAD_UP)) {
-			testCar.getCarSprite().setRotation(90);
-			testCar.getCarSprite().setY((float) (testCar.getCarSprite().getY() + (Gdx.graphics.getDeltaTime() * testCar.speed * 1.5)));
-		}
-		if(Gdx.input.isKeyPressed(Keys.DPAD_DOWN)) {
-			testCar.getCarSprite().setRotation(-90);
-			testCar.getCarSprite().setY((float) (testCar.getCarSprite().getY() - (Gdx.graphics.getDeltaTime() * testCar.speed * 1.5)));
-		}
-	
-		*/
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
@@ -105,9 +104,16 @@ public class LevelScreen implements Screen
 
 		thebatch.begin();
 		thebatch.draw(level_map, 0, 0);
-		testCar.getCarSprite().draw(thebatch);
+		for (int i = 0; i < num_cars; i++)
+		{
+			if (cars[i].get_is_start_path() && !cars[i].get_is_done_path())
+			{
+				cars[i].getCarSprite().setPosition((cars[i].get_current_point().get_x()-1)*64, (cars[i].get_current_point().get_y()-1)*64);
+				cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
+				cars[i].getCarSprite().draw(thebatch);
+			}
+		}
 		thebatch.end();
-
 	}
 
 	@Override

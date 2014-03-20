@@ -42,7 +42,7 @@ public class TrafficControl
 		W.add_traffic_signal(this, NW);
 	}
 	/* Note the naming idicates where the car is going to */
-	public void init_nes_traffic_signal(verilogTownGridNode N, verilogTownGridNode S, verilogTownGridNode E)
+	public void init_nse2_traffic_signal(verilogTownGridNode N, verilogTownGridNode S, verilogTownGridNode E)
 	{
 		t_type = TrafficType.THREE_WAY_NES;	
 
@@ -54,7 +54,7 @@ public class TrafficControl
 		S.add_traffic_signal(this, NS);
 		E.add_traffic_signal(this, NE);
 	}
-	public void init_esw_traffic_signal(verilogTownGridNode S, verilogTownGridNode E, verilogTownGridNode W)
+	public void init_sew2_traffic_signal(verilogTownGridNode S, verilogTownGridNode E, verilogTownGridNode W)
 	{
 		t_type = TrafficType.THREE_WAY_ESW;	
 
@@ -66,7 +66,7 @@ public class TrafficControl
 		E.add_traffic_signal(this, NE);
 		W.add_traffic_signal(this, NW);
 	}
-	public void init_swn_traffic_signal(verilogTownGridNode N, verilogTownGridNode S, verilogTownGridNode W)
+	public void init_nsw2_traffic_signal(verilogTownGridNode N, verilogTownGridNode S, verilogTownGridNode W)
 	{
 		t_type = TrafficType.THREE_WAY_SWN;	
 
@@ -78,7 +78,7 @@ public class TrafficControl
 		S.add_traffic_signal(this, NS);
 		W.add_traffic_signal(this, NW);
 	}
-	public void init_wne_traffic_signal(verilogTownGridNode N, verilogTownGridNode E, verilogTownGridNode W)
+	public void init_new2_traffic_signal(verilogTownGridNode N, verilogTownGridNode E, verilogTownGridNode W)
 	{
 		t_type = TrafficType.THREE_WAY_WNE;	
 
@@ -91,4 +91,16 @@ public class TrafficControl
 		W.add_traffic_signal(this, NW);
 	}
 
+	public TrafficSignal get_signal(int signal_index)
+	{
+		return this.signal_directions[signal_index];
+	}
+
+	public void set_all_signals_nsew(TrafficSignal N_Signal, TrafficSignal S_Signal, TrafficSignal E_Signal, TrafficSignal W_Signal)
+	{
+		signal_directions[NN] = N_Signal;
+		signal_directions[NS] = S_Signal;
+		signal_directions[NE] = E_Signal;
+		signal_directions[NW] = W_Signal;
+	}
 }
