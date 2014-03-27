@@ -52,7 +52,6 @@ tmp/
 local.properties
 .settings/
 .loadpath
-.classpath
 
 # External tool builders
 .externalToolBuilders/
@@ -83,11 +82,3 @@ local.properties
 *.jar
 *.war
 *.ear
-/DEVELOPMENT_SOFTWARE/libgdx-0.9.9.zip
-/DEVELOPMENT_SOFTWARE/TortoiseGit-1.8.7.0-64bit.msi
-/DEVELOPMENT_SOFTWARE/adt-bundle-windows-x86_64-20131030.zip
-/DEVELOPMENT_SOFTWARE/eclipse-jee-kepler-SR1-win32-x86_64.zip
-/DEVELOPMENT_SOFTWARE/gdx-setup-ui.jar
-/DEVELOPMENT_SOFTWARE/Git-1.8.5.2-preview20131230.exe
-/DEVELOPMENT_SOFTWARE/jdk-7u51-windows-x64.exe
-/LOCAL_BACKUPS/*.tgz
