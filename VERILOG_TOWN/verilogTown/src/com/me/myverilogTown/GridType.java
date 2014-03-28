@@ -20,49 +20,59 @@ public enum GridType
 
     /*
      * corner 1
-     * ____
-     * |a
-     * | b_
-     * | |
+     * ┏━━━
+     * ┃a
+     * ┃ b
+     * ┃  ┏━
+     * ┃  ┃
      */
     CORNER_ROAD_W2S, // a West then South
     CORNER_ROAD_N2E, // b
     /*
      * corner 2
-     * ____
-     * b|
-     * _a |
-     * | |
+     * ━━━━━┓
+     *     b┃
+     *    a ┃
+     * ━━┓  ┃
+     *   ┃  ┃
+     * 
      */
     CORNER_ROAD_E2S, // a
     CORNER_ROAD_N2W, // b
     /*
      * corner 3
-     * | |
-     * - |
-     * a |
-     * b|
-     * ----
+     * 
+     *   ┃  ┃
+     *   ┃  ┃
+     * ━━┛  ┃
+     *    a ┃
+     *     b┃
+     * ━━━━━┛
+     * 
      */
     CORNER_ROAD_S2W, // a
     CORNER_ROAD_E2N, // b
     /*
      * corner 4
-     * | |
-     * | -
-     * | b
-     * |a
-     * ----
+     * ┃  ┃
+     * ┃  ┃
+     * ┃  ┗━━
+     * ┃  b
+     * ┃a
+     * ┗━━━━
      */
     CORNER_ROAD_S2E, // a
     CORNER_ROAD_W2N, // b
 
     /*
      * Full Intersection
-     * !!
-     * -ab-
-     * -cd-
-     * ||
+     * 
+     *   ┃  ┃
+     * ━━┛  ┗━━
+     *    a b
+     *    c d
+     * ━━┓  ┏━━
+     *   ┃  ┃
      */
     INTER_TURN_N2EN, // d links to North and East
     INTER_TURN_W2NW, // b
