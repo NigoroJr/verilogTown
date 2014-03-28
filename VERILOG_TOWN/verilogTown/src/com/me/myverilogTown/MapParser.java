@@ -28,7 +28,7 @@ public class MapParser {
      */
     public static final String fileName = "../../samples/sample_map.xml";
 
-    private VerilogTownGridNode gridArray[][];
+    private GridNode gridArray[][];
 
     public MapParser() {
         this(fileName);
@@ -70,13 +70,14 @@ public class MapParser {
                 .getNamedItem("size_x").getTextContent());
         int mapSizeY = Integer.parseInt(map.getAttributes()
                 .getNamedItem("size_y").getTextContent());
-        gridArray = new VerilogTownGridNode[mapSizeX][mapSizeY];
+        gridArray = new GridNode[mapSizeX][mapSizeY];
 
         readMap(map.getChildNodes());
 
+        // DEBUG
         for (int i = 0; i < gridArray.length; i++) {
             for (int j = 0; j < gridArray[0].length; j++) {
-                System.out.print(gridArray[i][j].get_x());
+                System.out.print(gridArray[i][j].getX());
             }
             System.out.println();
         }
@@ -105,7 +106,7 @@ public class MapParser {
                     String gridType = type.getTextContent();
 
                     gridArray[x][y] =
-                            new VerilogTownGridNode(x, y, getGridType(gridType));
+                            new GridNode(x, y, getGridType(gridType));
                 }
             }
         }
@@ -211,7 +212,7 @@ public class MapParser {
         return ret;
     }
 
-    public VerilogTownGridNode[][] getGridArray() {
+    public GridNode[][] getGridArray() {
         return gridArray;
     }
 }

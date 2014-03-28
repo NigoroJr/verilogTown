@@ -4,7 +4,7 @@ import java.util.*;
 
 public class TrafficControl
 {
-    private VerilogTownGridNode traffic_corners[]; /*
+    private GridNode traffic_corners[]; /*
                                                     * Each traffic point is
                                                     * associated with 4 corner
                                                     * points
@@ -21,7 +21,7 @@ public class TrafficControl
     {
         int i;
 
-        traffic_corners = new VerilogTownGridNode[4];
+        traffic_corners = new GridNode[4];
         signal_directions = new TrafficSignal[4];
 
         for (i = 0; i < 4; i++)
@@ -31,8 +31,8 @@ public class TrafficControl
         }
     }
 
-    public void init_fourway_traffic_signal(VerilogTownGridNode N,
-            VerilogTownGridNode S, VerilogTownGridNode E, VerilogTownGridNode W)
+    public void init_fourway_traffic_signal(GridNode N,
+            GridNode S, GridNode E, GridNode W)
     {
         t_type = TrafficType.FOUR_WAY;
 
@@ -41,15 +41,15 @@ public class TrafficControl
         traffic_corners[NE] = E;
         traffic_corners[NW] = W;
 
-        N.add_traffic_signal(this, NN);
-        S.add_traffic_signal(this, NS);
-        E.add_traffic_signal(this, NE);
-        W.add_traffic_signal(this, NW);
+        N.addTrafficSignal(this, NN);
+        S.addTrafficSignal(this, NS);
+        E.addTrafficSignal(this, NE);
+        W.addTrafficSignal(this, NW);
     }
 
     /* Note the naming indicates where the car is going to */
-    public void init_nes_traffic_signal(VerilogTownGridNode N,
-            VerilogTownGridNode S, VerilogTownGridNode E)
+    public void init_nes_traffic_signal(GridNode N,
+            GridNode S, GridNode E)
     {
         t_type = TrafficType.THREE_WAY_NES;
 
@@ -57,13 +57,13 @@ public class TrafficControl
         traffic_corners[NS] = S;
         traffic_corners[NE] = E;
 
-        N.add_traffic_signal(this, NN);
-        S.add_traffic_signal(this, NS);
-        E.add_traffic_signal(this, NE);
+        N.addTrafficSignal(this, NN);
+        S.addTrafficSignal(this, NS);
+        E.addTrafficSignal(this, NE);
     }
 
-    public void init_esw_traffic_signal(VerilogTownGridNode S,
-            VerilogTownGridNode E, VerilogTownGridNode W)
+    public void init_esw_traffic_signal(GridNode S,
+            GridNode E, GridNode W)
     {
         t_type = TrafficType.THREE_WAY_ESW;
 
@@ -71,13 +71,13 @@ public class TrafficControl
         traffic_corners[NE] = E;
         traffic_corners[NW] = W;
 
-        S.add_traffic_signal(this, NS);
-        E.add_traffic_signal(this, NE);
-        W.add_traffic_signal(this, NW);
+        S.addTrafficSignal(this, NS);
+        E.addTrafficSignal(this, NE);
+        W.addTrafficSignal(this, NW);
     }
 
-    public void init_swn_traffic_signal(VerilogTownGridNode N,
-            VerilogTownGridNode S, VerilogTownGridNode W)
+    public void init_swn_traffic_signal(GridNode N,
+            GridNode S, GridNode W)
     {
         t_type = TrafficType.THREE_WAY_SWN;
 
@@ -85,13 +85,13 @@ public class TrafficControl
         traffic_corners[NS] = S;
         traffic_corners[NW] = W;
 
-        N.add_traffic_signal(this, NN);
-        S.add_traffic_signal(this, NS);
-        W.add_traffic_signal(this, NW);
+        N.addTrafficSignal(this, NN);
+        S.addTrafficSignal(this, NS);
+        W.addTrafficSignal(this, NW);
     }
 
-    public void init_wne_traffic_signal(VerilogTownGridNode N,
-            VerilogTownGridNode E, VerilogTownGridNode W)
+    public void init_wne_traffic_signal(GridNode N,
+            GridNode E, GridNode W)
     {
         t_type = TrafficType.THREE_WAY_WNE;
 
@@ -99,9 +99,9 @@ public class TrafficControl
         traffic_corners[NW] = W;
         traffic_corners[NE] = E;
 
-        N.add_traffic_signal(this, NN);
-        E.add_traffic_signal(this, NE);
-        W.add_traffic_signal(this, NW);
+        N.addTrafficSignal(this, NN);
+        E.addTrafficSignal(this, NE);
+        W.addTrafficSignal(this, NW);
     }
 
 }

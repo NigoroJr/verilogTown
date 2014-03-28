@@ -11,17 +11,17 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Car
 {
-    private VerilogTownGridNode start_point;
-    private VerilogTownGridNode end_point;
-    private VerilogTownGridNode current_point;
+    private GridNode start_point;
+    private GridNode end_point;
+    private GridNode current_point;
     private int start_time;
     private boolean is_crashed;
     private boolean is_done_path;
-    private VerilogTownGridNode location;
+    private GridNode location;
     private int x;
     private int y;
-    private VerilogTownGridNode next_spot;
-    private Stack<VerilogTownGridNode> path;
+    private GridNode next_spot;
+    private Stack<GridNode> path;
 
     /* Necessary for displaying car */
     private Texture carTexture;
@@ -44,8 +44,8 @@ public class Car
     protected float speed;
     protected float rotation;
 
-    public Car(VerilogTownGridNode start,
-            VerilogTownGridNode end,
+    public Car(GridNode start,
+            GridNode end,
             int starting_time,
             VerilogTownMap level,
             Vector2 position,
@@ -196,7 +196,7 @@ public class Car
         bounds.y = position.y;
     }
 
-    public void set_current_point(VerilogTownGridNode grid, VerilogTownMap level) {
+    public void set_current_point(GridNode grid, VerilogTownMap level) {
         this.current_point = grid;
         /* recalculate the path ... this might be computationaly expensive */
         this.path = level.findPath(grid, this.end_point);
@@ -207,19 +207,19 @@ public class Car
         }
     }
 
-    public VerilogTownGridNode get_current_point() {
+    public GridNode get_current_point() {
         return this.current_point;
     }
 
-    public VerilogTownGridNode get_start_point() {
+    public GridNode get_start_point() {
         return this.start_point;
     }
 
-    public VerilogTownGridNode get_end_point() {
+    public GridNode get_end_point() {
         return this.end_point;
     }
 
-    public VerilogTownGridNode get_next_point_on_path() {
+    public GridNode get_next_point_on_path() {
         return this.path.pop();
     }
 

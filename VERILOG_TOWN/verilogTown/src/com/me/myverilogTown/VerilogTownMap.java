@@ -11,7 +11,7 @@ public class VerilogTownMap
      */
     private int grid_x;
     private int grid_y;
-    public VerilogTownGridNode grid[][];
+    public GridNode grid[][];
     private int markPathCount; // used as a count for a mark path identifier
     public TrafficControl traffic_signals[];
     public int num_traffic_signals;
@@ -23,14 +23,14 @@ public class VerilogTownMap
         this.grid_y = size_y + 2;
         this.markPathCount = 0;
 
-        this.grid = new VerilogTownGridNode[size_x + 2][size_y + 2];
+        this.grid = new GridNode[size_x + 2][size_y + 2];
 
         for (int i = 0; i < size_x + 2; i++)
         {
             for (int j = 0; j < size_y + 2; j++)
             {
                 /* Initialize to Non roads */
-                this.grid[i][j] = new VerilogTownGridNode(i, j,
+                this.grid[i][j] = new GridNode(i, j,
                         GridType.NON_ROAD);
             }
         }
@@ -41,9 +41,9 @@ public class VerilogTownMap
         markPathCount++;
     }
 
-    void showPath(Stack<VerilogTownGridNode> path)
+    void showPath(Stack<GridNode> path)
     {
-        VerilogTownGridNode traverse;
+        GridNode traverse;
 
         /* debugging to see if path is good */
         while (!path.empty())
@@ -52,19 +52,19 @@ public class VerilogTownMap
             int y;
 
             traverse = path.pop();
-            y = traverse.get_y();
-            x = traverse.get_x();
+            y = traverse.getY();
+            x = traverse.getX();
 
             Gdx.app.log("verilogTownMap-showPath", "Stack x=" + x + " y=" + y);
         }
     }
 
-    Stack<VerilogTownGridNode> backTraversePath(VerilogTownGridNode end,
-            VerilogTownGridNode start, VerilogTownGridNode current)
+    Stack<GridNode> backTraversePath(GridNode end,
+            GridNode start, GridNode current)
     {
-        Stack<VerilogTownGridNode> path = new Stack<VerilogTownGridNode>();
+        Stack<GridNode> path = new Stack<GridNode>();
         path.push(end);
-        VerilogTownGridNode traverse = current;
+        GridNode traverse = current;
 
         /* push the current element onto the stack */
         path.push(traverse);
@@ -78,11 +78,11 @@ public class VerilogTownMap
     }
 
     /* given a start and end finds path between two in the form of a stack */
-    Stack<VerilogTownGridNode> findPath(VerilogTownGridNode start,
-            VerilogTownGridNode end)
+    Stack<GridNode> findPath(GridNode start,
+            GridNode end)
     {
-        Queue<VerilogTownGridNode> queue = new LinkedList<VerilogTownGridNode>();
-        VerilogTownGridNode current;
+        Queue<GridNode> queue = new LinkedList<GridNode>();
+        GridNode current;
 
         /* initialize QUEUE with start for BFS and get a new marker */
         queue.add(start);

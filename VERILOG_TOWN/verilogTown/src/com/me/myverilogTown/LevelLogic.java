@@ -83,7 +83,7 @@ public class LevelLogic
                 else if (cars[i].get_start_time() < time_step)
                 {
                     /* ELSE IF - Moving car then move to next spot */
-                    VerilogTownGridNode spot;
+                    GridNode spot;
 
                     spot = cars[i].get_next_point_on_path();
 
@@ -100,8 +100,8 @@ public class LevelLogic
                         cars[i].get_next_point_on_path();
 
                         /* debug info */
-                        y = cars[i].get_current_point().get_y();
-                        x = cars[i].get_current_point().get_x();
+                        y = cars[i].get_current_point().getY();
+                        x = cars[i].get_current_point().getX();
                         Gdx.app.log("LevelLogic", "Car=" + i + " At x=" + x
                                 + " y=" + y);
                     }
