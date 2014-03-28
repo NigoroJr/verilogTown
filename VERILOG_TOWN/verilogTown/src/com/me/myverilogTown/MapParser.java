@@ -57,21 +57,44 @@ public class MapParser {
         // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
         doc.getDocumentElement().normalize();
 
-        NodeList map = doc.getElementsByTagName("map");
-        int mapSizeX = Integer.parseInt(map.item(0).getAttributes()
+        NodeList level = doc.getElementsByTagName("level");
+        // NodeList map = doc.getElementsByTagName("map");
+        Node map = level.item(0).getChildNodes().item(1);
+        Node car = level.item(0).getChildNodes().item(3);
+
+        int levelNum = Integer.parseInt(level.item(0).getAttributes()
+                .getNamedItem("lv").getTextContent());
+
+        // Get size of the map
+        int mapSizeX = Integer.parseInt(map.getAttributes()
                 .getNamedItem("size_x").getTextContent());
-        int mapSizeY = Integer.parseInt(map.item(0).getAttributes()
+        int mapSizeY = Integer.parseInt(map.getAttributes()
                 .getNamedItem("size_y").getTextContent());
+        gridArray = new VerilogTownGridNode[mapSizeX][mapSizeY];
 
-        gridArray = new verilogTownGridNode[mapSizeX][mapSizeY];
+        readMap(map.getChildNodes());
 
-        readMap(map);
+        for (int i = 0; i < gridArray.length; i++) {
+            for (int j = 0; j < gridArray[0].length; j++) {
+                System.out.print(gridArray[i][j].get_x());
+            }
+            System.out.println();
+        }
     }
 
     public void readMap(NodeList map) {
         for (int i = 0; i < map.getLength(); i++) {
 
             Node grid = map.item(i);
+
+            if (grid.getNodeType() == Node.TEXT_NODE)
+                continue;
+
+            int x = Integer.parseInt(grid.getAttributes()
+                    .getNamedItem("x").getTextContent());
+            int y = Integer.parseInt(grid.getAttributes().
+                    getNamedItem("y").getTextContent());
+
             NodeList childrenOfGrid = grid.getChildNodes();
 
             // Iterate through child nodes of <grid>
@@ -79,12 +102,7 @@ public class MapParser {
                 Node type = childrenOfGrid.item(j);
 
                 if (type.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) type;
-
-                    int x = Integer.parseInt(element.getAttribute("x"));
-                    int y = Integer.parseInt(element.getAttribute("y"));
-                    String gridType = element.getElementsByTagName("type")
-                            .item(0).getTextContent();
+                    String gridType = type.getTextContent();
 
                     gridArray[x][y] =
                             new verilogTownGridNode(x, y, getGridType(gridType));
