@@ -28,7 +28,7 @@ public class MapParser {
      */
     public static final String fileName = "../../samples/sample_map.xml";
 
-    private verilogTownGridNode gridArray[][];
+    private VerilogTownGridNode gridArray[][];
 
     public MapParser() {
         this(fileName);
@@ -105,7 +105,7 @@ public class MapParser {
                     String gridType = type.getTextContent();
 
                     gridArray[x][y] =
-                            new verilogTownGridNode(x, y, getGridType(gridType));
+                            new VerilogTownGridNode(x, y, getGridType(gridType));
                 }
             }
         }
@@ -211,7 +211,7 @@ public class MapParser {
         return ret;
     }
 
-    public verilogTownGridNode[][] getGridArray() {
+    public VerilogTownGridNode[][] getGridArray() {
         return gridArray;
     }
 }

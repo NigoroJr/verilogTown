@@ -1,23 +1,23 @@
 package com.me.myverilogTown;
 
-public class verilogTownGridNode
+public class VerilogTownGridNode
 {
     private int x; // x location assuming x = 0 is left most
     private int y; // y location assuming y = 0 is bottom most
     private GridType grid_type; // type of grid point - see GridType for what
                                 // they all mean
-    private verilogTownGridNode north;
-    private verilogTownGridNode south;
-    private verilogTownGridNode east;
-    private verilogTownGridNode west;
+    private VerilogTownGridNode north;
+    private VerilogTownGridNode south;
+    private VerilogTownGridNode east;
+    private VerilogTownGridNode west;
     private int visited_mark; // mark for BFS marking
-    private verilogTownGridNode visited_by; // node that visited this node for
+    private VerilogTownGridNode visited_by; // node that visited this node for
                                             // reverse traversal
     private TrafficControl signal;
     private int signal_index;
 
     /* Constructor */
-    verilogTownGridNode(int x, int y, GridType type)
+    VerilogTownGridNode(int x, int y, GridType type)
     {
         this.x = x;
         this.y = y;
@@ -50,13 +50,13 @@ public class verilogTownGridNode
         return this.visited_mark;
     }
 
-    void setVisited(int mark, verilogTownGridNode by)
+    void setVisited(int mark, VerilogTownGridNode by)
     {
         this.visited_mark = mark;
         this.visited_by = by;
     }
 
-    verilogTownGridNode getVisitedBy()
+    VerilogTownGridNode getVisitedBy()
     {
         return this.visited_by;
     }
@@ -71,25 +71,25 @@ public class verilogTownGridNode
 
     /* Functions for initializing the pointing of different grid points */
     /* Starting Points */
-    void set_START_NEDGE2S(verilogTownGridNode dest)
+    void set_START_NEDGE2S(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.START_NEDGE2S;
         this.south = dest;
     }
 
-    void set_START_SEDGE2N(verilogTownGridNode dest)
+    void set_START_SEDGE2N(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.START_SEDGE2N;
         this.north = dest;
     }
 
-    void set_START_EEDGE2W(verilogTownGridNode dest)
+    void set_START_EEDGE2W(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.START_EEDGE2W;
         this.west = dest;
     }
 
-    void set_START_WEDGE2E(verilogTownGridNode dest)
+    void set_START_WEDGE2E(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.START_WEDGE2E;
         this.east = dest;
@@ -117,106 +117,106 @@ public class verilogTownGridNode
     }
 
     /* Straight roads */
-    void set_STRAIGHT_ROAD_E2E(verilogTownGridNode dest)
+    void set_STRAIGHT_ROAD_E2E(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.STRAIGHT_ROAD_E2E;
         this.east = dest;
     }
 
-    void set_STRAIGHT_ROAD_N2N(verilogTownGridNode dest)
+    void set_STRAIGHT_ROAD_N2N(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.STRAIGHT_ROAD_N2N;
         this.north = dest;
     }
 
-    void set_STRAIGHT_ROAD_S2S(verilogTownGridNode dest)
+    void set_STRAIGHT_ROAD_S2S(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.STRAIGHT_ROAD_S2S;
         this.south = dest;
     }
 
-    void set_STRAIGHT_ROAD_W2W(verilogTownGridNode dest)
+    void set_STRAIGHT_ROAD_W2W(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.STRAIGHT_ROAD_W2W;
         this.west = dest;
     }
 
     /* Corners with only one path */
-    void set_CORNER_ROAD_W2S(verilogTownGridNode dest)
+    void set_CORNER_ROAD_W2S(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_W2S;
         this.south = dest;
     }
 
-    void set_CORNER_ROAD_N2E(verilogTownGridNode dest)
+    void set_CORNER_ROAD_N2E(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_N2E;
         this.east = dest;
     }
 
-    void set_CORNER_ROAD_E2S(verilogTownGridNode dest)
+    void set_CORNER_ROAD_E2S(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_E2S;
         this.south = dest;
     }
 
-    void set_CORNER_ROAD_N2W(verilogTownGridNode dest)
+    void set_CORNER_ROAD_N2W(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_N2W;
         this.west = dest;
     }
 
-    void set_CORNER_ROAD_S2W(verilogTownGridNode dest)
+    void set_CORNER_ROAD_S2W(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_S2W;
         this.west = dest;
     }
 
-    void set_CORNER_ROAD_E2N(verilogTownGridNode dest)
+    void set_CORNER_ROAD_E2N(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_E2N;
         this.north = dest;
     }
 
-    void set_CORNER_ROAD_S2E(verilogTownGridNode dest)
+    void set_CORNER_ROAD_S2E(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_S2E;
         this.east = dest;
     }
 
-    void set_CORNER_ROAD_W2N(verilogTownGridNode dest)
+    void set_CORNER_ROAD_W2N(VerilogTownGridNode dest)
     {
         this.grid_type = GridType.CORNER_ROAD_W2N;
         this.north = dest;
     }
 
     /* intersections with 2 options */
-    void set_INTER_TURN_S2WS(verilogTownGridNode dest1,
-            verilogTownGridNode dest2)
+    void set_INTER_TURN_S2WS(VerilogTownGridNode dest1,
+            VerilogTownGridNode dest2)
     {
         this.grid_type = GridType.INTER_TURN_S2WS;
         this.west = dest1;
         this.south = dest2;
     }
 
-    void set_INTER_TURN_N2EN(verilogTownGridNode dest1,
-            verilogTownGridNode dest2)
+    void set_INTER_TURN_N2EN(VerilogTownGridNode dest1,
+            VerilogTownGridNode dest2)
     {
         this.grid_type = GridType.INTER_TURN_N2EN;
         this.east = dest1;
         this.north = dest2;
     }
 
-    void set_INTER_TURN_E2SE(verilogTownGridNode dest1,
-            verilogTownGridNode dest2)
+    void set_INTER_TURN_E2SE(VerilogTownGridNode dest1,
+            VerilogTownGridNode dest2)
     {
         this.grid_type = GridType.INTER_TURN_E2SE;
         this.south = dest1;
         this.east = dest2;
     }
 
-    void set_INTER_TURN_W2NW(verilogTownGridNode dest1,
-            verilogTownGridNode dest2)
+    void set_INTER_TURN_W2NW(VerilogTownGridNode dest1,
+            VerilogTownGridNode dest2)
     {
         this.grid_type = GridType.INTER_TURN_W2NW;
         this.north = dest1;
@@ -224,22 +224,22 @@ public class verilogTownGridNode
     }
 
     /* grabing destinations */
-    verilogTownGridNode getNorth()
+    VerilogTownGridNode getNorth()
     {
         return this.north;
     }
 
-    verilogTownGridNode getSouth()
+    VerilogTownGridNode getSouth()
     {
         return this.south;
     }
 
-    verilogTownGridNode getEast()
+    VerilogTownGridNode getEast()
     {
         return this.east;
     }
 
-    verilogTownGridNode getWest()
+    VerilogTownGridNode getWest()
     {
         return this.west;
     }

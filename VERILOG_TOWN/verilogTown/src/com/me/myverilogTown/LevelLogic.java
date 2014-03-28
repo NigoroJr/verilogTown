@@ -83,7 +83,7 @@ public class LevelLogic
                 else if (cars[i].get_start_time() < time_step)
                 {
                     /* ELSE IF - Moving car then move to next spot */
-                    verilogTownGridNode spot;
+                    VerilogTownGridNode spot;
 
                     spot = cars[i].get_next_point_on_path();
 

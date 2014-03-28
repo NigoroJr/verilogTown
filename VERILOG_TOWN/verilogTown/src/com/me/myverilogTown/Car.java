@@ -11,17 +11,17 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Car
 {
-    private verilogTownGridNode start_point;
-    private verilogTownGridNode end_point;
-    private verilogTownGridNode current_point;
+    private VerilogTownGridNode start_point;
+    private VerilogTownGridNode end_point;
+    private VerilogTownGridNode current_point;
     private int start_time;
     private boolean is_crashed;
     private boolean is_done_path;
-    private verilogTownGridNode location;
+    private VerilogTownGridNode location;
     private int x;
     private int y;
-    private verilogTownGridNode next_spot;
-    private Stack<verilogTownGridNode> path;
+    private VerilogTownGridNode next_spot;
+    private Stack<VerilogTownGridNode> path;
 
     /* Necessary for displaying car */
     private Texture carTexture;
@@ -44,8 +44,8 @@ public class Car
     protected float speed;
     protected float rotation;
 
-    public Car(verilogTownGridNode start,
-            verilogTownGridNode end,
+    public Car(VerilogTownGridNode start,
+            VerilogTownGridNode end,
             int starting_time,
             VerilogTownMap level,
             Vector2 position,
@@ -196,7 +196,7 @@ public class Car
         bounds.y = position.y;
     }
 
-    public void set_current_point(verilogTownGridNode grid, VerilogTownMap level) {
+    public void set_current_point(VerilogTownGridNode grid, VerilogTownMap level) {
         this.current_point = grid;
         /* recalculate the path ... this might be computationaly expensive */
         this.path = level.findPath(grid, this.end_point);
@@ -207,19 +207,19 @@ public class Car
         }
     }
 
-    public verilogTownGridNode get_current_point() {
+    public VerilogTownGridNode get_current_point() {
         return this.current_point;
     }
 
-    public verilogTownGridNode get_start_point() {
+    public VerilogTownGridNode get_start_point() {
         return this.start_point;
     }
 
-    public verilogTownGridNode get_end_point() {
+    public VerilogTownGridNode get_end_point() {
         return this.end_point;
     }
 
-    public verilogTownGridNode get_next_point_on_path() {
+    public VerilogTownGridNode get_next_point_on_path() {
         return this.path.pop();
     }
 
