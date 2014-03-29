@@ -68,14 +68,20 @@ public class MapParser {
                 .getNamedItem("size_x").getTextContent());
         int mapSizeY = Integer.parseInt(map.getAttributes()
                 .getNamedItem("size_y").getTextContent());
-        gridArray = new GridNode[mapSizeX][mapSizeY];
+        grids = new GridNode[mapSizeX][mapSizeY];
 
+        // TODO: init() to NON_ROAD??
         readMap(map.getChildNodes());
 
+        // Relate nodes by setting destinations
+        for (int i = 0; i < grids.length; i++)
+            for (int j = 0; j < grids[0].length; j++)
+                setDestination(grids[i][j]);
+
         // DEBUG
-        for (int i = 0; i < gridArray.length; i++) {
-            for (int j = 0; j < gridArray[0].length; j++) {
-                System.out.print(gridArray[i][j].getX());
+        for (int i = 0; i < grids.length; i++) {
+            for (int j = 0; j < grids[0].length; j++) {
+                System.out.print(grids[i][j].getX());
             }
             System.out.println();
         }
@@ -107,6 +113,75 @@ public class MapParser {
                             new GridNode(x, y, getGridType(gridType));
                 }
             }
+        }
+    }
+
+    /**
+     * Sets the destination of the given node, according to its type. This
+     * method assumes that the grids array is populated with nodes read from the
+     * XML file.
+     * 
+     * @param node
+     *            Node to set the destination.
+     */
+    public void setDestination(GridNode node) {
+        int x = node.getX();
+        int y = node.getY();
+
+        // Grids other than END grids and intersections
+        switch (node.getType()) {
+            default:
+                break;
+            // Grids that go North
+            case START_SEDGE2N:
+            case STRAIGHT_ROAD_N2N:
+            case CORNER_ROAD_E2N:
+            case CORNER_ROAD_W2N:
+                node.setNorth(grids[x][y + 1]);
+                break;
+            // Grids that go South
+            case START_NEDGE2S:
+            case STRAIGHT_ROAD_S2S:
+            case CORNER_ROAD_W2S:
+            case CORNER_ROAD_E2S:
+                node.setSouth(grids[x][y - 1]);
+                break;
+            // Grids that go West
+            case START_EEDGE2W:
+            case STRAIGHT_ROAD_W2W:
+            case CORNER_ROAD_N2W:
+            case CORNER_ROAD_S2W:
+                node.setWest(grids[x - 1][y]);
+                break;
+            // Grids that go East
+            case START_WEDGE2E:
+            case STRAIGHT_ROAD_E2E:
+            case CORNER_ROAD_N2E:
+            case CORNER_ROAD_S2E:
+                node.setEast(grids[x + 1][y]);
+                break;
+        }
+
+        // Intersections have 2 possible destinations
+        switch (node.getType()) {
+            case INTER_TURN_S2WS:
+                node.setWest(grids[x - 1][y]);
+                node.setSouth(grids[x][y - 1]);
+                break;
+            case INTER_TURN_N2EN:
+                node.setEast(grids[x + 1][y]);
+                node.setNorth(grids[x][y + 1]);
+                break;
+            case INTER_TURN_E2SE:
+                node.setSouth(grids[x][y - 1]);
+                node.setEast(grids[x + 1][y]);
+                break;
+            case INTER_TURN_W2NW:
+                node.setNorth(grids[x][y + 1]);
+                node.setWest(grids[x - 1][y]);
+                break;
+            default:
+                break;
         }
     }
 
