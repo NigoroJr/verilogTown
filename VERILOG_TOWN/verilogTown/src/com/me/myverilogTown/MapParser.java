@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public class MapParser {
      */
     public static final String fileName = "../../samples/sample_map.xml";
 
-    private GridNode gridArray[][];
+    private GridNode grids[][];
 
     public MapParser() {
         this(fileName);
@@ -58,7 +57,6 @@ public class MapParser {
         doc.getDocumentElement().normalize();
 
         NodeList level = doc.getElementsByTagName("level");
-        // NodeList map = doc.getElementsByTagName("map");
         Node map = level.item(0).getChildNodes().item(1);
         Node car = level.item(0).getChildNodes().item(3);
 
@@ -88,7 +86,7 @@ public class MapParser {
 
             Node grid = map.item(i);
 
-            if (grid.getNodeType() == Node.TEXT_NODE)
+            if (grid.getNodeType() != Node.ELEMENT_NODE)
                 continue;
 
             int x = Integer.parseInt(grid.getAttributes()
@@ -105,7 +103,7 @@ public class MapParser {
                 if (type.getNodeType() == Node.ELEMENT_NODE) {
                     String gridType = type.getTextContent();
 
-                    gridArray[x][y] =
+                    grids[x][y] =
                             new GridNode(x, y, getGridType(gridType));
                 }
             }
@@ -213,6 +211,6 @@ public class MapParser {
     }
 
     public GridNode[][] getGridArray() {
-        return gridArray;
+        return grids;
     }
 }
