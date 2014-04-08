@@ -49,7 +49,7 @@ date
 ls -lh $back_dest
 
 # now copy to detination
-echo "cp $backup2_files1 $dest1"
+echo "cp $backup_files1 $dest1"
 `cp $backup_files1 $dest1`
 echo "cp $backup_files2 $dest2"
 `cp $backup_files2 $dest2`
