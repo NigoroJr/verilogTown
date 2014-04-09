@@ -1,4 +1,4 @@
-package com.me.myverilogTown;
+package com.me.myverilogtown;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;

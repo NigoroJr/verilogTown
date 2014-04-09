@@ -1,4 +1,4 @@
-package com.me.myverilogTown;
+package com.me.myverilogtown;
 
 import java.util.*;
 
@@ -28,6 +28,11 @@ public class LevelScreen implements Screen
 	private Car testCar;
 	private Sprite carSprite;
 	private Texture car_texture;
+	private Texture stop;
+	private Texture go;
+	private Texture go_forward;
+	private Texture go_right;
+	private Texture go_left;
 	int toggle;
 
 	float Time; // Game clock of passed time
@@ -55,8 +60,21 @@ public class LevelScreen implements Screen
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1280, 1280);
 
+		/* NOTE - for graphics "paint.net" pretty good.  Need to save as 8-bit png file */
+
 		car_texture = new Texture("data/CAR_BLUE_WHITE_STRIPE_SINGLE.png");
 		car_texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		/* get all the textures for the lights */
+		stop = new Texture("data/stop_tran.png");
+		stop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go = new Texture("data/go_tran.png");
+		go.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go_forward = new Texture("data/go_forward_tran.png");
+		go_forward.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go_right = new Texture("data/go_right_tran.png");
+		go_right.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go_left = new Texture("data/go_left_tran.png");
+		go_left.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 	//	testCar = new Car(new Vector2(640,640), 64, 64, 0, 100f, tmp);
 
 		/* after reading the number of cars from level */
@@ -113,6 +131,8 @@ public class LevelScreen implements Screen
 				cars[i].getCarSprite().draw(thebatch);
 			}
 		}
+
+		clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
 		thebatch.end();
 	}
 

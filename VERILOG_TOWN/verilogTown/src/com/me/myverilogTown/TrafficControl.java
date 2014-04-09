@@ -1,6 +1,11 @@
-package com.me.myverilogTown;
+package com.me.myverilogtown;
 
 import java.util.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class TrafficControl 
 {
@@ -24,6 +29,64 @@ public class TrafficControl
 		{
 			traffic_corners[i] = null;
 			signal_directions[i] = TrafficSignal.STOP;
+		}
+	}
+
+	public void render_signal(TrafficSignal signal, verilogTownGridNode grid, float rot, SpriteBatch batch, Texture stop, Texture go, Texture left, Texture right, Texture forward)
+	{
+		// draw(texture, x, y, origin to rotate around x, origin to rotate around y, size of texture x, size of tecture y, scale, scale, rotate, bottom part of texture x, bottom part of texture y, top of texture x, top of texture y, flip x boolean, flip y boolean)
+		if (signal == TrafficSignal.STOP)
+		{
+			batch.draw(stop, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 0.7f, 0.7f, rot, 0, 0, 64, 64, false, false);
+		}
+		else if (signal == TrafficSignal.GO)
+		{
+			batch.draw(go, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
+		}
+		else if (signal == TrafficSignal.GO_FORWARD)
+		{
+			batch.draw(forward, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
+		}
+		else if (signal == TrafficSignal.GO_LEFT)
+		{
+			batch.draw(left, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
+		}
+		else if (signal == TrafficSignal.GO_RIGHT)
+		{
+			batch.draw(right, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
+		}
+	}
+
+	public float rotate(int dir)
+	{
+		if (dir == NN)
+		{
+			return 0.0f;
+		}
+		else if (dir == NS)
+		{
+			return 180.0f;
+		}
+		else if (dir == NE)
+		{
+			return 90.0f;
+		}
+		else if (dir == NW)
+		{
+			return 270.0f;
+		}
+
+		return -45.0f;
+	}
+
+	public void render_traffic_signal(SpriteBatch batch, Texture stop, Texture go, Texture left, Texture right, Texture forward)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (traffic_corners[i] != null)
+			{
+				render_signal(signal_directions[i], traffic_corners[i], this.rotate(i), batch, stop, go, left, right, forward);
+			}
 		}
 	}
 	

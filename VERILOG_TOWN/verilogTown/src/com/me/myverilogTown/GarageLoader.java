@@ -1,4 +1,4 @@
-package com.me.myverilogTown;
+package com.me.myverilogtown;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class GarageLoader {
 	
-	private Car[] garage;
+/*	private Car[] garage;
 	private Sprite[] graphicsGarage;
 	
 	public GarageLoader(LevelLogic logic){
@@ -33,5 +33,5 @@ public class GarageLoader {
 	public void setGraphicsGarage(Sprite[] graphicsGarage) {
 		this.graphicsGarage = graphicsGarage;
 	}
-
+*/
 }

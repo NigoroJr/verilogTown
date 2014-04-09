@@ -1,7 +1,11 @@
-package com.me.myverilogTown;
+package com.me.myverilogtown;
 
 import java.util.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class verilogTownMap 
 {
@@ -274,6 +278,15 @@ public class verilogTownMap
 			Gdx.app.log("verilogTownMap-Traffic Light", " N="+ traffic_signals[i].get_signal(0) +" S="+ traffic_signals[i].get_signal(1) +" E="+ traffic_signals[i].get_signal(2) +" W="+ traffic_signals[i].get_signal(3));
 		}
 	}
+
+	void render_traffic_signal_lights(SpriteBatch batch, Texture stop, Texture go, Texture left, Texture right, Texture forward)
+	{
+		for (int i = 0; i < this.num_traffic_signals; i++)
+		{
+			this.traffic_signals[i].render_traffic_signal(batch, stop, go, left, right, forward);
+		}
+	}
+
 	/* hard code initialization of firt_map.png */
 	void verilogTownMapHardCode_first_map()
 	{

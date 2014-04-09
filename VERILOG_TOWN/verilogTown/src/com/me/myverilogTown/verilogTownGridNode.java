@@ -1,4 +1,4 @@
-package com.me.myverilogTown;
+package com.me.myverilogtown;
 
 public class verilogTownGridNode 
 {
