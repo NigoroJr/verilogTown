@@ -36,6 +36,8 @@ public class LevelScreen implements Screen
 	int toggle;
 
 	float Time; // Game clock of passed time
+	float Frame_Time_25; // amount of time for 25FPS
+	float Next_Frame_Time; 
 
 	private verilogTownMap clevel;
 
@@ -82,34 +84,51 @@ public class LevelScreen implements Screen
 		cars = new Car[num_cars];
 
 		/* initialize cars */
-		cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][22], 1, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][22], 1, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][22], 1, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 2, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 2, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 2, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 3, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 3, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 4, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
-		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 4, clevel,new Vector2(640,640), 64, 64, 0, 100f, car_texture);
+		cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][22], 10, clevel, 0, 0, 64, 64, 0, 4, car_texture);
+		cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 2000, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 300, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 400, clevel,0, 0, 64, 64, 0, 4, car_texture);
 
 		/* initialize the level logic control */
 		levelLogic = new LevelLogic();
 
 		/* initialize the time */
 		Time = 0f;
+		Frame_Time_25 = 1/25;
+		Next_Frame_Time = 0f;
 	}
 
+	
 	@Override
 	public void render(float delta) 
 	{
+		boolean fps_tick = false;
+
 		// prints out delta time	Gdx.app.log("Time:", "="+ Time);
 		Time += Gdx.graphics.getDeltaTime();
+		Next_Frame_Time += Gdx.graphics.getDeltaTime();
+
+		if (Next_Frame_Time >= Frame_Time_25)
+		{
+			Next_Frame_Time = Next_Frame_Time - Frame_Time_25;
+			fps_tick = true;
+		}
 
 		// Simulation step alternate left and right 
 		if((Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && toggle == 1) || Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && toggle == 0) 
 		{
 			toggle = (toggle+1) % 2;
+	//		Gdx.app.log("Time Since last simulation:", "="+ Time);
+	//		levelLogic.update(this.cars, this.num_cars, clevel);
+		}
+		if (fps_tick = true && toggle == 1)
+		{
 			Gdx.app.log("Time Since last simulation:", "="+ Time);
 			levelLogic.update(this.cars, this.num_cars, clevel);
 		}
@@ -126,7 +145,7 @@ public class LevelScreen implements Screen
 		{
 			if (cars[i].get_is_start_path() && !cars[i].get_is_done_path())
 			{
-				cars[i].getCarSprite().setPosition((cars[i].get_current_point().get_x()-1)*64, (cars[i].get_current_point().get_y()-1)*64);
+				cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
 				cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
 				cars[i].getCarSprite().draw(thebatch);
 			}

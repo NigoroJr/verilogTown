@@ -32,28 +32,25 @@ public class Car
 	private Texture carTexture;
 	private Sprite carSprite;
 	
-	/* Animations for crashed states */
-	private Animation crashedRight;
-	private Animation crashedLeft;
-	private Animation crashedUp;
-	private Animation crashedDown;
-
 	/* Necessary variables for proper rendering of car sprites */
-	protected Vector2 position;
+	protected float position_x;
+	protected float position_y;
 	protected float width;
 	protected float height;
 	protected float xScale;
 	protected float yScale;
-	protected Rectangle bounds;
-	protected Vector2 velocity;
 	protected float speed;
 	protected float rotation;
+	protected CarAnimateStates animate_state;
+	private boolean at_signal;
+	private Direction animation_direction;
 
 	public Car(verilogTownGridNode start, 
 				verilogTownGridNode end, 
 				int starting_time, 
 				verilogTownMap level,
-				Vector2 position, 
+				int position_x, 
+				int position_y, 
 				float width, 
 				float height, 
 				float rotation,
@@ -66,6 +63,7 @@ public class Car
 		this.current_point = null;
 		this.way_point = null;
 		this.direction = null;
+		this.animation_direction = null;
 		this.success_getting_to_end_point = true;
 		this.is_crashed = false;
 		this.is_done_path = false;
@@ -73,118 +71,86 @@ public class Car
 		this.is_processed = false;
 		this.start_time = starting_time;
 
-		this.position = position;
+		this.position_x = position_x;
+		this.position_y = position_y;
 		this.width = width;
 		this.height = height;
-		this.speed = speed;
+		this.speed = speed; // at 25fps, 8pixels/frame = ~ 20mph
 		this.rotation = rotation;
-		velocity = new Vector2(0, 0);
 		this.xScale = 1;
 		this.yScale = 1;
 		this.carTexture = texture;
+		this.animate_state = CarAnimateStates.STOPPED;
+		this.at_signal = false;
+
 		carSprite = new Sprite(texture);
-		carSprite.setPosition(position.x, position.y);
+		carSprite.setPosition(this.position_x, this.position_y);
 		carSprite.setSize(width, height);
 	}
 	
-	/* For graphics rendering, could be merged with the constructor above */
-	public Car(Vector2 position, float width, float height, float rotation,
-			float speed, Texture texture)
+	public float getPosition_x() 
 	{
-		this.position = position;
-		this.width = width;
-		this.height = height;
-		this.speed = speed;
-		this.rotation = rotation;
-		velocity = new Vector2(0, 0);
-		this.xScale = 1;
-		this.yScale = 1;
-		this.carTexture = texture;
-		carSprite = new Sprite(texture);
-		carSprite.setPosition(position.x, position.y);
-		carSprite.setSize(width, height);
+		return position_x;
+	}
+	public float getPosition_y() 
+	{
+		return position_y;
 	}
 	
-	/**
-	 * @return the position
-	 */
-	public Vector2 getPosition() {
-		return position;
-	}
-	
-	/**
-	 * @param position the position to set
-	 */
-	public void setPosition(Vector2 position) {
-		this.position = position;
-	}
-	
-	public Sprite getCarSprite() {
+	public Sprite getCarSprite() 
+	{
 		return carSprite;
 	}
 
-	public void setCarSprite(Sprite carSprite) {
+	public void setCarSprite(Sprite carSprite) 
+	{
 		this.carSprite = carSprite;
 	}
 
 	/**
 	 * @return the width
 	 */
-	public float getWidth() {
+	public float getWidth() 
+	{
 		return width;
 	}
 	
 	/**
 	 * @param width the width to set
 	 */
-	public void setWidth(float width) {
+	public void setWidth(float width) 
+	{
 		this.width = width;
 	}
 	
 	/**
 	 * @return the height
 	 */
-	public float getHeight() {
+	public float getHeight() 
+	{
 		return height;
 	}
 	
 	/**
 	 * @param height the height to set
 	 */
-	public void setHeight(float height) {
+	public void setHeight(float height) 
+	{
 		this.height = height;
 	}
 	
-	/**
-	 * @return the bounds
-	 */
-	public Rectangle getBounds() {
-		return bounds;
-	}
-	
-	/**
-	 * @param bounds the bounds to set
-	 */
-	public void setBounds(Rectangle bounds) {
-		this.bounds = bounds;
-	}
-	public Vector2 getVelocity(){
-		return velocity;
-	}
-	
-	public void setVelocity(Vector2 velocity){
-		this.velocity = velocity;
-	}
-	
-	public float getRotation(){
+	public float getRotation()
+	{
 		return rotation;
 	}
 	
-	public void setRotation(float rotation){
+	public void setRotation(float rotation)
+	{
 		this.rotation = rotation;
 	}
 
-	public float set_and_get_rotation_based_on_direction(){
+	public float set_and_get_rotation_based_on_direction()
+	{
 		if (this.direction == Direction.N)
 			this.rotation = 90;
 		else if (this.direction == Direction.S)
@@ -196,27 +162,90 @@ public class Car
 		return this.rotation;
 	}
 	
-	public float getxScale() {
+	public float getxScale() 
+	{
 		return xScale;
 	}
 
-	public void setxScale(float xScale) {
+	public void setxScale(float xScale) 
+	{
 		this.xScale = xScale;
 	}
 
-	public float getyScale() {
+	public float getyScale() 
+	{
 		return yScale;
 	}
 
-	public void setyScale(float yScale) {
+	public void setyScale(float yScale) 
+	{
 		this.yScale = yScale;
 	}
 
-	public void update(Car car){
-		bounds.x = position.x;
-		bounds.y = position.y;
-	}
 
+	public void animation_direction(verilogTownGridNode from, verilogTownGridNode to)
+	{
+		GridType grid_type_to;
+		GridType grid_type_from;
+		grid_type_to = to.get_grid_type();
+
+		if (from == null) // starting move
+		{
+			if (grid_type_to == GridType.START_NEDGE2S)
+			{
+				this.animation_direction = Direction.S;
+			}
+			else if (grid_type_to == GridType.START_SEDGE2N)
+			{
+				this.animation_direction = Direction.N;
+			}
+			else if (grid_type_to == GridType.START_EEDGE2W)
+			{
+				this.animation_direction = Direction.W;
+			}
+			else if (grid_type_to == GridType.START_WEDGE2E)
+			{
+				this.animation_direction = Direction.E;
+			}
+		}
+		else
+		{
+			grid_type_from = from.get_grid_type();
+			/* corner conditions */
+			if (grid_type_from == GridType.CORNER_ROAD_W2S || grid_type_from == GridType.CORNER_ROAD_E2S)
+			{
+				this.animation_direction = Direction.S;
+			}
+			else if (grid_type_from == GridType.CORNER_ROAD_N2E || grid_type_from == GridType.CORNER_ROAD_S2E)
+			{
+				this.animation_direction = Direction.E;
+			}
+			else if (grid_type_from == GridType.CORNER_ROAD_N2W || grid_type_from == GridType.CORNER_ROAD_S2W)
+			{
+				this.animation_direction = Direction.W;
+			}
+			else if (grid_type_from == GridType.CORNER_ROAD_E2N || grid_type_from == GridType.CORNER_ROAD_W2N)
+			{
+				this.animation_direction = Direction.N;
+			}
+			else if (to.get_x() > from.get_x())
+			{
+				this.animation_direction = Direction.E;
+			}
+			else if (to.get_x() < from.get_x())
+			{
+				this.animation_direction = Direction.W;
+			}
+			else if (to.get_y() > from.get_y())
+			{
+				this.animation_direction = Direction.N;
+			}
+			else if (to.get_y() < from.get_y())
+			{
+				this.animation_direction = Direction.S;
+			}
+		}
+	}
 	public void set_car_direction(verilogTownGridNode from, verilogTownGridNode to)
 	{
 		GridType grid_type;
@@ -278,18 +307,23 @@ public class Car
 
 	public void set_current_point_end(verilogTownGridNode from, verilogTownGridNode to) 
 	{
-		/* update which direction the car will now be going */
-		set_car_direction(from, to);
-		/* store the car in the grid details */
 		from.set_car(null);
-
+		to.set_car(null);
 		this.current_point = to;
+	}
+
+	public boolean at_signal_check()
+	{
+		return at_signal;
 	}
 
 	public void set_current_point(verilogTownGridNode from, verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
 	{
 		/* update which direction the car will now be going */
 		set_car_direction(from, to);
+
+		/* set the at signal check */
+		at_signal = true;
 
 		this.current_point = to;
 		/* store the car in the grid details */
@@ -299,6 +333,28 @@ public class Car
 		}
 		to.set_car(this);
 
+		/* check if car made it */
+		if (to == this.get_end_point())
+		{
+			Gdx.app.log("Car", "done");
+			this.set_current_point_end(from, to);
+			this.set_is_done_path();
+		}
+		else if (
+				to.get_grid_type() == GridType.END_S2SEDGE ||
+				to.get_grid_type() == GridType.END_N2NEDGE ||
+				to.get_grid_type() == GridType.END_E2EEDGE ||
+				to.get_grid_type() == GridType.END_W2WEDGE)
+		{
+			/* Failed path */
+			Gdx.app.log("Car", "failed done");
+			this.set_current_point_end(from, to);
+			this.set_is_done_path();
+		}
+	}
+		
+	public void set_path(verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
+	{
 		/* update the path - some paths have way_points because of forced turns */
 		if (via_point == null && this.way_point == null)
 		{
@@ -309,11 +365,11 @@ public class Car
 		else 
 		{
 			Gdx.app.log("Car", "in here!!!!");
-
+	
 			if (this.way_point == to)
 			{
 				this.way_point = null;
-
+	
 				this.path = level.findPath(null, to, this.end_point, this);
 			}
 			else if (via_point != null)
@@ -329,6 +385,43 @@ public class Car
 				this.path = level.findPath(this.path, to, this.way_point, this);
 			}
 		}
+	}
+
+	public boolean at_next_grid()
+	{
+		return (this.position_x%64==0 && this.position_y%64==0);
+	}
+
+	public void set_animate_start()
+	{
+		this.position_x = (this.get_current_point().get_x()-1)*64;
+		this.position_y = (this.get_current_point().get_y()-1)*64;
+	}
+
+	public void animate_car()
+	{		
+		if (this.animate_state == CarAnimateStates.MOVING)
+		{
+			if (this.animation_direction == Direction.N)
+				this.position_y += this.speed;	
+			else if (this.animation_direction == Direction.S)
+				this.position_y -= this.speed;	
+			else if (this.animation_direction == Direction.E)
+				this.position_x += this.speed;	
+			else if (this.animation_direction == Direction.W)
+				this.position_x -= this.speed;	
+
+			this.animate_state = CarAnimateStates.MOVED;
+			Gdx.app.log("Car ", "ax="+ this.position_x+" ay="+this.position_y);
+		}
+	}
+	public void set_animate_state(CarAnimateStates state)
+	{
+		this.animate_state = state;
+	}
+	public CarAnimateStates get_animate_state()
+	{
+		return this.animate_state;
 	}
 
 	public verilogTownGridNode get_current_point() {
@@ -373,9 +466,20 @@ public class Car
 		return this.is_start_path;
 	}
 
-	public void set_processed(boolean value) {
+	public void set_processed(boolean value) 
+	{
 		this.is_processed = value;
 	}
+	public void reset_states()
+	{
+		this.set_processed(false);	
+
+		if (this.animate_state == CarAnimateStates.MOVED)
+		{
+			this.animate_state = CarAnimateStates.MOVING;
+		}
+	}
+
 	public boolean get_processed() {
 		return this.is_processed;
 	}

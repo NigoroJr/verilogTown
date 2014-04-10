@@ -651,7 +651,7 @@ public class verilogTownMap
 		else if (which == 23)
 			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
 		else if (which == 24)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO_LEFT, TrafficSignal.GO, TrafficSignal.STOP);
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO);
 		else if (which == 25)
 			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
 		else if (which == 26)
