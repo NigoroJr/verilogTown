@@ -5,6 +5,7 @@ import java.util.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -31,6 +32,7 @@ public class Car
 	/* Necessary for displaying car */
 	private Texture carTexture;
 	private Sprite carSprite;
+	private Sprite crashSprite;
 	
 	/* Necessary variables for proper rendering of car sprites */
 	protected float position_x;
@@ -55,7 +57,8 @@ public class Car
 				float height, 
 				float rotation,
 				float speed,
-				Texture texture)
+				Texture texture,
+				Random rand)
 	{
 		// how do I assert(start >= 1)
 		this.start_point = start;
@@ -83,9 +86,24 @@ public class Car
 		this.animate_state = CarAnimateStates.STOPPED;
 		this.at_signal = false;
 
-		carSprite = new Sprite(texture);
+		TextureRegion[] carFrames; 
+		TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth()/2, texture.getHeight()/2);
+		carFrames = new TextureRegion[2 * 2];
+		int index = 0;
+		for (int i = 0; i < 2; i++)
+	       	{
+			for (int j = 0; j < 2; j++) 
+			{
+				carFrames[index++] = tmp[i][j];
+			}
+		}
+
+		carSprite = new Sprite(carFrames[rand.nextInt(3)]);
 		carSprite.setPosition(this.position_x, this.position_y);
 		carSprite.setSize(width, height);
+
+		crashSprite = new Sprite(carFrames[3]); // crash sprite is last
+		crashSprite.setSize(width, height);
 	}
 	
 	public float getPosition_x() 
@@ -336,7 +354,7 @@ public class Car
 		/* check if car made it */
 		if (to == this.get_end_point())
 		{
-			Gdx.app.log("Car", "done");
+			Gdx.app.log("Car", "success done");
 			this.set_current_point_end(from, to);
 			this.set_is_done_path();
 		}
@@ -351,6 +369,18 @@ public class Car
 			this.set_current_point_end(from, to);
 			this.set_is_done_path();
 		}
+	}
+
+	public void crashed()
+	{
+		verilogTownGridNode crash_point = this.get_current_point();
+
+		Gdx.app.log("Car", "crash done");
+		crash_point.set_car(null);
+		this.set_is_crashed();
+		this.set_is_done_path();
+
+		carSprite = crashSprite;
 	}
 		
 	public void set_path(verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
@@ -412,7 +442,7 @@ public class Car
 				this.position_x -= this.speed;	
 
 			this.animate_state = CarAnimateStates.MOVED;
-			Gdx.app.log("Car ", "ax="+ this.position_x+" ay="+this.position_y);
+			Gdx.app.log("Car ", "x="+this.current_point.get_x()+ " y="+this.current_point.get_y()+" ax="+ this.position_x+" ay="+this.position_y);
 		}
 	}
 	public void set_animate_state(CarAnimateStates state)
@@ -455,7 +485,6 @@ public class Car
 		this.is_crashed = true;
 	}
 	public boolean get_is_crashed() {
-		this.current_point = null;
 		return this.is_crashed;
 	}
 

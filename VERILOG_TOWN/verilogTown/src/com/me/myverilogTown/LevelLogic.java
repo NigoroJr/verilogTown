@@ -10,22 +10,20 @@ public class LevelLogic
 {
 	private int time_step;
 	Queue<Integer> car_processing_q;
-	Random randomno;
-	
 	
 	public LevelLogic()
 	{
 
 		/* init a simple time step where a unit is the maximum time it takes a car's front to travel through a grid point */
 		time_step = 0;
-		randomno = new Random(2);
 
 		car_processing_q = new LinkedList<Integer>();
 	}
 
-	public void update(Car cars[], int num_cars, verilogTownMap clevel)
+	public boolean update(Car cars[], int num_cars, verilogTownMap clevel, Random randomno)
 	{
-		int last_added_back = -1;
+		int count_cars_done = 0;
+
 		/* increment time */
 		time_step ++;
 
@@ -33,11 +31,12 @@ public class LevelLogic
 		{
 			for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
 			{
-				clevel.cycle_signal_3(i, randomno.nextInt(32)); // Random all signals randoms
+				clevel.crash_signal(i, randomno.nextInt(4)); // Trying to cause crashes
+				//clevel.cycle_signal_3(i, randomno.nextInt(32)); // Random all signals randoms
 				//clevel.cycle_signal_2(i, randomno.nextInt(16)); // Random all signals one at a time
 				//clevel.cycle_signal(i, randomno.nextInt(4)); // All GO
 			}
-			clevel.display_traffic_lights();
+			//clevel.display_traffic_lights();
 		}
 	
 		/* load up a queue with indices so we can process in priority.  Basically, if a car has another car in front we delay the processing */
@@ -70,7 +69,6 @@ public class LevelLogic
 
 					Gdx.app.log("LevelLogic", "Car="+ car_index);
 
-					/* update that it's reached the next spot */
 					if (!(cars[car_index].get_animate_state() == CarAnimateStates.STOPPED || cars[car_index].get_animate_state() == CarAnimateStates.STOP_FOR_CAR))
 					{
 						update_spot(cars[car_index], cars[car_index].get_current_point(), clevel);
@@ -128,12 +126,20 @@ public class LevelLogic
 				{
 					Gdx.app.log("LevelLogic", "Added back="+car_index);
 					car_processing_q.add(car_index);
-
-					while (last_added_back == car_index);
-					last_added_back = car_index;
 				}
 			}
+			else
+			{
+				count_cars_done++;
+			}
 		}
+		
+		if (count_cars_done == num_cars)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	private void update_spot(Car the_car, verilogTownGridNode current_spot, verilogTownMap clevel)
@@ -178,6 +184,7 @@ public class LevelLogic
 		if (turn_via_point == null)
 		{
 			Gdx.app.log("LevelLogic", "Thinks it's an illegal turn");
+			the_car.set_animate_state(CarAnimateStates.STOPPED);
 			the_car.set_processed(true);
 		}
 		else
@@ -271,7 +278,8 @@ public class LevelLogic
 					/* ELSE - crash!!! */
 					Gdx.app.log("LevelLogic", "CRASH!!!");
 					/* If only animate put next spot back on stack */
-					the_car.set_current_point(current_spot, next_spot, null, clevel);
+					the_car.crashed();
+					car_in_front.crashed();
 
 					the_car.set_processed(true);
 					return true;

@@ -526,7 +526,7 @@ public class verilogTownMap
 		this.grid[3][3].set_STRAIGHT_ROAD_E2E(this.grid[4][3]);
 		this.grid[4][3].set_STRAIGHT_ROAD_E2E(this.grid[5][3]);
 		this.grid[5][3].set_STRAIGHT_ROAD_E2E(this.grid[6][3]);
-		this.grid[6][3].set_INTER_TURN_E2SE(this.grid[6][2], this.grid[7][2]);
+		this.grid[6][3].set_INTER_TURN_E2SE(this.grid[6][2], this.grid[7][3]);
 		this.grid[7][3].set_INTER_TURN_N2EN(this.grid[8][3], this.grid[7][4]);
 		this.grid[8][3].set_STRAIGHT_ROAD_E2E(this.grid[9][3]);
 		this.grid[9][3].set_STRAIGHT_ROAD_E2E(this.grid[10][3]);
@@ -565,6 +565,17 @@ public class verilogTownMap
 			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO);
 	}
 
+	void crash_signal(int light_index, int which)
+	{
+		if (which == 0)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.STOP);
+		else if (which == 1)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO);
+		else if (which == 2)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO);
+		else if (which == 3)
+			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO);
+	}
 	void cycle_signal_2(int light_index, int which)
 	{
 		if (which == 0)

@@ -25,7 +25,6 @@ public class LevelScreen implements Screen
 	private Texture level_map;
 	private SpriteBatch thebatch;
 	private LevelLogic levelLogic;
-	private Car testCar;
 	private Sprite carSprite;
 	private Texture car_texture;
 	private Texture stop;
@@ -34,18 +33,22 @@ public class LevelScreen implements Screen
 	private Texture go_right;
 	private Texture go_left;
 	int toggle;
+	Random random_number;
 
 	float Time; // Game clock of passed time
 	float Frame_Time_25; // amount of time for 25FPS
 	float Next_Frame_Time; 
 
 	private verilogTownMap clevel;
+	private boolean level_done;
 
 	public LevelScreen(final verilogTown gam) 
 	{
 		toggle = 0;
 
 		this.game = gam;
+		this.level_done = false;
+		this.random_number = new Random(3);
 
 		/* init current level map data structure */
 		this.clevel = new verilogTownMap(20, 21); // firts_map
@@ -55,8 +58,7 @@ public class LevelScreen implements Screen
 
 		thebatch = new SpriteBatch();
 		/* initialize the map */
-		// Josh's level_map = new Texture("asset_resources/tiled_maps/first_map.png");
-		level_map = new Texture("data/first_map.png"); // mine
+		level_map = new Texture("data/first_map.png"); 
 
 		// create the camera for the SpriteBatch
 		camera = new OrthographicCamera();
@@ -64,8 +66,9 @@ public class LevelScreen implements Screen
 
 		/* NOTE - for graphics "paint.net" pretty good.  Need to save as 8-bit png file */
 
-		car_texture = new Texture("data/CAR_BLUE_WHITE_STRIPE_SINGLE.png");
+		car_texture = new Texture("data/car_sheet.png");
 		car_texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
 		/* get all the textures for the lights */
 		stop = new Texture("data/stop_tran.png");
 		stop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -77,23 +80,22 @@ public class LevelScreen implements Screen
 		go_right.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go_left = new Texture("data/go_left_tran.png");
 		go_left.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-	//	testCar = new Car(new Vector2(640,640), 64, 64, 0, 100f, tmp);
 
 		/* after reading the number of cars from level */
 		num_cars = 10; // hard coded
 		cars = new Car[num_cars];
 
 		/* initialize cars */
-		cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][22], 10, clevel, 0, 0, 64, 64, 0, 4, car_texture);
-		cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 2000, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 300, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_texture);
-		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 400, clevel,0, 0, 64, 64, 0, 4, car_texture);
+		cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][22], 100, clevel, 0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 
 		/* initialize the level logic control */
 		levelLogic = new LevelLogic();
@@ -104,13 +106,11 @@ public class LevelScreen implements Screen
 		Next_Frame_Time = 0f;
 	}
 
-	
 	@Override
 	public void render(float delta) 
 	{
 		boolean fps_tick = false;
 
-		// prints out delta time	Gdx.app.log("Time:", "="+ Time);
 		Time += Gdx.graphics.getDeltaTime();
 		Next_Frame_Time += Gdx.graphics.getDeltaTime();
 
@@ -121,16 +121,18 @@ public class LevelScreen implements Screen
 		}
 
 		// Simulation step alternate left and right 
-		if((Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && toggle == 1) || Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && toggle == 0) 
+		if((Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && toggle == 1) || (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && toggle == 0)) 
 		{
 			toggle = (toggle+1) % 2;
-	//		Gdx.app.log("Time Since last simulation:", "="+ Time);
-	//		levelLogic.update(this.cars, this.num_cars, clevel);
 		}
-		if (fps_tick = true && toggle == 1)
+		if (fps_tick = true && toggle == 1 && this.level_done == false)
 		{
 			Gdx.app.log("Time Since last simulation:", "="+ Time);
-			levelLogic.update(this.cars, this.num_cars, clevel);
+			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number);
+		}
+		else if (this.level_done == true)
+		{
+
 		}
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -139,20 +141,43 @@ public class LevelScreen implements Screen
 		// tell the camera to update its matrices.
 		camera.update();
 
-		thebatch.begin();
-		thebatch.draw(level_map, 0, 0);
-		for (int i = 0; i < num_cars; i++)
+		if (this.level_done == true)
 		{
-			if (cars[i].get_is_start_path() && !cars[i].get_is_done_path())
+			thebatch.begin();
+			thebatch.draw(level_map, 0, 0);
+			for (int i = 0; i < num_cars; i++)
 			{
-				cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
-				cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
-				cars[i].getCarSprite().draw(thebatch);
+				if ((cars[i].get_is_start_path() && !cars[i].get_is_done_path()) || cars[i].get_is_crashed())
+				{
+					cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
+					cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
+					cars[i].getCarSprite().draw(thebatch);
+				}
 			}
-		}
+	
+			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			this.game.font.draw(thebatch, "Level Done", 100, 150);
+			this.game.font.draw(thebatch, "Score", 100, 100);
 
-		clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
-		thebatch.end();
+			thebatch.end();
+		}
+		else
+		{
+			thebatch.begin();
+			thebatch.draw(level_map, 0, 0);
+			for (int i = 0; i < num_cars; i++)
+			{
+				if ((cars[i].get_is_start_path() && !cars[i].get_is_done_path()) || cars[i].get_is_crashed())
+				{
+					cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
+					cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
+					cars[i].getCarSprite().draw(thebatch);
+				}
+			}
+	
+			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			thebatch.end();
+		}
 	}
 
 	@Override
@@ -184,11 +209,6 @@ public class LevelScreen implements Screen
 	public void dispose() 
 	{
 
-	}
-
-	public Car getCar() {
-		return testCar;
-		// TODO Auto-generated method stub
 	}
 }
 
