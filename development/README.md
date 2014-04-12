@@ -1,10 +1,12 @@
 # Setup guide
 
 ## Background info
-We were first importing the Git repository that we cloned, but it turned out
-that there were some issues setting up our individual environment. So as a
-workaround, we decided to create our own libgdx project in a separate place
-and then copy the source codes/resources TO that project.
+We were first directly importing the Git repository that we cloned, but there
+were some issues with build path due to different classpaths. Thus, an
+approach to first create a project in a temporary directory using the setup
+UI and then copy the libraries and the .classpath file was taken instead.
+`copy_project.pl` in this directory can be used to do this for Perl v5.14 and
+up.
 
 ## Required software/plugins
 * JDK 1.7.0 or later (Google Plugin for Eclipse supports only >1.7.0)
@@ -26,8 +28,10 @@ to create a new project with the following properties:
 * Package: `com.me.myverilogTown`
 * Game class: `verilogTown` (need confirmation)
 * Uncheck `Generate iOS project`
+* Location: whereever you want
 
-Use the shell script to copy source codes into the project you just created.
+Use `copy_project.pl` to copy the libraries and .classpath files to the local
+repository.
 
 Note that the fixing the GWT error part in the page above only works if you
 have GWT Designer installed.
@@ -35,16 +39,3 @@ have GWT Designer installed.
 ## Error regarding GWT
 Refer to
 [http://stackoverflow.com/questions/16699301/unresolved-gwt-error-in-libgdx-html-project](http://stackoverflow.com/questions/16699301/unresolved-gwt-error-in-libgdx-html-project)
-
-## Other issues
-It seems like you cannot start the setup UI with `java -jar gdx-setup-ui.jar`
-if you're using JDK 7. Couldn't start on Gentoo Linux with:
-
-    java version "1.7.0_45"
-    OpenJDK Runtime Environment (IcedTea 2.4.3) (Gentoo build 1.7.0_45-b31)
-    OpenJDK 64-Bit Server VM (build 24.45-b08, mixed mode)
-
-Changing the java version can be done with
-
-    sudo java-config --set-system-vm icedtea-bin-6
-
