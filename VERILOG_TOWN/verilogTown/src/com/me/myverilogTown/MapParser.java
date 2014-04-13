@@ -25,7 +25,7 @@ public class MapParser {
      * |
      * +-- ...
      */
-    public static final String fileName = "../../samples/sample_map.xml";
+    public static final String fileName = "../../samples/first_map.xml";
 
     private GridNode grids[][];
 
@@ -58,7 +58,8 @@ public class MapParser {
 
         NodeList level = doc.getElementsByTagName("level");
         Node map = level.item(0).getChildNodes().item(1);
-        Node car = level.item(0).getChildNodes().item(3);
+        Node intersection = level.item(0).getChildNodes().item(3);
+        Node car = level.item(0).getChildNodes().item(5);
 
         int levelNum = Integer.parseInt(level.item(0).getAttributes()
                 .getNamedItem("lv").getTextContent());
@@ -79,9 +80,9 @@ public class MapParser {
                 setDestination(grids[i][j]);
 
         // DEBUG
-        for (int i = 0; i < grids.length; i++) {
-            for (int j = 0; j < grids[0].length; j++) {
-                System.out.print(grids[i][j].getX());
+        for (int j = 0; j < grids[0].length; j++) {
+            for (int i = 0; i < grids.length; i++) {
+                System.out.print(grids[i][j].getType().toString().substring(0, 1));
             }
             System.out.println();
         }

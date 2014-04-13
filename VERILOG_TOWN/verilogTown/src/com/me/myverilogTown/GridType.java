@@ -13,6 +13,7 @@ public enum GridType
     END_W2WEDGE,
     END_E2EEDGE,
 
+    // Read STRAIGHT_ROAD_W2W as "enter facing west, exit facing went"
     STRAIGHT_ROAD_N2N,
     STRAIGHT_ROAD_S2S,
     STRAIGHT_ROAD_E2E,
