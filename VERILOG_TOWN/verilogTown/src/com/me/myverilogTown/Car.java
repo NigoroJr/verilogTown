@@ -12,21 +12,21 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Car
 {
-	private verilogTownGridNode start_point;
-	private verilogTownGridNode end_point;
-	private verilogTownGridNode current_point;
-	private verilogTownGridNode way_point;
+	private GridNode start_point;
+	private GridNode end_point;
+	private GridNode current_point;
+	private GridNode way_point;
 	private int start_time;
 	private boolean success_getting_to_end_point;
 	private boolean is_crashed;
 	private boolean is_done_path;
 	private boolean is_start_path;
 	private boolean is_processed;
-	private verilogTownGridNode location;
+	private GridNode location;
 	private int x;
 	private int y;
-	private verilogTownGridNode next_spot;
-	private Stack<verilogTownGridNode> path;
+	private GridNode next_spot;
+	private Stack<GridNode> path;
 	private Direction direction;
 	
 	/* Necessary for displaying car */
@@ -47,10 +47,10 @@ public class Car
 	private boolean at_signal;
 	private Direction animation_direction;
 
-	public Car(verilogTownGridNode start, 
-				verilogTownGridNode end, 
+	public Car(GridNode start, 
+				GridNode end, 
 				int starting_time, 
-				verilogTownMap level,
+				VerilogTownMap level,
 				int position_x, 
 				int position_y, 
 				float width, 
@@ -201,11 +201,11 @@ public class Car
 	}
 
 
-	public void animation_direction(verilogTownGridNode from, verilogTownGridNode to)
+	public void animation_direction(GridNode from, GridNode to)
 	{
 		GridType grid_type_to;
 		GridType grid_type_from;
-		grid_type_to = to.get_grid_type();
+		grid_type_to = to.getType();
 
 		if (from == null) // starting move
 		{
@@ -228,7 +228,7 @@ public class Car
 		}
 		else
 		{
-			grid_type_from = from.get_grid_type();
+			grid_type_from = from.getType();
 			/* corner conditions */
 			if (grid_type_from == GridType.CORNER_ROAD_W2S || grid_type_from == GridType.CORNER_ROAD_E2S)
 			{
@@ -246,28 +246,28 @@ public class Car
 			{
 				this.animation_direction = Direction.N;
 			}
-			else if (to.get_x() > from.get_x())
+			else if (to.getX() > from.getX())
 			{
 				this.animation_direction = Direction.E;
 			}
-			else if (to.get_x() < from.get_x())
+			else if (to.getX() < from.getX())
 			{
 				this.animation_direction = Direction.W;
 			}
-			else if (to.get_y() > from.get_y())
+			else if (to.getY() > from.getY())
 			{
 				this.animation_direction = Direction.N;
 			}
-			else if (to.get_y() < from.get_y())
+			else if (to.getY() < from.getY())
 			{
 				this.animation_direction = Direction.S;
 			}
 		}
 	}
-	public void set_car_direction(verilogTownGridNode from, verilogTownGridNode to)
+	public void set_car_direction(GridNode from, GridNode to)
 	{
 		GridType grid_type;
-		grid_type = to.get_grid_type();
+		grid_type = to.getType();
 
 		if (from == null) // starting move
 		{
@@ -305,28 +305,28 @@ public class Car
 		{
 			this.direction = Direction.N;
 		}
-		else if (to.get_x() > from.get_x())
+		else if (to.getX() > from.getX())
 		{
 			this.direction = Direction.E;
 		}
-		else if (to.get_x() < from.get_x())
+		else if (to.getX() < from.getX())
 		{
 			this.direction = Direction.W;
 		}
-		else if (to.get_y() > from.get_y())
+		else if (to.getY() > from.getY())
 		{
 			this.direction = Direction.N;
 		}
-		else if (to.get_y() < from.get_y())
+		else if (to.getY() < from.getY())
 		{
 			this.direction = Direction.S;
 		}
 	}
 
-	public void set_current_point_end(verilogTownGridNode from, verilogTownGridNode to) 
+	public void set_current_point_end(GridNode from, GridNode to) 
 	{
-		from.set_car(null);
-		to.set_car(null);
+		from.setCar(null);
+		to.setCar(null);
 		this.current_point = to;
 	}
 
@@ -335,7 +335,7 @@ public class Car
 		return at_signal;
 	}
 
-	public void set_current_point(verilogTownGridNode from, verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
+	public void set_current_point(GridNode from, GridNode to, GridNode via_point, VerilogTownMap level) 
 	{
 		/* update which direction the car will now be going */
 		set_car_direction(from, to);
@@ -347,9 +347,9 @@ public class Car
 		/* store the car in the grid details */
 		if (from != null)
 		{
-			from.set_car(null);
+			from.setCar(null);
 		}
-		to.set_car(this);
+		to.setCar(this);
 
 		/* check if car made it */
 		if (to == this.get_end_point())
@@ -359,10 +359,10 @@ public class Car
 			this.set_is_done_path();
 		}
 		else if (
-				to.get_grid_type() == GridType.END_S2SEDGE ||
-				to.get_grid_type() == GridType.END_N2NEDGE ||
-				to.get_grid_type() == GridType.END_E2EEDGE ||
-				to.get_grid_type() == GridType.END_W2WEDGE)
+				to.getType() == GridType.END_S2SEDGE ||
+				to.getType() == GridType.END_N2NEDGE ||
+				to.getType() == GridType.END_E2EEDGE ||
+				to.getType() == GridType.END_W2WEDGE)
 		{
 			/* Failed path */
 			Gdx.app.log("Car", "failed done");
@@ -373,17 +373,17 @@ public class Car
 
 	public void crashed()
 	{
-		verilogTownGridNode crash_point = this.get_current_point();
+		GridNode crash_point = this.get_current_point();
 
 		Gdx.app.log("Car", "crash done");
-		crash_point.set_car(null);
+		crash_point.setCar(null);
 		this.set_is_crashed();
 		this.set_is_done_path();
 
 		carSprite = crashSprite;
 	}
 		
-	public void set_path(verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
+	public void set_path(GridNode to, GridNode via_point, VerilogTownMap level) 
 	{
 		/* update the path - some paths have way_points because of forced turns */
 		if (via_point == null && this.way_point == null)
@@ -424,8 +424,8 @@ public class Car
 
 	public void set_animate_start()
 	{
-		this.position_x = (this.get_current_point().get_x()-1)*64;
-		this.position_y = (this.get_current_point().get_y()-1)*64;
+		this.position_x = (this.get_current_point().getX()-1)*64;
+		this.position_y = (this.get_current_point().getY()-1)*64;
 	}
 
 	public void animate_car()
@@ -442,7 +442,7 @@ public class Car
 				this.position_x -= this.speed;	
 
 			this.animate_state = CarAnimateStates.MOVED;
-			Gdx.app.log("Car ", "x="+this.current_point.get_x()+ " y="+this.current_point.get_y()+" ax="+ this.position_x+" ay="+this.position_y);
+			Gdx.app.log("Car ", "x="+this.current_point.getX()+ " y="+this.current_point.getY()+" ax="+ this.position_x+" ay="+this.position_y);
 		}
 	}
 	public void set_animate_state(CarAnimateStates state)
@@ -454,26 +454,26 @@ public class Car
 		return this.animate_state;
 	}
 
-	public verilogTownGridNode get_current_point() {
+	public GridNode get_current_point() {
 		return this.current_point;
 	}
 
-	public verilogTownGridNode get_start_point() {
+	public GridNode get_start_point() {
 		return this.start_point;
 	}
 
-	public verilogTownGridNode get_end_point() {
+	public GridNode get_end_point() {
 		return this.end_point;
 	}
-	public void set_end_point_and_fail_on_getting_car_accross(verilogTownGridNode point) {
+	public void set_end_point_and_fail_on_getting_car_accross(GridNode point) {
 		this.success_getting_to_end_point = false;
 		this.end_point = point;
 	}
 
-	public verilogTownGridNode get_next_point_on_path() {
+	public GridNode get_next_point_on_path() {
 		return this.path.pop();
 	}
-	public void put_next_point_back_on_path(verilogTownGridNode point) {
+	public void put_next_point_back_on_path(GridNode point) {
 		this.path.push(point);
 	}
 

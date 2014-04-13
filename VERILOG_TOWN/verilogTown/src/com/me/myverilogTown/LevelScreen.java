@@ -39,7 +39,7 @@ public class LevelScreen implements Screen
 	float Frame_Time_25; // amount of time for 25FPS
 	float Next_Frame_Time; 
 
-	private verilogTownMap clevel;
+	private VerilogTownMap clevel;
 	private boolean level_done;
 
 	public LevelScreen(final verilogTown gam) 
@@ -51,7 +51,7 @@ public class LevelScreen implements Screen
 		this.random_number = new Random(3);
 
 		/* init current level map data structure */
-		this.clevel = new verilogTownMap(20, 21); // firts_map
+		this.clevel = new VerilogTownMap(20, 21); // firts_map
 		/* this might be where the XML read map goes */
 		/* hard coded */
 		clevel.verilogTownMapHardCode_first_map();

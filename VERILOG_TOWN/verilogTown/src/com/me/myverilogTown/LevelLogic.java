@@ -20,7 +20,7 @@ public class LevelLogic
 		car_processing_q = new LinkedList<Integer>();
 	}
 
-	public boolean update(Car cars[], int num_cars, verilogTownMap clevel, Random randomno)
+	public boolean update(Car cars[], int num_cars, VerilogTownMap clevel, Random randomno)
 	{
 		int count_cars_done = 0;
 
@@ -81,8 +81,8 @@ public class LevelLogic
 					}
 
 					/* check the future */
-					verilogTownGridNode current_spot = cars[car_index].get_current_point();
-					TrafficSignal signal = current_spot.get_traffic_signal(); 
+					GridNode current_spot = cars[car_index].get_current_point();
+					TrafficSignal signal = current_spot.getTrafficSignal(); 
 
 					if (signal == TrafficSignal.NO_SIGNAL)
 					{
@@ -108,8 +108,8 @@ public class LevelLogic
 						cars[car_index].set_processed(true);
 						cars[car_index].set_animate_state(CarAnimateStates.STOPPED);
 
-						int y = cars[car_index].get_current_point().get_y();
-						int x = cars[car_index].get_current_point().get_x();
+						int y = cars[car_index].get_current_point().getY();
+						int x = cars[car_index].get_current_point().getX();
 						float ax = cars[car_index].getPosition_x();
 						float ay = cars[car_index].getPosition_y();
 						Gdx.app.log("LevelLogic", "Car waiting at stop light:"+ car_index +" At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
@@ -142,9 +142,9 @@ public class LevelLogic
 		return false;
 	}
 
-	private void update_spot(Car the_car, verilogTownGridNode current_spot, verilogTownMap clevel)
+	private void update_spot(Car the_car, GridNode current_spot, VerilogTownMap clevel)
 	{
-		verilogTownGridNode next_spot;
+		GridNode next_spot;
 
 		next_spot = the_car.get_next_point_on_path();
 		the_car.set_current_point(current_spot, next_spot, null, clevel);
@@ -153,7 +153,7 @@ public class LevelLogic
 		the_car.set_path(next_spot, null, clevel);
 	}
 
-	private void car_starts(Car the_car, verilogTownMap clevel)
+	private void car_starts(Car the_car, VerilogTownMap clevel)
 
 	{
 		int x;
@@ -165,19 +165,19 @@ public class LevelLogic
 		the_car.animation_direction(null, the_car.get_start_point());
 		the_car.set_is_start_path();
 
-		y = the_car.get_current_point().get_y();
-		x = the_car.get_current_point().get_x();
+		y = the_car.get_current_point().getY();
+		x = the_car.get_current_point().getX();
 		float ay = the_car.getPosition_y();
 		float ax = the_car.getPosition_x();
 		Gdx.app.log("LevelLogic-starts", "At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
 	}
 
-	private void car_has_forced_movement(Car the_car, verilogTownGridNode current_spot, TrafficSignal signal, verilogTownMap clevel)
+	private void car_has_forced_movement(Car the_car, GridNode current_spot, TrafficSignal signal, VerilogTownMap clevel)
 	{
 		int x;
 		int y;
-		verilogTownGridNode next_spot;
-		verilogTownGridNode turn_via_point;
+		GridNode next_spot;
+		GridNode turn_via_point;
 
 		/* get the turn unless it's illegal */
 		turn_via_point = clevel.get_turn(current_spot, signal, the_car.get_direction());
@@ -206,19 +206,19 @@ public class LevelLogic
 			the_car.set_processed(true);
 
 			/* debug info */
-			y = the_car.get_current_point().get_y();
-			x = the_car.get_current_point().get_x();
+			y = the_car.get_current_point().getY();
+			x = the_car.get_current_point().getX();
 			float ax = the_car.getPosition_x();
 			float ay = the_car.getPosition_y();
 			Gdx.app.log("LevelLogic-forced", "At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
 		}
 	}
 
-	private void car_has_free_movement(Car the_car, verilogTownGridNode current_spot, verilogTownMap clevel)
+	private void car_has_free_movement(Car the_car, GridNode current_spot, VerilogTownMap clevel)
 	{
 		int x;
 		int y;
-		verilogTownGridNode next_spot;
+		GridNode next_spot;
 		
 		next_spot = the_car.get_next_point_on_path();
 		
@@ -237,24 +237,24 @@ public class LevelLogic
 		the_car.set_processed(true);
 	
 		/* debug info */
-		y = the_car.get_current_point().get_y();
-		x = the_car.get_current_point().get_x();
+		y = the_car.get_current_point().getY();
+		x = the_car.get_current_point().getX();
 		float ax = the_car.getPosition_x();
 		float ay = the_car.getPosition_y();
 		Gdx.app.log("LevelLogic-move", "At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
 	}
 
-	private boolean car_in_front_check(Car the_car, verilogTownGridNode current_spot, verilogTownGridNode next_spot, verilogTownMap clevel)
+	private boolean car_in_front_check(Car the_car, GridNode current_spot, GridNode next_spot, VerilogTownMap clevel)
 	{
 		Car car_in_front;
 		GridType car_in_front_grid_type;
 		
 		/* check if there's a car going in the same direction ahead */
-		car_in_front = next_spot.get_car();
+		car_in_front = next_spot.getCar();
 
 		if (car_in_front != null)
 		{
-			car_in_front_grid_type = car_in_front.get_current_point().get_grid_type();
+			car_in_front_grid_type = car_in_front.get_current_point().getType();
 
 			if (car_in_front.get_processed() == true)
 			{

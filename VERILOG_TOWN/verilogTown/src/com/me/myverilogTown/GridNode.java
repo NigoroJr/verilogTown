@@ -11,8 +11,10 @@ public class GridNode {
     private GridNode east;
     private GridNode west;
 
-    private TrafficControl signal;
-    private int signal_index;
+    private TrafficControl signal = null;;
+    private int signal_index = -1;
+
+    private Car car = null;
 
     /* Mark for BFS. Always greater than 0 */
     private int visited_mark = 0;
@@ -24,13 +26,6 @@ public class GridNode {
         this.x = x;
         this.y = y;
         this.grid_type = type;
-        this.north = null;
-        this.south = null;
-        this.east = null;
-        this.west = null;
-
-        this.signal = null;
-        this.signal_index = -1;
     }
 
     public int getX() {
@@ -112,6 +107,35 @@ public class GridNode {
      */
     public GridNode getWest() {
         return this.west;
+    }
+
+    /**
+     * Returns whether this grid is a traffic signal or not.
+     * 
+     * @return True if this grid is a traffic signal, false if not.
+     */
+    public boolean isTrafficSignal() {
+        return signal != null;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public TrafficSignal getTrafficSignal() {
+        if (this.signal_index != -1)
+            return (this.signal.get_signal(this.signal_index));
+        else
+            return TrafficSignal.NO_SIGNAL;
+    }
+
+    public void setTrafficControl(TrafficControl traffic_signal, int index) {
+        this.signal = traffic_signal;
+        this.signal_index = index;
     }
 
     /* hooks up the associated traffic signal */
