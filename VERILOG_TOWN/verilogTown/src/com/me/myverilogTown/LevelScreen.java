@@ -16,140 +16,198 @@ import com.badlogic.gdx.math.Vector2;
 
 public class LevelScreen implements Screen
 {
-    final verilogTown game;
+	final verilogTown game;
 
-    private OrthographicCamera camera;
-    private Texture level_map;
-    private SpriteBatch thebatch;
-    private LevelLogic levelLogic;
-    private Car testCar;
-    private Sprite carSprite;
-    private Texture tmp;
-    int toggle;
+	private Car cars[];
+	private int num_cars;
 
-    float Time; // Game clock of passed time
+	private OrthographicCamera camera;
+	private Texture level_map;
+	private SpriteBatch thebatch;
+	private LevelLogic levelLogic;
+	private Sprite carSprite;
+	private Texture car_texture;
+	private Texture stop;
+	private Texture go;
+	private Texture go_forward;
+	private Texture go_right;
+	private Texture go_left;
+	int toggle;
+	Random random_number;
 
-    public LevelScreen(final verilogTown gam)
-    {
-        toggle = 0;
-        /* initialize the level logic control */
-        levelLogic = new LevelLogic();
+	float Time; // Game clock of passed time
+	float Frame_Time_25; // amount of time for 25FPS
+	float Next_Frame_Time; 
 
-        this.game = gam;
+	private verilogTownMap clevel;
+	private boolean level_done;
 
-        thebatch = new SpriteBatch();
-        /* initialize the map */
-        // Josh's level_map = new
-        // Texture("asset_resources/tiled_maps/first_map.png");
-        level_map = new Texture("data/first_map.png"); // mine
+	public LevelScreen(final verilogTown gam) 
+	{
+		toggle = 0;
 
-        // create the camera for the SpriteBatch
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1280, 1280);
+		this.game = gam;
+		this.level_done = false;
+		this.random_number = new Random(3);
 
-        tmp = new Texture("data/CAR_BLUE_WHITE_STRIPE_SINGLE.png");
+		/* init current level map data structure */
+		this.clevel = new verilogTownMap(20, 21); // firts_map
+		/* this might be where the XML read map goes */
+		/* hard coded */
+		clevel.verilogTownMapHardCode_first_map();
 
-        tmp.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        testCar = new Car(new Vector2(640, 640), 64, 64, 0, 100f, tmp);
-        // paj commented: Gdx.input.setInputProcessor(new InputHandler(this));
+		thebatch = new SpriteBatch();
+		/* initialize the map */
+		level_map = new Texture("data/first_map.png"); 
 
-        /* initialize the time */
-        Time = 0f;
-    }
+		// create the camera for the SpriteBatch
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, 1280, 1280);
 
-    @Override
-    public void render(float delta)
-    {
-        // prints out delta time Gdx.app.log("Time:", "="+ Time);
-        Time += Gdx.graphics.getDeltaTime();
+		/* NOTE - for graphics "paint.net" pretty good.  Need to save as 8-bit png file */
 
-        // Simulation step alternate left and right
-        if ((Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && toggle == 1)
-                || Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && toggle == 0)
-        {
-            toggle = (toggle + 1) % 2;
-            Gdx.app.log("Time Since last simulation:", "=" + Time);
-            levelLogic.update();
-        }
+		car_texture = new Texture("data/car_sheet.png");
+		car_texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-        /*
-         * Below is the test code for redrawing, rotating, and moving the sprite
-         * about the map
-         * 
-         * if(Gdx.input.isKeyPressed(Keys.DPAD_LEFT)) {
-         * testCar.getCarSprite().setRotation(-180);
-         * testCar.getCarSprite().setX(testCar.getCarSprite().getX()-(Gdx.graphics
-         * .getDeltaTime() * testCar.speed));
-         * }
-         * if(Gdx.input.isKeyPressed(Keys.DPAD_RIGHT)) {
-         * testCar.getCarSprite().setRotation(0);
-         * testCar.getCarSprite().setX(testCar.getCarSprite().getX() +
-         * (Gdx.graphics.getDeltaTime() * testCar.speed));
-         * }
-         * 
-         * //For some reason, north/south movement is slower than east/west.
-         * Probably due to widescreen screen resolutions. Multiplying
-         * //Velocity by 1.5 seems to make it look at least similar, speed wise
-         * - that's why it's cast as a float.
-         * 
-         * if(Gdx.input.isKeyPressed(Keys.DPAD_UP)) {
-         * testCar.getCarSprite().setRotation(90);
-         * testCar.getCarSprite().setY((float) (testCar.getCarSprite().getY() +
-         * (Gdx.graphics.getDeltaTime() * testCar.speed * 1.5)));
-         * }
-         * if(Gdx.input.isKeyPressed(Keys.DPAD_DOWN)) {
-         * testCar.getCarSprite().setRotation(-90);
-         * testCar.getCarSprite().setY((float) (testCar.getCarSprite().getY() -
-         * (Gdx.graphics.getDeltaTime() * testCar.speed * 1.5)));
-         * }
-         */
+		/* get all the textures for the lights */
+		stop = new Texture("data/stop_tran.png");
+		stop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go = new Texture("data/go_tran.png");
+		go.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go_forward = new Texture("data/go_forward_tran.png");
+		go_forward.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go_right = new Texture("data/go_right_tran.png");
+		go_right.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		go_left = new Texture("data/go_left_tran.png");
+		go_left.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		/* after reading the number of cars from level */
+		num_cars = 10; // hard coded
+		cars = new Car[num_cars];
 
-        // tell the camera to update its matrices.
-        camera.update();
+		/* initialize cars */
+		cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][22], 100, clevel, 0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 
-        thebatch.begin();
-        thebatch.draw(level_map, 0, 0);
-        testCar.getCarSprite().draw(thebatch);
-        thebatch.end();
+		/* initialize the level logic control */
+		levelLogic = new LevelLogic();
 
-    }
+		/* initialize the time */
+		Time = 0f;
+		Frame_Time_25 = 1/25;
+		Next_Frame_Time = 0f;
+	}
 
-    @Override
-    public void resize(int width, int height)
-    {
-    }
+	@Override
+	public void render(float delta) 
+	{
+		boolean fps_tick = false;
 
-    @Override
-    public void show()
-    {
-    }
+		Time += Gdx.graphics.getDeltaTime();
+		Next_Frame_Time += Gdx.graphics.getDeltaTime();
 
-    @Override
-    public void hide()
-    {
-    }
+		if (Next_Frame_Time >= Frame_Time_25)
+		{
+			Next_Frame_Time = Next_Frame_Time - Frame_Time_25;
+			fps_tick = true;
+		}
 
-    @Override
-    public void pause()
-    {
-    }
+		// Simulation step alternate left and right 
+		if((Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && toggle == 1) || (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && toggle == 0)) 
+		{
+			toggle = (toggle+1) % 2;
+		}
+		if (fps_tick = true && toggle == 1 && this.level_done == false)
+		{
+			Gdx.app.log("Time Since last simulation:", "="+ Time);
+			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number);
+		}
+		else if (this.level_done == true)
+		{
 
-    @Override
-    public void resume()
-    {
-    }
+		}
 
-    @Override
-    public void dispose()
-    {
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-    }
+		// tell the camera to update its matrices.
+		camera.update();
 
-    public Car getCar() {
-        return testCar;
-        // TODO Auto-generated method stub
-    }
+		if (this.level_done == true)
+		{
+			thebatch.begin();
+			thebatch.draw(level_map, 0, 0);
+			for (int i = 0; i < num_cars; i++)
+			{
+				if ((cars[i].get_is_start_path() && !cars[i].get_is_done_path()) || cars[i].get_is_crashed())
+				{
+					cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
+					cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
+					cars[i].getCarSprite().draw(thebatch);
+				}
+			}
+	
+			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			this.game.font.draw(thebatch, "Level Done", 100, 150);
+			this.game.font.draw(thebatch, "Score", 100, 100);
+
+			thebatch.end();
+		}
+		else
+		{
+			thebatch.begin();
+			thebatch.draw(level_map, 0, 0);
+			for (int i = 0; i < num_cars; i++)
+			{
+				if ((cars[i].get_is_start_path() && !cars[i].get_is_done_path()) || cars[i].get_is_crashed())
+				{
+					cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
+					cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
+					cars[i].getCarSprite().draw(thebatch);
+				}
+			}
+	
+			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			thebatch.end();
+		}
+	}
+
+	@Override
+	public void resize(int width, int height) 
+	{
+	}
+
+	@Override
+	public void show() 
+	{
+	}
+
+	@Override
+	public void hide() 
+	{
+	}
+
+	@Override
+	public void pause() 
+	{
+	}
+
+	@Override
+	public void resume() 
+	{
+	}
+
+	@Override
+	public void dispose() 
+	{
+
+	}
 }

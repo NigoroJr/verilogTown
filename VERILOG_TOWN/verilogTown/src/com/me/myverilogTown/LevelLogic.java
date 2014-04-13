@@ -1,115 +1,297 @@
 package com.me.myverilogTown;
 
 import java.util.*;
+import java.util.Random.*;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 
 public class LevelLogic
 {
-    private VerilogTownMap clevel;
-    private Car cars[];
-    private int num_cars;
-    private int time_step;
+	private int time_step;
+	Queue<Integer> car_processing_q;
+	
+	public LevelLogic()
+	{
 
-    public LevelLogic()
-    {
-        /* init current level map data structure */
-        this.clevel = new VerilogTownMap(20, 20); // firts_map
+		/* init a simple time step where a unit is the maximum time it takes a car's front to travel through a grid point */
+		time_step = 0;
 
-        /*
-         * init a simple time step where a unit is the maximum time it takes a
-         * car's front to travel through a grid point
-         */
-        time_step = 0;
+		car_processing_q = new LinkedList<Integer>();
+	}
 
-        /* this might be where the XML read map goes */
-        /* hard coded */
-        clevel.verilogTownMapHardCode_first_map();
+	public boolean update(Car cars[], int num_cars, verilogTownMap clevel, Random randomno)
+	{
+		int count_cars_done = 0;
 
-        /* after reading the number of cars from level */
-        num_cars = 10; // hard coded
-        cars = new Car[num_cars];
+		/* increment time */
+		time_step ++;
 
-        /* initialize cars */
-        cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][21], 1, clevel,
-                null, 0, 0, 0, 0);
-        cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][21], 1, clevel,
-                null, 0, 0, 0, 0);
-        cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][21], 1, clevel,
-                null, 0, 0, 0, 0);
-        cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 2, clevel,
-                null, 0, 0, 0, 0);
-        cars[4] = new Car(clevel.grid[3][21], clevel.grid[14][0], 2, clevel,
-                null, 0, 0, 0, 0);
-        cars[5] = new Car(clevel.grid[17][21], clevel.grid[14][0], 2, clevel,
-                null, 0, 0, 0, 0);
-        cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 3, clevel,
-                null, 0, 0, 0, 0);
-        cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 3, clevel,
-                null, 0, 0, 0, 0);
-        cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 4, clevel,
-                null, 0, 0, 0, 0);
-        cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][21], 4, clevel,
-                null, 0, 0, 0, 0);
-    }
+		if (time_step % 50 == 0)
+		{
+			for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
+			{
+				clevel.crash_signal(i, randomno.nextInt(4)); // Trying to cause crashes
+				//clevel.cycle_signal_3(i, randomno.nextInt(32)); // Random all signals randoms
+				//clevel.cycle_signal_2(i, randomno.nextInt(16)); // Random all signals one at a time
+				//clevel.cycle_signal(i, randomno.nextInt(4)); // All GO
+			}
+			//clevel.display_traffic_lights();
+		}
+	
+		/* load up a queue with indices so we can process in priority.  Basically, if a car has another car in front we delay the processing */
+		for (int i = 0; i < num_cars; i++)
+		{
+			car_processing_q.add(i);
+			cars[i].reset_states();
+		}
 
-    public void update()
-    {
-        int x;
-        int y;
+		while (!car_processing_q.isEmpty())
+		{
+			int car_index = car_processing_q.remove();
 
-        /* increment time */
-        time_step++;
+			if (!cars[car_index].get_is_done_path())
+			{
+				cars[car_index].animate_car();
 
-        for (int i = 0; i < num_cars; i++)
-        {
-            if (!cars[i].get_is_done_path())
-            {
-                Gdx.app.log("LevelLogic", "Car=" + i);
+				/* check if a car needs to be started */
+				if (cars[car_index].get_start_time() == time_step)
+				{
+					/* IF - time to start - currently assume that there won't be a back log of cars - probably results in crash logic */
+					car_starts(cars[car_index], clevel);
+					cars[car_index].set_animate_state(CarAnimateStates.MOVING);
+					cars[car_index].set_processed(true);
+				}
+				/* move next spot */
+				else if (cars[car_index].get_start_time() < time_step && cars[car_index].at_next_grid())
+				{
+					/* ELSE IF - Moving car then move to next spot */
 
-                /* check if a car needs to be started */
-                if (cars[i].get_start_time() == time_step)
-                {
-                    /*
-                     * IF - time to start - currently assume that there won't be
-                     * a back log of cars - probably results in crash logic
-                     */
-                    cars[i].set_current_point(cars[i].get_start_point(), clevel);
-                    /* now remove the start point */
-                    cars[i].get_next_point_on_path();
-                }
-                /* move next spot */
-                else if (cars[i].get_start_time() < time_step)
-                {
-                    /* ELSE IF - Moving car then move to next spot */
-                    GridNode spot;
+					Gdx.app.log("LevelLogic", "Car="+ car_index);
 
-                    spot = cars[i].get_next_point_on_path();
+					if (!(cars[car_index].get_animate_state() == CarAnimateStates.STOPPED || cars[car_index].get_animate_state() == CarAnimateStates.STOP_FOR_CAR))
+					{
+						update_spot(cars[car_index], cars[car_index].get_current_point(), clevel);
 
-                    /* check if car made it */
-                    if (spot == cars[i].get_end_point())
-                    {
-                        cars[i].set_is_done_path();
-                        Gdx.app.log("LevelLogic", "Car=" + i + "done");
-                    }
-                    else
-                    {
-                        cars[i].set_current_point(spot, clevel);
-                        /* now remove the current point */
-                        cars[i].get_next_point_on_path();
+						if (cars[car_index].get_is_done_path())
+						{
+							cars[car_index].set_processed(true);
+							continue;
+						}
+					}
 
-                        /* debug info */
-                        y = cars[i].get_current_point().getY();
-                        x = cars[i].get_current_point().getX();
-                        Gdx.app.log("LevelLogic", "Car=" + i + " At x=" + x
-                                + " y=" + y);
-                    }
+					/* check the future */
+					verilogTownGridNode current_spot = cars[car_index].get_current_point();
+					TrafficSignal signal = current_spot.get_traffic_signal(); 
 
-                }
+					if (signal == TrafficSignal.NO_SIGNAL)
+					{
+						/* IF - you're at a stop light and you can GO then just do what you want OR you're not at a traffic light */
+						cars[car_index].set_animate_state(CarAnimateStates.MOVING);
+						car_has_free_movement(cars[car_index], current_spot, clevel);
+					}
+					else if (signal == TrafficSignal.GO)
+					{
+						/* IF - you're at a stop light and you can GO then just do what you want OR you're not at a traffic light */
+						cars[car_index].set_animate_state(CarAnimateStates.MOVING);
+						car_has_free_movement(cars[car_index], current_spot, clevel);
+					}
+					else if (	signal == TrafficSignal.GO_RIGHT ||  
+							signal == TrafficSignal.GO_LEFT ||  
+							signal == TrafficSignal.GO_FORWARD)   
+					{
+						cars[car_index].set_animate_state(CarAnimateStates.MOVING);
+						car_has_forced_movement(cars[car_index], current_spot, signal, clevel); 
+					}
+					else if (signal == TrafficSignal.STOP)
+					{
+						cars[car_index].set_processed(true);
+						cars[car_index].set_animate_state(CarAnimateStates.STOPPED);
 
-            }
+						int y = cars[car_index].get_current_point().get_y();
+						int x = cars[car_index].get_current_point().get_x();
+						float ax = cars[car_index].getPosition_x();
+						float ay = cars[car_index].getPosition_y();
+						Gdx.app.log("LevelLogic", "Car waiting at stop light:"+ car_index +" At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
+					}
+				}
+				else
+				{
+					/* ELSE - the car is not yet going so it is processed OR it is moving, but not at a grid point */
+					cars[car_index].set_processed(true);
+				}
 
-        }
-    }
+				/* if not processed add to Q for later */
+				if (cars[car_index].get_processed() == false)
+				{
+					Gdx.app.log("LevelLogic", "Added back="+car_index);
+					car_processing_q.add(car_index);
+				}
+			}
+			else
+			{
+				count_cars_done++;
+			}
+		}
+		
+		if (count_cars_done == num_cars)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	private void update_spot(Car the_car, verilogTownGridNode current_spot, verilogTownMap clevel)
+	{
+		verilogTownGridNode next_spot;
+
+		next_spot = the_car.get_next_point_on_path();
+		the_car.set_current_point(current_spot, next_spot, null, clevel);
+		if (the_car.get_is_done_path())
+			return;
+		the_car.set_path(next_spot, null, clevel);
+	}
+
+	private void car_starts(Car the_car, verilogTownMap clevel)
+
+	{
+		int x;
+		int y;
+
+		the_car.set_current_point(null, the_car.get_start_point(), null, clevel);
+		the_car.set_path(the_car.get_start_point(), null, clevel);
+		the_car.set_animate_start();
+		the_car.animation_direction(null, the_car.get_start_point());
+		the_car.set_is_start_path();
+
+		y = the_car.get_current_point().get_y();
+		x = the_car.get_current_point().get_x();
+		float ay = the_car.getPosition_y();
+		float ax = the_car.getPosition_x();
+		Gdx.app.log("LevelLogic-starts", "At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
+	}
+
+	private void car_has_forced_movement(Car the_car, verilogTownGridNode current_spot, TrafficSignal signal, verilogTownMap clevel)
+	{
+		int x;
+		int y;
+		verilogTownGridNode next_spot;
+		verilogTownGridNode turn_via_point;
+
+		/* get the turn unless it's illegal */
+		turn_via_point = clevel.get_turn(current_spot, signal, the_car.get_direction());
+		if (turn_via_point == null)
+		{
+			Gdx.app.log("LevelLogic", "Thinks it's an illegal turn");
+			the_car.set_animate_state(CarAnimateStates.STOPPED);
+			the_car.set_processed(true);
+		}
+		else
+		{
+			next_spot = the_car.get_next_point_on_path();
+
+			if (car_in_front_check(the_car, current_spot, next_spot, clevel))
+			{
+				the_car.put_next_point_back_on_path(next_spot);
+				the_car.set_animate_state(CarAnimateStates.STOP_FOR_CAR);
+				return;
+			}
+
+			/* update the animation direction */
+			the_car.animation_direction(current_spot, next_spot);
+
+			/* rebuild the path since forced turn */
+			the_car.set_path(current_spot, turn_via_point, clevel);
+			the_car.set_processed(true);
+
+			/* debug info */
+			y = the_car.get_current_point().get_y();
+			x = the_car.get_current_point().get_x();
+			float ax = the_car.getPosition_x();
+			float ay = the_car.getPosition_y();
+			Gdx.app.log("LevelLogic-forced", "At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
+		}
+	}
+
+	private void car_has_free_movement(Car the_car, verilogTownGridNode current_spot, verilogTownMap clevel)
+	{
+		int x;
+		int y;
+		verilogTownGridNode next_spot;
+		
+		next_spot = the_car.get_next_point_on_path();
+		
+		if (car_in_front_check(the_car, current_spot, next_spot, clevel))
+		{
+			the_car.put_next_point_back_on_path(next_spot);
+			the_car.set_animate_state(CarAnimateStates.STOP_FOR_CAR);
+			return;
+		}
+
+		/* update the animation direction */
+		the_car.animation_direction(current_spot, next_spot);
+
+		/* If only animate put next spot back on stack */
+		the_car.set_path(current_spot, null, clevel);
+		the_car.set_processed(true);
+	
+		/* debug info */
+		y = the_car.get_current_point().get_y();
+		x = the_car.get_current_point().get_x();
+		float ax = the_car.getPosition_x();
+		float ay = the_car.getPosition_y();
+		Gdx.app.log("LevelLogic-move", "At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
+	}
+
+	private boolean car_in_front_check(Car the_car, verilogTownGridNode current_spot, verilogTownGridNode next_spot, verilogTownMap clevel)
+	{
+		Car car_in_front;
+		GridType car_in_front_grid_type;
+		
+		/* check if there's a car going in the same direction ahead */
+		car_in_front = next_spot.get_car();
+
+		if (car_in_front != null)
+		{
+			car_in_front_grid_type = car_in_front.get_current_point().get_grid_type();
+
+			if (car_in_front.get_processed() == true)
+			{
+				/* IF - car already processed then */
+				if (car_in_front.get_direction() == the_car.get_direction() || 
+						car_in_front_grid_type == GridType.CORNER_ROAD_W2S || 
+						car_in_front_grid_type == GridType.CORNER_ROAD_E2S ||
+						car_in_front_grid_type == GridType.CORNER_ROAD_E2N || 
+						car_in_front_grid_type == GridType.CORNER_ROAD_W2N ||
+						car_in_front_grid_type == GridType.CORNER_ROAD_N2E || 
+						car_in_front_grid_type == GridType.CORNER_ROAD_S2E ||
+						car_in_front_grid_type == GridType.CORNER_ROAD_N2W || 
+						car_in_front_grid_type == GridType.CORNER_ROAD_S2W)
+				{
+					/* IF - it's going the same direction then don't crash */
+					the_car.set_processed(true);
+					return true;
+				}
+				else
+				{
+					/* ELSE - crash!!! */
+					Gdx.app.log("LevelLogic", "CRASH!!!");
+					/* If only animate put next spot back on stack */
+					the_car.crashed();
+					car_in_front.crashed();
+
+					the_car.set_processed(true);
+					return true;
+				}
+			}
+			else
+			{
+				/* ELSE put back for later processing - don't update processed to true */
+				return true;
+			}
+		}
+
+		return false;
+	}
 }
