@@ -26,7 +26,6 @@ public class Car
 	private int y;
 	private verilogTownGridNode next_spot;
 	private Stack<verilogTownGridNode> path;
-	private Direction direction;
 	
 	/* Necessary for displaying car */
 	private Texture carTexture;
@@ -44,7 +43,20 @@ public class Car
 	protected float rotation;
 	protected CarAnimateStates animate_state;
 	private boolean at_signal;
+	private Direction direction;
 	private Direction animation_direction;
+
+	/* turn variables */
+	private boolean animate_turn;
+	private boolean animate_uturn;
+	private float center_x;
+	private float center_y;
+	private int fps_start;
+	private float start_angle;
+	private boolean direction_clockwise; // true = CW false = CCW
+	private float animating_turn_x;
+	private float animating_turn_y;
+	private float turn_rotation;
 
 	public Car(verilogTownGridNode start, 
 				verilogTownGridNode end, 
@@ -64,14 +76,13 @@ public class Car
 		this.end_point = end;
 		this.current_point = null;
 		this.way_point = null;
-		this.direction = null;
 		this.animation_direction = null;
+		this.direction = null;
 		this.success_getting_to_end_point = true;
 		this.is_crashed = false;
 		this.is_done_path = false;
 		this.is_start_path = false;
 		this.start_time = starting_time;
-
 		this.position_x = position_x;
 		this.position_y = position_y;
 		this.width = width;
@@ -86,6 +97,7 @@ public class Car
 		this.animate_turn = false;
 		this.animate_uturn = false;
 
+		/* breakup all the pixel pictures of cars to pick 1 for your sprite.  Crash is last one */
 		TextureRegion[] carFrames; 
 		TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth()/2, texture.getHeight()/2);
 		carFrames = new TextureRegion[2 * 2];
@@ -119,52 +131,9 @@ public class Car
 	{
 		return carSprite;
 	}
-
 	public void setCarSprite(Sprite carSprite) 
 	{
 		this.carSprite = carSprite;
-	}
-
-	/**
-	 * @return the width
-	 */
-	public float getWidth() 
-	{
-		return width;
-	}
-	
-	/**
-	 * @param width the width to set
-	 */
-	public void setWidth(float width) 
-	{
-		this.width = width;
-	}
-	
-	/**
-	 * @return the height
-	 */
-	public float getHeight() 
-	{
-		return height;
-	}
-	
-	/**
-	 * @param height the height to set
-	 */
-	public void setHeight(float height) 
-	{
-		this.height = height;
-	}
-	
-	public float getRotation()
-	{
-		return rotation;
-	}
-	
-	public void setRotation(float rotation)
-	{
-		this.rotation = rotation;
 	}
 
 	public float set_and_get_rotation_based_on_direction()
@@ -180,27 +149,6 @@ public class Car
 		return this.rotation;
 	}
 	
-	public float getxScale() 
-	{
-		return xScale;
-	}
-
-	public void setxScale(float xScale) 
-	{
-		this.xScale = xScale;
-	}
-
-	public float getyScale() 
-	{
-		return yScale;
-	}
-
-	public void setyScale(float yScale) 
-	{
-		this.yScale = yScale;
-	}
-
-
 	public void animation_direction(verilogTownGridNode from, verilogTownGridNode to)
 	{
 		GridType grid_type_to;
@@ -264,7 +212,6 @@ public class Car
 			}
 		}
 	}
-
 	public void set_car_direction(verilogTownGridNode from, verilogTownGridNode to)
 	{
 		GridType grid_type;
@@ -326,14 +273,10 @@ public class Car
 
 	public void set_current_point_end(verilogTownGridNode from, verilogTownGridNode to) 
 	{
+		/* Cleans up the grid with this car */
 		from.set_car(null);
 		to.set_car(null);
 		this.current_point = to;
-	}
-
-	public boolean at_signal_check()
-	{
-		return at_signal;
 	}
 
 	public void set_current_point(verilogTownGridNode from, verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
@@ -345,6 +288,7 @@ public class Car
 		at_signal = true;
 
 		this.current_point = to;
+
 		/* store the car in the grid details */
 		if (from != null)
 		{
@@ -352,7 +296,7 @@ public class Car
 		}
 		to.set_car(this);
 
-		/* check if car made it */
+		/* check if car made it to the end */
 		if (to == this.get_end_point())
 		{
 			Gdx.app.log("Car", "success done");
@@ -365,7 +309,7 @@ public class Car
 				to.get_grid_type() == GridType.END_E2EEDGE ||
 				to.get_grid_type() == GridType.END_W2WEDGE)
 		{
-			/* Failed path */
+			/* Failed to get to proper destination path */
 			Gdx.app.log("Car", "failed done");
 			this.set_current_point_end(from, to);
 			this.set_is_done_path();
@@ -395,21 +339,28 @@ public class Car
 		}
 		else 
 		{
+			/* this is way point forced turn path calculations.  Can be this update or in previous update */
 			if (this.way_point == to)
 			{
+				/* IF you get the the way point */
 				this.way_point = null;
 	
 				this.path = level.findPath(null, to, this.end_point, this);
 			}
 			else if (via_point != null)
 			{
+				/* If there's a new via point that you have to go to */
 				this.way_point = via_point; 
 
+				/* create the path in to the way point and then to the end point */
 				this.path = level.findPath(null, this.way_point, this.end_point, this);
 				this.path = level.findPath(this.path, to, this.way_point, this);
 			}
 			else
 			{
+				/* If you're on your way to a way point */
+
+				/* create the path in to the way point and then to the end point */
 				this.path = level.findPath(null, this.way_point, this.end_point, this);
 				this.path = level.findPath(this.path, to, this.way_point, this);
 			}
@@ -418,27 +369,20 @@ public class Car
 
 	public boolean at_next_grid()
 	{
+		/* Checks if you're at the next spot */
 		return (this.position_x%64==0 && this.position_y%64==0);
 	}
 
 	public void set_animate_start()
 	{
+		/* 64 is the size of the tiles, so start point */
 		this.position_x = (this.get_current_point().get_x()-1)*64;
 		this.position_y = (this.get_current_point().get_y()-1)*64;
 	}
 
-	private boolean animate_turn;
-	private float center_x;
-	private float center_y;
-	private int fps_start;
-	private float start_angle;
-	private boolean direction_clockwise; // true = CW false = CCW
-	private float animating_turn_x;
-	private float animating_turn_y;
-	private float turn_rotation;
-
 	public void check_animate_turn()
 	{
+		/* checks if 3 or 4 points is a turn or uturn which needs to go in an animation sequence */
 		verilogTownGridNode p1 = this.current_point; 
 		verilogTownGridNode p2; 
 		verilogTownGridNode p3; 
@@ -474,7 +418,7 @@ public class Car
 
 		if (p4 != null && p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y() && (p4.get_x() == p1.get_x() || p4.get_y() == p1.get_y()))
 		{
-			/* if one of the directions is not the same, must be a turn assuming from and to are 3 points of a corner */
+			/* if this is a uturn */
 			init_animate_uturn(p1, p2, p3, p4);
 		}
 		else if (p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y())
@@ -483,16 +427,16 @@ public class Car
 			init_animate_turn(p1, p2, p3);
 		}
 
+		/* replace the points on the path */
 		if (p4 != null)
 			put_next_point_back_on_path(p4);
 		put_next_point_back_on_path(p3);
 		put_next_point_back_on_path(p2);
 	}
 
-	boolean animate_uturn;
-
 	public void init_animate_turn(verilogTownGridNode p1, verilogTownGridNode p2, verilogTownGridNode p3) 
 	{
+		/* sets all the variables to calulate the arc of the circle to travel on */
 		this.animate_turn = true;
 		fps_start = 0;
 		float p1_x = (p1.get_x()-1)*64;
@@ -617,6 +561,7 @@ public class Car
 
 	public void init_animate_uturn(verilogTownGridNode p1, verilogTownGridNode p2, verilogTownGridNode p3, verilogTownGridNode p4) 
 	{
+		/* sets all the variables to calulate the arc of the circle to travel on */
 		this.animate_turn = true;
 		this.animate_uturn = true;
 		fps_start = 0;
@@ -685,6 +630,8 @@ public class Car
 
 	public void animate_car()
 	{		
+		/* local animation .  Always moves position_x and position_y since these are whe the car logically is.
+		   Also can be turning so update those variables */
 		if (this.animate_state == CarAnimateStates.MOVING)
 		{
 			if (this.animation_direction == Direction.N)
@@ -696,12 +643,11 @@ public class Car
 			else if (this.animation_direction == Direction.W)
 				this.position_x -= this.speed;	
 
-			/*Gdx.app.log("Car ", "x="+this.current_point.get_x()+ " y="+this.current_point.get_y()+" ax="+ this.position_x+" ay="+this.position_y);*/
-
 			if (this.animate_turn == true)
 			{
 				if (animate_uturn == false)
 				{
+					/* 90 Degree TURN */
 					if (fps_start == 31)
 					{
 						/* animation done */
@@ -711,6 +657,7 @@ public class Car
 	
 					fps_start++;
 	
+					/* Radius of turn is 64 */
 					animating_turn_x = (float)(this.center_x + 64 * Math.cos(Math.toRadians(this.start_angle)));
 					animating_turn_y = (float)(this.center_y + 64 * Math.sin(Math.toRadians(this.start_angle)));
 	
@@ -725,10 +672,10 @@ public class Car
 						turn_rotation += 2.8125; // 90 degrees / 32 frames 
 						start_angle += 2.8125; // relative to the center to p1
 					}
-					//Gdx.app.log("Car", "x="+position_x+" y="+position_y+" animate_turn x="+animating_turn_x+" animate_turn y=="+animating_turn_y+" rot angle="+turn_rotation+" angle= "+start_angle+" center_x="+center_x+" center_y="+center_y+" fps="+fps_start);
 				}
 				else
 				{
+					/* U-TURN */
 					if (fps_start == 47)
 					{
 						/* animation done */
@@ -739,6 +686,7 @@ public class Car
 	
 					fps_start++;
 	
+					/* Radius of turn is 32 */
 					animating_turn_x = (float)(this.center_x + 32 * Math.cos(Math.toRadians(this.start_angle)));
 					animating_turn_y = (float)(this.center_y + 32 * Math.sin(Math.toRadians(this.start_angle)));
 	
@@ -753,7 +701,6 @@ public class Car
 						turn_rotation += 3.75; // 180 degrees / 48 frames 
 						start_angle += 3.75; // relative to the center to p1
 					}
-					//Gdx.app.log("Car", "x="+position_x+" y="+position_y+" animate_turn x="+animating_turn_x+" animate_turn y=="+animating_turn_y+" rot angle="+turn_rotation+" angle= "+start_angle+" center_x="+center_x+" center_y="+center_y+" fps="+fps_start);
 				}
 
 			}
@@ -790,12 +737,10 @@ public class Car
 	{
 		return this.current_point;
 	}
-
 	public verilogTownGridNode get_start_point() 
 	{
 		return this.start_point;
 	}
-
 	public verilogTownGridNode get_end_point() 
 	{
 		return this.end_point;
@@ -822,11 +767,12 @@ public class Car
 
 	public boolean check_for_crash(Car car_two)
 	{
-		float c1_x = this.position_x+10;
+		/* checks if car ones box has any points from car_two in it's rectangle */
+		float c1_x = this.position_x+10; // 10 is a fudge factor */
 		float c1_y = this.position_y+10;
 		float c2_x = car_two.position_x+10;
 		float c2_y = car_two.position_y+10;
-		float c1_x_offset = this.position_x + 54;
+		float c1_x_offset = this.position_x + 54; // 54 is a fudge factor = 64-10 */
 		float c1_y_offset = this.position_y + 54;
 		float c2_x_offset = car_two.position_x + 54;
 		float c2_y_offset = car_two.position_y + 54;
@@ -883,6 +829,7 @@ public class Car
 	public boolean get_is_done_path() {
 		return this.is_done_path;
 	}
+
 	public Direction get_direction() {
 		return this.direction;
 	}
