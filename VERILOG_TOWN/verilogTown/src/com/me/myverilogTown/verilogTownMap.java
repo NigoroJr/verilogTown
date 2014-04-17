@@ -181,7 +181,7 @@ public class verilogTownMap
 		/* Error in that it can't find a path */
 		/* update cars end point */
 		the_car.set_end_point_and_fail_on_getting_car_accross(possible_end);
-		Gdx.app.log("verilogTownMap-findPath", "Car couldn't find path so forcing to new end");
+		//Gdx.app.log("verilogTownMap-findPath", "Car couldn't find path so forcing to new end");
 
 		while(!queue.isEmpty())
 			queue.remove();

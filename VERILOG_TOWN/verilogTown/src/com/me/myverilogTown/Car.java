@@ -84,6 +84,7 @@ public class Car
 		this.animate_state = CarAnimateStates.STOPPED;
 		this.at_signal = false;
 		this.animate_turn = false;
+		this.animate_uturn = false;
 
 		TextureRegion[] carFrames; 
 		TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth()/2, texture.getHeight()/2);
@@ -441,6 +442,7 @@ public class Car
 		verilogTownGridNode p1 = this.current_point; 
 		verilogTownGridNode p2; 
 		verilogTownGridNode p3; 
+		verilogTownGridNode p4; 
 
 		if (this.animate_turn == true)
 			return;
@@ -461,16 +463,33 @@ public class Car
 			put_next_point_back_on_path(p2);
 			return;
 		}
+		else if (!path.empty())
+		{
+			p4 = this.get_next_point_on_path(); 
+		}
+		else
+		{
+			p4 = null;
+		}
 
-		if (p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y())
+		if (p4 != null && p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y() && (p4.get_x() == p1.get_x() || p4.get_y() == p1.get_y()))
+		{
+			/* if one of the directions is not the same, must be a turn assuming from and to are 3 points of a corner */
+			init_animate_uturn(p1, p2, p3, p4);
+		}
+		else if (p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y())
 		{
 			/* if one of the directions is not the same, must be a turn assuming from and to are 3 points of a corner */
 			init_animate_turn(p1, p2, p3);
 		}
 
+		if (p4 != null)
+			put_next_point_back_on_path(p4);
 		put_next_point_back_on_path(p3);
 		put_next_point_back_on_path(p2);
 	}
+
+	boolean animate_uturn;
 
 	public void init_animate_turn(verilogTownGridNode p1, verilogTownGridNode p2, verilogTownGridNode p3) 
 	{
@@ -481,7 +500,7 @@ public class Car
 		float p3_x = (p3.get_x()-1)*64;
 		float p3_y = (p3.get_y()-1)*64;
 		animating_turn_x = p1_x;
-		inganimating_turn_y = p1_y;
+		animating_turn_y = p1_y;
 		
 		/*
 		   p2-->p3
@@ -596,6 +615,74 @@ public class Car
 		}
 	}
 
+	public void init_animate_uturn(verilogTownGridNode p1, verilogTownGridNode p2, verilogTownGridNode p3, verilogTownGridNode p4) 
+	{
+		this.animate_turn = true;
+		this.animate_uturn = true;
+		fps_start = 0;
+		float p1_x = (p1.get_x()-1)*64;
+		float p1_y = (p1.get_y()-1)*64;
+		animating_turn_x = p1_x;
+		animating_turn_y = p1_y;
+		
+		/*
+		   p3--p2
+		   |   |
+		   |   |
+		   p4  p1
+		*/
+		if (p1.get_y() == p4.get_y() && p1.get_y() < p2.get_y())
+		{
+			direction_clockwise = false;
+			center_x = p1_x-32;
+			center_y = p1_y;
+			turn_rotation = 90; // relative to direction animation
+			start_angle = 0; // relative to the center to p1
+		}
+		/*
+		   p4--p3
+		       |
+		       |
+		   p1--p2
+		*/
+		else if (p1.get_x() == p4.get_x() && p1.get_x() < p2.get_x())
+		{
+			direction_clockwise = false;
+			center_x = p1_x;
+			center_y = p1_y+32;
+			turn_rotation = 0; // relative to direction animation
+			start_angle = 270; // relative to the center to p1
+		}	
+		/*
+		   p1  p4
+		   |   |
+		   |   |
+		   p2--p3
+		*/
+		else if (p1.get_y() == p4.get_y() && p1.get_y() > p2.get_y())
+		{
+			direction_clockwise = false;
+			center_x = p1_x+32;
+			center_y = p1_y;
+			turn_rotation = 270; // relative to direction animation
+			start_angle = 180; // relative to the center to p1
+		}	
+		/*
+		   p2--p1
+		   |    
+		   |    
+		   p3--p4
+		*/
+		else if (p1.get_x() == p4.get_x() && p1.get_x() > p2.get_x())
+		{
+			direction_clockwise = false;
+			center_x = p1_x;
+			center_y = p1_y-32;
+			turn_rotation = 180; // relative to direction animation
+			start_angle = 90; // relative to the center to p1
+		}	
+	}
+
 	public void animate_car()
 	{		
 		if (this.animate_state == CarAnimateStates.MOVING)
@@ -613,31 +700,62 @@ public class Car
 
 			if (this.animate_turn == true)
 			{
-				if (fps_start == 31)
+				if (animate_uturn == false)
 				{
-					/* animation done */
-					animate_turn = false;
-					return;
-				}
-
-				fps_start++;
-
-				animating_turn_x = (float)(this.center_x + 64 * Math.cos(Math.toRadians(this.start_angle)));
-				animating_turn_y = (float)(this.center_y + 64 * Math.sin(Math.toRadians(this.start_angle)));
-
-				if (this.direction_clockwise == true)
-				{
-					turn_rotation -= 2.8125; // 90 degrees / 32 frames (16 Frames to move through a tile)
-					start_angle -= 2.8125; // relative to the center to p1
-
+					if (fps_start == 31)
+					{
+						/* animation done */
+						animate_turn = false;
+						return;
+					}
+	
+					fps_start++;
+	
+					animating_turn_x = (float)(this.center_x + 64 * Math.cos(Math.toRadians(this.start_angle)));
+					animating_turn_y = (float)(this.center_y + 64 * Math.sin(Math.toRadians(this.start_angle)));
+	
+					if (this.direction_clockwise == true)
+					{
+						turn_rotation -= 2.8125; // 90 degrees / 32 frames (16 Frames to move through a tile)
+						start_angle -= 2.8125; // relative to the center to p1
+	
+					}
+					else
+					{
+						turn_rotation += 2.8125; // 90 degrees / 32 frames 
+						start_angle += 2.8125; // relative to the center to p1
+					}
+					//Gdx.app.log("Car", "x="+position_x+" y="+position_y+" animate_turn x="+animating_turn_x+" animate_turn y=="+animating_turn_y+" rot angle="+turn_rotation+" angle= "+start_angle+" center_x="+center_x+" center_y="+center_y+" fps="+fps_start);
 				}
 				else
 				{
-					turn_rotation += 2.8125; // 90 degrees / 50 frames 
-					start_angle += 2.8125; // relative to the center to p1
+					if (fps_start == 47)
+					{
+						/* animation done */
+						animate_turn = false;
+						animate_uturn = false;
+						return;
+					}
+	
+					fps_start++;
+	
+					animating_turn_x = (float)(this.center_x + 32 * Math.cos(Math.toRadians(this.start_angle)));
+					animating_turn_y = (float)(this.center_y + 32 * Math.sin(Math.toRadians(this.start_angle)));
+	
+					if (this.direction_clockwise == true)
+					{
+						turn_rotation -= 3.75; // 90 degrees / 48 frames (16 Frames to move through a tile)
+						start_angle -= 3.75; // relative to the center to p1
+	
+					}
+					else
+					{
+						turn_rotation += 3.75; // 180 degrees / 48 frames 
+						start_angle += 3.75; // relative to the center to p1
+					}
+					//Gdx.app.log("Car", "x="+position_x+" y="+position_y+" animate_turn x="+animating_turn_x+" animate_turn y=="+animating_turn_y+" rot angle="+turn_rotation+" angle= "+start_angle+" center_x="+center_x+" center_y="+center_y+" fps="+fps_start);
 				}
-		
-				//Gdx.app.log("Car", "x="+position_x+" y="+position_y+" animate_turn x="+animating_turn_x+" animate_turn y=="+animating_turn_y+" rot angle="+turn_rotation+" angle= "+start_angle+" center_x="+center_x+" center_y="+center_y+" fps="+fps_start);
+
 			}
 		}
 	}
