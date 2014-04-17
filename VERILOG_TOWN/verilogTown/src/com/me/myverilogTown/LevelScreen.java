@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
 
 public class LevelScreen implements Screen 
 {
@@ -32,8 +33,11 @@ public class LevelScreen implements Screen
 	private Texture go_forward;
 	private Texture go_right;
 	private Texture go_left;
+	private int LEVEL_WIDTH;
+	private int LEVEL_HEIGHT;
 	int toggle;
 	Random random_number;
+	private Rectangle glViewport;
 
 	float Time; // Game clock of passed time
 	float Frame_Time_25; // amount of time for 25FPS
@@ -60,9 +64,17 @@ public class LevelScreen implements Screen
 		/* initialize the map */
 		level_map = new Texture("data/first_map.png"); 
 
-		// create the camera for the SpriteBatch
+		/* create the camera for the SpriteBatch */
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1280, 1280);
+		/* set the level hegiht parameters */
+		LEVEL_HEIGHT = 1280;
+		LEVEL_WIDTH = 1280;
+		/* make the viewport to the level size */
+		camera.setToOrtho(false, LEVEL_WIDTH, LEVEL_HEIGHT);
+		camera.position.set(LEVEL_WIDTH / 2, LEVEL_HEIGHT / 2, 0);
+		glViewport = new Rectangle(0, 0, LEVEL_WIDTH, LEVEL_HEIGHT);
+		/* record the starting parameters */
+		zoom_initial = camera.zoom;
 
 		/* NOTE - for graphics "paint.net" pretty good.  Need to save as 8-bit png file */
 
@@ -106,7 +118,6 @@ public class LevelScreen implements Screen
 		cars[17] = new Car(clevel.grid[15][0], clevel.grid[4][22], 400, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 		cars[18] = new Car(clevel.grid[21][9], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 		cars[19] = new Car(clevel.grid[21][14], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
-	
 
 		/* initialize the level logic control */
 		levelLogic = new LevelLogic();
@@ -121,7 +132,9 @@ public class LevelScreen implements Screen
 	public void render(float delta) 
 	{
 		boolean fps_tick = false;
+		GL10 gl = Gdx.graphics.getGL10();
 
+        	
 		Time += Gdx.graphics.getDeltaTime();
 		Next_Frame_Time += Gdx.graphics.getDeltaTime();
 
@@ -131,11 +144,9 @@ public class LevelScreen implements Screen
 			fps_tick = true;
 		}
 
-		// Simulation step alternate left and right 
-		if((Gdx.input.isKeyPressed(Keys.DPAD_LEFT) && toggle == 1) || (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT) && toggle == 0)) 
-		{
-			toggle = (toggle+1) % 2;
-		}
+		/* check for button presses */
+		handle_inputs();
+
 		if (fps_tick = true && toggle == 1 && this.level_done == false)
 		{
 			/*Gdx.app.log("Time Since last simulation:", "="+ Time);*/
@@ -146,11 +157,16 @@ public class LevelScreen implements Screen
 
 		}
 
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		// Camera --------------------- /
+		gl.glClearColor(0, 0, 0, 1);
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+	     	/*   gl.glViewport((int) glViewport.x, (int) glViewport.y, (int) glViewport.width, (int) glViewport.height); -- seems to cause clipping of full map */
 
 		// tell the camera to update its matrices.
 		camera.update();
+		/*	camera.apply(gl); -- With the above glViewport, seems to cutoff some of map */
+
+		thebatch.setProjectionMatrix(camera.combined);
 
 		if (this.level_done == true)
 		{
@@ -200,6 +216,74 @@ public class LevelScreen implements Screen
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
 			thebatch.end();
 		}
+	}
+
+	private float zoom_initial;
+	public void handle_inputs()
+	{
+		/* Sim on and off */
+		if((Gdx.input.isKeyPressed(Keys.S) && toggle == 0) || (Gdx.input.isKeyPressed(Keys.X) && toggle == 1)) 
+		{
+			toggle = (toggle+1) % 2;
+			Gdx.app.log("LevelScreen", "Toggle="+toggle);
+		}
+		/* Zoom out */
+		if(Gdx.input.isKeyPressed(Keys.A)) 
+		{
+			if (zoom_initial != camera.zoom)
+			{
+				camera.zoom += 0.02;
+				zoom_limit_to_border();
+			}
+		}
+		/* Zoom in */
+		if(Gdx.input.isKeyPressed(Keys.Q)) 
+		{
+			camera.zoom -= 0.02;
+			zoom_limit_to_border();
+		}
+
+		if(Gdx.input.isKeyPressed(Keys.LEFT)) 
+		{
+			camera.translate(-3, 0, 0);
+			zoom_limit_to_border();
+		}
+		if(Gdx.input.isKeyPressed(Keys.RIGHT)) 
+		{
+			camera.translate(3, 0, 0);
+			zoom_limit_to_border();
+		}
+		if(Gdx.input.isKeyPressed(Keys.DOWN)) 
+		{
+			camera.translate(0, -3, 0);
+			zoom_limit_to_border();
+		}
+		if(Gdx.input.isKeyPressed(Keys.UP)) 
+		{
+			camera.translate(0, 3, 0);
+			zoom_limit_to_border();
+		}
+
+	}
+
+	private void zoom_limit_to_border()
+	{
+		float camX;
+		float camY;
+
+		camX = camera.position.x;
+		camY = camera.position.y;
+	
+		Vector2 camMin = new Vector2(camera.viewportWidth, camera.viewportHeight);
+		camMin.scl(camera.zoom/2); //bring to center and scale by the zoom level
+		Vector2 camMax = new Vector2(LEVEL_WIDTH, LEVEL_HEIGHT);
+		camMax.sub(camMin); //bring to center
+
+		//keep camera within borders
+		camX = Math.min(camMax.x, Math.max(camX, camMin.x));
+		camY = Math.min(camMax.y, Math.max(camY, camMin.y));
+
+		camera.position.set(camX, camY, camera.position.z);
 	}
 
 	@Override
