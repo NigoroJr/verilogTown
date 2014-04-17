@@ -21,7 +21,6 @@ public class Car
 	private boolean is_crashed;
 	private boolean is_done_path;
 	private boolean is_start_path;
-	private boolean is_processed;
 	private verilogTownGridNode location;
 	private int x;
 	private int y;
@@ -71,7 +70,6 @@ public class Car
 		this.is_crashed = false;
 		this.is_done_path = false;
 		this.is_start_path = false;
-		this.is_processed = false;
 		this.start_time = starting_time;
 
 		this.position_x = position_x;
@@ -85,6 +83,7 @@ public class Car
 		this.carTexture = texture;
 		this.animate_state = CarAnimateStates.STOPPED;
 		this.at_signal = false;
+		this.animate_turn = false;
 
 		TextureRegion[] carFrames; 
 		TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth()/2, texture.getHeight()/2);
@@ -264,6 +263,7 @@ public class Car
 			}
 		}
 	}
+
 	public void set_car_direction(verilogTownGridNode from, verilogTownGridNode to)
 	{
 		GridType grid_type;
@@ -375,7 +375,7 @@ public class Car
 	{
 		verilogTownGridNode crash_point = this.get_current_point();
 
-		Gdx.app.log("Car", "crash done");
+		Gdx.app.log("Car", "crash done"+ " x="+this.position_x+" y="+this.position_y);
 		crash_point.set_car(null);
 		this.set_is_crashed();
 		this.set_is_done_path();
@@ -394,8 +394,6 @@ public class Car
 		}
 		else 
 		{
-			Gdx.app.log("Car", "in here!!!!");
-	
 			if (this.way_point == to)
 			{
 				this.way_point = null;
@@ -428,6 +426,176 @@ public class Car
 		this.position_y = (this.get_current_point().get_y()-1)*64;
 	}
 
+	private boolean animate_turn;
+	private float center_x;
+	private float center_y;
+	private int fps_start;
+	private float start_angle;
+	private boolean direction_clockwise; // true = CW false = CCW
+	private float animating_turn_x;
+	private float animating_turn_y;
+	private float turn_rotation;
+
+	public void check_animate_turn()
+	{
+		verilogTownGridNode p1 = this.current_point; 
+		verilogTownGridNode p2; 
+		verilogTownGridNode p3; 
+
+		if (this.animate_turn == true)
+			return;
+
+		p2 = this.get_next_point_on_path();
+		if (p2 != null && !path.empty())
+		{
+			p3 = this.get_next_point_on_path(); 
+		}
+		else
+		{
+			put_next_point_back_on_path(p2);
+			return;
+		}
+
+		if (p3 == null)
+		{
+			put_next_point_back_on_path(p2);
+			return;
+		}
+
+		if (p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y())
+		{
+			/* if one of the directions is not the same, must be a turn assuming from and to are 3 points of a corner */
+			init_animate_turn(p1, p2, p3);
+		}
+
+		put_next_point_back_on_path(p3);
+		put_next_point_back_on_path(p2);
+	}
+
+	public void init_animate_turn(verilogTownGridNode p1, verilogTownGridNode p2, verilogTownGridNode p3) 
+	{
+		this.animate_turn = true;
+		fps_start = 0;
+		float p1_x = (p1.get_x()-1)*64;
+		float p1_y = (p1.get_y()-1)*64;
+		float p3_x = (p3.get_x()-1)*64;
+		float p3_y = (p3.get_y()-1)*64;
+		animating_turn_x = p1_x;
+		inganimating_turn_y = p1_y;
+		
+		/*
+		   p2-->p3
+		   |
+		   |
+		   p1
+		   */
+		if (p1.get_x() < p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p1.get_x())
+		{
+			direction_clockwise = true;
+			center_x = p3_x;
+			center_y = p1_y;
+			turn_rotation = 90; // relative to direction animation
+			start_angle = 180; // relative to the center to p1
+		}
+		/*
+		 p1--
+		     |
+		     |
+		     v
+		   */
+		else if (p1.get_x() < p3.get_x() && p1.get_y() > p3.get_y()  && p2.get_x() == p3.get_x())
+		{
+			direction_clockwise = true;
+			center_x = p1_x;
+			center_y = p3_y;
+			turn_rotation = 360;
+			start_angle = 90;
+		}
+		/*  p1
+		     |
+		     |
+		  <-- 
+		   */
+		else if (p1.get_x() > p3.get_x() && p1.get_y() > p3.get_y()  && p2.get_x() == p1.get_x())
+		{
+			direction_clockwise = true;
+			center_x = p3_x;
+			center_y = p1_y;
+			turn_rotation = 270;
+			start_angle = 360;
+		}
+		/*
+		  A 
+		  | 
+		  | 
+		   --p1
+		   */
+		else if (p1.get_x() > p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p3.get_x())
+		{
+			direction_clockwise = true;
+			center_x = p1_x;
+			center_y = p3_y;
+			turn_rotation = 180;
+			start_angle = 270;
+		}
+		/*
+		    --p1
+		   |
+		   |
+		   v
+		   p3
+		   */
+		else if (p1.get_x() > p3.get_x() && p1.get_y() > p3.get_y() && p2.get_x() == p3.get_x())
+		{
+			direction_clockwise = false;
+			center_x = p1_x;
+			center_y = p3_y;
+			turn_rotation = 180;
+			start_angle = 90;
+		}
+		/*
+		 p3--
+		     |
+		     |
+		     A
+		   */
+		else if (p1.get_x() > p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p1.get_x())
+		{
+			direction_clockwise = false;
+			center_x = p3_x;
+			center_y = p1_y;
+			turn_rotation = 90;
+			start_angle = 0;
+		}
+		/*  p3
+		     |
+		     |
+		  >-- 
+		   */
+		else if (p1.get_x() < p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p3.get_x())
+		{
+			direction_clockwise = false;
+			center_x = p1_x;
+			center_y = p3_y;
+			turn_rotation = 0;
+			start_angle = 270;
+		}
+		/*
+		  v 
+		  | 
+		  | 
+		   --p3
+		   */
+		else if (p1.get_x() < p3.get_x() && p1.get_y() > p3.get_y() && p2.get_x() == p1.get_x())
+		{
+			direction_clockwise = false;
+			center_x = p3_x;
+			center_y = p1_y;
+			turn_rotation = 270;
+			start_angle = 180;
+		}
+	}
+
 	public void animate_car()
 	{		
 		if (this.animate_state == CarAnimateStates.MOVING)
@@ -441,10 +609,56 @@ public class Car
 			else if (this.animation_direction == Direction.W)
 				this.position_x -= this.speed;	
 
-			this.animate_state = CarAnimateStates.MOVED;
-			Gdx.app.log("Car ", "x="+this.current_point.get_x()+ " y="+this.current_point.get_y()+" ax="+ this.position_x+" ay="+this.position_y);
+			/*Gdx.app.log("Car ", "x="+this.current_point.get_x()+ " y="+this.current_point.get_y()+" ax="+ this.position_x+" ay="+this.position_y);*/
+
+			if (this.animate_turn == true)
+			{
+				if (fps_start == 31)
+				{
+					/* animation done */
+					animate_turn = false;
+					return;
+				}
+
+				fps_start++;
+
+				animating_turn_x = (float)(this.center_x + 64 * Math.cos(Math.toRadians(this.start_angle)));
+				animating_turn_y = (float)(this.center_y + 64 * Math.sin(Math.toRadians(this.start_angle)));
+
+				if (this.direction_clockwise == true)
+				{
+					turn_rotation -= 2.8125; // 90 degrees / 32 frames (16 Frames to move through a tile)
+					start_angle -= 2.8125; // relative to the center to p1
+
+				}
+				else
+				{
+					turn_rotation += 2.8125; // 90 degrees / 50 frames 
+					start_angle += 2.8125; // relative to the center to p1
+				}
+		
+				//Gdx.app.log("Car", "x="+position_x+" y="+position_y+" animate_turn x="+animating_turn_x+" animate_turn y=="+animating_turn_y+" rot angle="+turn_rotation+" angle= "+start_angle+" center_x="+center_x+" center_y="+center_y+" fps="+fps_start);
+			}
 		}
 	}
+
+	public boolean get_animate_turn() 
+	{
+		return this.animate_turn;
+	}
+	public float get_turn_x() 
+	{
+		return this.animating_turn_x;
+	}
+	public float get_turn_y() 
+	{
+		return this.animating_turn_y;
+	}
+	public float get_turn_rotation() 
+	{
+		return this.turn_rotation;
+	}
+
 	public void set_animate_state(CarAnimateStates state)
 	{
 		this.animate_state = state;
@@ -454,64 +668,96 @@ public class Car
 		return this.animate_state;
 	}
 
-	public verilogTownGridNode get_current_point() {
+	public verilogTownGridNode get_current_point() 
+	{
 		return this.current_point;
 	}
 
-	public verilogTownGridNode get_start_point() {
+	public verilogTownGridNode get_start_point() 
+	{
 		return this.start_point;
 	}
 
-	public verilogTownGridNode get_end_point() {
+	public verilogTownGridNode get_end_point() 
+	{
 		return this.end_point;
 	}
-	public void set_end_point_and_fail_on_getting_car_accross(verilogTownGridNode point) {
+	public void set_end_point_and_fail_on_getting_car_accross(verilogTownGridNode point) 
+	{
 		this.success_getting_to_end_point = false;
 		this.end_point = point;
 	}
 
-	public verilogTownGridNode get_next_point_on_path() {
+	public verilogTownGridNode get_next_point_on_path() 
+	{
 		return this.path.pop();
 	}
-	public void put_next_point_back_on_path(verilogTownGridNode point) {
+	public void put_next_point_back_on_path(verilogTownGridNode point) 
+	{
 		this.path.push(point);
 	}
 
-	public int get_start_time() {
+	public int get_start_time() 
+	{
 		return this.start_time;
 	}
 
-	public void set_is_crashed() {
+	public boolean check_for_crash(Car car_two)
+	{
+		float c1_x = this.position_x+10;
+		float c1_y = this.position_y+10;
+		float c2_x = car_two.position_x+10;
+		float c2_y = car_two.position_y+10;
+		float c1_x_offset = this.position_x + 54;
+		float c1_y_offset = this.position_y + 54;
+		float c2_x_offset = car_two.position_x + 54;
+		float c2_y_offset = car_two.position_y + 54;
+
+		float p1_x = c2_x;
+		float p1_y = c2_y;
+		float p2_x = c2_x_offset;
+		float p2_y = c2_y;
+		float p3_x = c2_x;
+		float p3_y = c2_y_offset;
+		float p4_x = c2_x_offset;
+		float p4_y = c2_y_offset;
+
+		if (c1_x <= p1_x && c1_x_offset >= p1_x && c1_y <= p1_y && c1_y_offset >= p1_y)
+			return true;
+		else if (c1_x <= p2_x && c1_x_offset >= p2_x && c1_y <= p2_y && c1_y_offset >= p2_y)
+			return true;
+		else if (c1_x <= p3_x && c1_x_offset >= p3_x && c1_y <= p3_y && c1_y_offset >= p3_y)
+			return true;
+		else if (c1_x <= p4_x && c1_x_offset >= p4_x && c1_y <= p4_y && c1_y_offset >= p4_y)
+			return true;
+		else
+			return false;
+
+	}
+	public void set_is_crashed() 
+	{
 		this.is_crashed = true;
 	}
 	public boolean get_is_crashed() {
 		return this.is_crashed;
 	}
 
-	public void set_is_start_path() {
+	public void set_is_start_path() 
+	{
 		this.is_start_path = true;
 	}
-	public boolean get_is_start_path() {
+	public boolean get_is_start_path() 
+	{
 		return this.is_start_path;
 	}
-
-	public void set_processed(boolean value) 
+	public boolean get_is_running()
 	{
-		this.is_processed = value;
-	}
-	public void reset_states()
-	{
-		this.set_processed(false);	
-
-		if (this.animate_state == CarAnimateStates.MOVED)
-		{
-			this.animate_state = CarAnimateStates.MOVING;
-		}
+		if (this.is_start_path == true && this.is_done_path == false)
+			return true;
+		else
+			return false;
 	}
 
-	public boolean get_processed() {
-		return this.is_processed;
-	}
 	public void set_is_done_path() {
 		this.is_done_path = true;
 		this.current_point = null;

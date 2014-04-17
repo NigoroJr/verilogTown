@@ -82,7 +82,7 @@ public class LevelScreen implements Screen
 		go_left.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
 		/* after reading the number of cars from level */
-		num_cars = 10; // hard coded
+		num_cars = 20; // hard coded
 		cars = new Car[num_cars];
 
 		/* initialize cars */
@@ -93,9 +93,20 @@ public class LevelScreen implements Screen
 		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
-		cars[7] = new Car(clevel.grid[15][0], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[7] = new Car(clevel.grid[15][0], clevel.grid[4][22], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
 		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 200, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[10] = new Car(clevel.grid[7][0], clevel.grid[4][22], 300, clevel, 0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[11] = new Car(clevel.grid[15][0], clevel.grid[4][22], 300, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[12] = new Car(clevel.grid[21][9], clevel.grid[4][22], 300, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[13] = new Car(clevel.grid[21][14], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[14] = new Car(clevel.grid[3][22], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[15] = new Car(clevel.grid[17][22], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[16] = new Car(clevel.grid[7][0], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[17] = new Car(clevel.grid[15][0], clevel.grid[4][22], 400, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[18] = new Car(clevel.grid[21][9], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+		cars[19] = new Car(clevel.grid[21][14], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_texture, random_number);
+	
 
 		/* initialize the level logic control */
 		levelLogic = new LevelLogic();
@@ -127,7 +138,7 @@ public class LevelScreen implements Screen
 		}
 		if (fps_tick = true && toggle == 1 && this.level_done == false)
 		{
-			Gdx.app.log("Time Since last simulation:", "="+ Time);
+			/*Gdx.app.log("Time Since last simulation:", "="+ Time);*/
 			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number);
 		}
 		else if (this.level_done == true)
@@ -143,11 +154,12 @@ public class LevelScreen implements Screen
 
 		if (this.level_done == true)
 		{
+			/* LEVEL COMPLETE */
 			thebatch.begin();
 			thebatch.draw(level_map, 0, 0);
 			for (int i = 0; i < num_cars; i++)
 			{
-				if ((cars[i].get_is_start_path() && !cars[i].get_is_done_path()) || cars[i].get_is_crashed())
+				if (cars[i].get_is_running() || cars[i].get_is_crashed())
 				{
 					cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
 					cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
@@ -163,15 +175,25 @@ public class LevelScreen implements Screen
 		}
 		else
 		{
+			/* BAsic animation */
 			thebatch.begin();
 			thebatch.draw(level_map, 0, 0);
 			for (int i = 0; i < num_cars; i++)
 			{
-				if ((cars[i].get_is_start_path() && !cars[i].get_is_done_path()) || cars[i].get_is_crashed())
+				if (cars[i].get_is_running() || cars[i].get_is_crashed())
 				{
-					cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
-					cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
-					cars[i].getCarSprite().draw(thebatch);
+					if (!cars[i].get_animate_turn())
+					{
+						cars[i].getCarSprite().setPosition(cars[i].getPosition_x(), cars[i].getPosition_y());
+						cars[i].getCarSprite().setRotation(cars[i].set_and_get_rotation_based_on_direction());
+						cars[i].getCarSprite().draw(thebatch);
+					}
+					else
+					{
+						cars[i].getCarSprite().setPosition(cars[i].get_turn_x(), cars[i].get_turn_y());
+						cars[i].getCarSprite().setRotation(cars[i].get_turn_rotation());
+						cars[i].getCarSprite().draw(thebatch);
+					}
 				}
 			}
 	
