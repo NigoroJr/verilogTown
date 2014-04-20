@@ -275,7 +275,7 @@ public class VerilogTownMap
 	{
 		for (int i = 0; i < this.num_traffic_signals ; i++)
 		{
-			Gdx.app.log("verilogTownMap-Traffic Light", " N="+ traffic_signals[i].get_signal(0) +" S="+ traffic_signals[i].get_signal(1) +" E="+ traffic_signals[i].get_signal(2) +" W="+ traffic_signals[i].get_signal(3));
+			Gdx.app.log("verilogTownMap-Traffic Light", " N="+ traffic_signals[i].getSignalWhen(TrafficControl.PROCEED_NORTH) +" S="+ traffic_signals[i].getSignalWhen(1) +" E="+ traffic_signals[i].getSignalWhen(2) +" W="+ traffic_signals[i].getSignalWhen(3));
 		}
 	}
 
