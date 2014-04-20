@@ -1,9 +1,6 @@
 package com.me.myverilogTown;
 
 import java.util.*;
-import java.util.Random.*;
-
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 
 public class LevelLogic
@@ -24,7 +21,7 @@ public class LevelLogic
 		car_crashing_q = new LinkedList<Integer>();
 	}
 
-	public boolean update(Car cars[], int num_cars, verilogTownMap clevel, Random randomno)
+	public boolean update(Car cars[], int num_cars, VerilogTownMap clevel, Random randomno)
 	{
 		/* increment time */
 		time_step ++; // a second of time at 25 FPS
@@ -84,34 +81,34 @@ public class LevelLogic
 				}
 
 				/* check the logic of the game */
-				verilogTownGridNode current_spot = cars[car_index].get_current_point();
-				TrafficSignal signal = current_spot.get_traffic_signal(); 
+				GridNode current_spot = cars[car_index].get_current_point();
+				TrafficSignalState signal = current_spot.getTrafficSignal(); 
 
 				/* Check what/if there is a traffic signal and a response needed */
-				if (signal == TrafficSignal.NO_SIGNAL)
+				if (signal == TrafficSignalState.NO_SIGNAL)
 				{
 					/* IF - you're just on a road then do what you want */
 					cars[car_index].set_animate_state(CarAnimateStates.MOVING);
 					car_has_free_movement(cars[car_index], current_spot, clevel);
 					cars[car_index].check_animate_turn();
 				}
-				else if (signal == TrafficSignal.GO)
+				else if (signal == TrafficSignalState.GO)
 				{
 					/* IF - you're at a GO signal then you're free to do what you want */
 					cars[car_index].set_animate_state(CarAnimateStates.MOVING);
 					car_has_free_movement(cars[car_index], current_spot, clevel);
 					cars[car_index].check_animate_turn();
 				}
-				else if (	signal == TrafficSignal.GO_RIGHT ||  
-						signal == TrafficSignal.GO_LEFT ||  
-						signal == TrafficSignal.GO_FORWARD)   
+				else if (	signal == TrafficSignalState.GO_RIGHT ||  
+						signal == TrafficSignalState.GO_LEFT ||  
+						signal == TrafficSignalState.GO_FORWARD)   
 				{
 					/* ELSE IF - you're forced by the traffic signal to do something */
 					cars[car_index].set_animate_state(CarAnimateStates.MOVING);
 					car_has_forced_movement(cars[car_index], current_spot, signal, clevel); 
 					cars[car_index].check_animate_turn();
 				}
-				else if (signal == TrafficSignal.STOP)
+				else if (signal == TrafficSignalState.STOP)
 				{
 					/* ELSE IF - the signal says STOP */
 					cars[car_index].set_animate_state(CarAnimateStates.STOPPED);
@@ -151,9 +148,9 @@ public class LevelLogic
 		return false;
 	}
 
-	private void update_spot(Car the_car, verilogTownGridNode current_spot, verilogTownMap clevel)
+	private void update_spot(Car the_car, GridNode current_spot, VerilogTownMap clevel)
 	{
-		verilogTownGridNode next_spot;
+		GridNode next_spot;
 
 		/* get the next point on the path */
 		next_spot = the_car.get_next_point_on_path();
@@ -161,7 +158,7 @@ public class LevelLogic
 		the_car.set_current_point(current_spot, next_spot, null, clevel);
 	}
 
-	private void car_starts(Car the_car, verilogTownMap clevel)
+	private void car_starts(Car the_car, VerilogTownMap clevel)
 	{
 		int x;
 		int y;
@@ -177,14 +174,14 @@ public class LevelLogic
 		the_car.set_is_start_path();
 	}
 
-	private void car_has_forced_movement(Car the_car, verilogTownGridNode current_spot, TrafficSignal signal, verilogTownMap clevel)
+	private void car_has_forced_movement(Car the_car, GridNode current_spot, TrafficSignalState signal, VerilogTownMap clevel)
 	{
 		int x;
 		int y;
-		verilogTownGridNode next_spot;
-		verilogTownGridNode turn_via_point;
-		verilogTownGridNode second_spot;
-		verilogTownGridNode third_spot;
+		GridNode next_spot;
+		GridNode turn_via_point;
+		GridNode second_spot;
+		GridNode third_spot;
 
 		/* get the turn unless it's illegal */
 		turn_via_point = clevel.get_turn(current_spot, signal, the_car.get_direction());
@@ -215,11 +212,11 @@ public class LevelLogic
 		}
 	}
 
-	private void car_has_free_movement(Car the_car, verilogTownGridNode current_spot, verilogTownMap clevel)
+	private void car_has_free_movement(Car the_car, GridNode current_spot, VerilogTownMap clevel)
 	{
 		int x;
 		int y;
-		verilogTownGridNode next_spot;
+		GridNode next_spot;
 		
 		next_spot = the_car.get_next_point_on_path();
 		
@@ -238,17 +235,17 @@ public class LevelLogic
 		the_car.set_path(current_spot, null, clevel);
 	}
 
-	private boolean car_in_front_check(Car the_car, verilogTownGridNode current_spot, verilogTownGridNode next_spot, verilogTownMap clevel)
+	private boolean car_in_front_check(Car the_car, GridNode current_spot, GridNode next_spot, VerilogTownMap clevel)
 	{
 		Car car_in_front;
 		GridType car_in_front_grid_type;
 		
 		/* check if there's a car going in the same direction ahead */
-		car_in_front = next_spot.get_car();
+		car_in_front = next_spot.getCar();
 
 		if (car_in_front != null)
 		{
-			car_in_front_grid_type = car_in_front.get_current_point().get_grid_type();
+			car_in_front_grid_type = car_in_front.get_current_point().getType();
 
 			/* IF - car already processed then */
 			if (car_in_front.get_direction() == the_car.get_direction() || 

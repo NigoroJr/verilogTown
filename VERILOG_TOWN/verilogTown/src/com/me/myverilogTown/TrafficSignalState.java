@@ -1,6 +1,6 @@
 package com.me.myverilogTown;
 
-public enum TrafficSignal
+public enum TrafficSignalState
 {
 	STOP,
 	GO,

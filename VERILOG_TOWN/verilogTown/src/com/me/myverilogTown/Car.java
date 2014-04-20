@@ -12,20 +12,21 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Car
 {
-	private verilogTownGridNode start_point;
-	private verilogTownGridNode end_point;
-	private verilogTownGridNode current_point;
-	private verilogTownGridNode way_point;
+	private GridNode start_point;
+	private GridNode end_point;
+	private GridNode current_point;
+	private GridNode way_point;
 	private int start_time;
 	private boolean success_getting_to_end_point;
 	private boolean is_crashed;
 	private boolean is_done_path;
 	private boolean is_start_path;
-	private verilogTownGridNode location;
+	private boolean is_processed;
+	private GridNode location;
 	private int x;
 	private int y;
-	private verilogTownGridNode next_spot;
-	private Stack<verilogTownGridNode> path;
+	private GridNode next_spot;
+	private Stack<GridNode> path;
 	
 	/* Necessary for displaying car */
 	private Texture carTexture;
@@ -58,10 +59,10 @@ public class Car
 	private float animating_turn_y;
 	private float turn_rotation;
 
-	public Car(verilogTownGridNode start, 
-				verilogTownGridNode end, 
+	public Car(GridNode start, 
+				GridNode end, 
 				int starting_time, 
-				verilogTownMap level,
+				VerilogTownMap level,
 				int position_x, 
 				int position_y, 
 				float width, 
@@ -149,11 +150,32 @@ public class Car
 		return this.rotation;
 	}
 	
-	public void animation_direction(verilogTownGridNode from, verilogTownGridNode to)
+	public float getxScale() 
+	{
+		return xScale;
+	}
+
+	public void setxScale(float xScale) 
+	{
+		this.xScale = xScale;
+	}
+
+	public float getyScale() 
+	{
+		return yScale;
+	}
+
+	public void setyScale(float yScale) 
+	{
+		this.yScale = yScale;
+	}
+
+
+	public void animation_direction(GridNode from, GridNode to)
 	{
 		GridType grid_type_to;
 		GridType grid_type_from;
-		grid_type_to = to.get_grid_type();
+		grid_type_to = to.getType();
 
 		if (from == null) // starting move
 		{
@@ -176,7 +198,7 @@ public class Car
 		}
 		else
 		{
-			grid_type_from = from.get_grid_type();
+			grid_type_from = from.getType();
 			/* corner conditions */
 			if (grid_type_from == GridType.CORNER_ROAD_W2S || grid_type_from == GridType.CORNER_ROAD_E2S)
 			{
@@ -194,28 +216,28 @@ public class Car
 			{
 				this.animation_direction = Direction.N;
 			}
-			else if (to.get_x() > from.get_x())
+			else if (to.getX() > from.getX())
 			{
 				this.animation_direction = Direction.E;
 			}
-			else if (to.get_x() < from.get_x())
+			else if (to.getX() < from.getX())
 			{
 				this.animation_direction = Direction.W;
 			}
-			else if (to.get_y() > from.get_y())
+			else if (to.getY() > from.getY())
 			{
 				this.animation_direction = Direction.N;
 			}
-			else if (to.get_y() < from.get_y())
+			else if (to.getY() < from.getY())
 			{
 				this.animation_direction = Direction.S;
 			}
 		}
 	}
-	public void set_car_direction(verilogTownGridNode from, verilogTownGridNode to)
+	public void set_car_direction(GridNode from, GridNode to)
 	{
 		GridType grid_type;
-		grid_type = to.get_grid_type();
+		grid_type = to.getType();
 
 		if (from == null) // starting move
 		{
@@ -253,33 +275,37 @@ public class Car
 		{
 			this.direction = Direction.N;
 		}
-		else if (to.get_x() > from.get_x())
+		else if (to.getX() > from.getX())
 		{
 			this.direction = Direction.E;
 		}
-		else if (to.get_x() < from.get_x())
+		else if (to.getX() < from.getX())
 		{
 			this.direction = Direction.W;
 		}
-		else if (to.get_y() > from.get_y())
+		else if (to.getY() > from.getY())
 		{
 			this.direction = Direction.N;
 		}
-		else if (to.get_y() < from.get_y())
+		else if (to.getY() < from.getY())
 		{
 			this.direction = Direction.S;
 		}
 	}
 
-	public void set_current_point_end(verilogTownGridNode from, verilogTownGridNode to) 
+	public void set_current_point_end(GridNode from, GridNode to) 
 	{
-		/* Cleans up the grid with this car */
-		from.set_car(null);
-		to.set_car(null);
+		from.removeCar();
+		to.removeCar();
 		this.current_point = to;
 	}
 
-	public void set_current_point(verilogTownGridNode from, verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
+	public boolean at_signal_check()
+	{
+		return at_signal;
+	}
+
+	public void set_current_point(GridNode from, GridNode to, GridNode via_point, VerilogTownMap level) 
 	{
 		/* update which direction the car will now be going */
 		set_car_direction(from, to);
@@ -292,9 +318,9 @@ public class Car
 		/* store the car in the grid details */
 		if (from != null)
 		{
-			from.set_car(null);
+			from.setCar(null);
 		}
-		to.set_car(this);
+		to.setCar(this);
 
 		/* check if car made it to the end */
 		if (to == this.get_end_point())
@@ -304,10 +330,10 @@ public class Car
 			this.set_is_done_path();
 		}
 		else if (
-				to.get_grid_type() == GridType.END_S2SEDGE ||
-				to.get_grid_type() == GridType.END_N2NEDGE ||
-				to.get_grid_type() == GridType.END_E2EEDGE ||
-				to.get_grid_type() == GridType.END_W2WEDGE)
+				to.getType() == GridType.END_S2SEDGE ||
+				to.getType() == GridType.END_N2NEDGE ||
+				to.getType() == GridType.END_E2EEDGE ||
+				to.getType() == GridType.END_W2WEDGE)
 		{
 			/* Failed to get to proper destination path */
 			Gdx.app.log("Car", "failed done");
@@ -318,17 +344,17 @@ public class Car
 
 	public void crashed()
 	{
-		verilogTownGridNode crash_point = this.get_current_point();
+		GridNode crash_point = this.get_current_point();
 
 		Gdx.app.log("Car", "crash done"+ " x="+this.position_x+" y="+this.position_y);
-		crash_point.set_car(null);
+		crash_point.removeCar();;
 		this.set_is_crashed();
 		this.set_is_done_path();
 
 		carSprite = crashSprite;
 	}
 		
-	public void set_path(verilogTownGridNode to, verilogTownGridNode via_point, verilogTownMap level) 
+	public void set_path(GridNode to, GridNode via_point, VerilogTownMap level) 
 	{
 		/* update the path - some paths have way_points because of forced turns */
 		if (via_point == null && this.way_point == null)
@@ -376,17 +402,17 @@ public class Car
 	public void set_animate_start()
 	{
 		/* 64 is the size of the tiles, so start point */
-		this.position_x = (this.get_current_point().get_x()-1)*64;
-		this.position_y = (this.get_current_point().get_y()-1)*64;
+		this.position_x = (this.get_current_point().getX()-1)*64;
+		this.position_y = (this.get_current_point().getY()-1)*64;
 	}
 
 	public void check_animate_turn()
 	{
 		/* checks if 3 or 4 points is a turn or uturn which needs to go in an animation sequence */
-		verilogTownGridNode p1 = this.current_point; 
-		verilogTownGridNode p2; 
-		verilogTownGridNode p3; 
-		verilogTownGridNode p4; 
+		GridNode p1 = this.current_point; 
+		GridNode p2; 
+		GridNode p3; 
+		GridNode p4; 
 
 		if (this.animate_turn == true)
 			return;
@@ -416,12 +442,12 @@ public class Car
 			p4 = null;
 		}
 
-		if (p4 != null && p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y() && (p4.get_x() == p1.get_x() || p4.get_y() == p1.get_y()))
+		if (p4 != null && p1.getX() != p3.getX() && p1.getY() != p3.getY() && (p4.getX() == p1.getX() || p4.getY() == p1.getY()))
 		{
 			/* if this is a uturn */
 			init_animate_uturn(p1, p2, p3, p4);
 		}
-		else if (p1.get_x() != p3.get_x() && p1.get_y() != p3.get_y())
+		else if (p1.getX() != p3.getX() && p1.getY() != p3.getY())
 		{
 			/* if one of the directions is not the same, must be a turn assuming from and to are 3 points of a corner */
 			init_animate_turn(p1, p2, p3);
@@ -434,15 +460,15 @@ public class Car
 		put_next_point_back_on_path(p2);
 	}
 
-	public void init_animate_turn(verilogTownGridNode p1, verilogTownGridNode p2, verilogTownGridNode p3) 
+	public void init_animate_turn(GridNode p1, GridNode p2, GridNode p3) 
 	{
 		/* sets all the variables to calulate the arc of the circle to travel on */
 		this.animate_turn = true;
 		fps_start = 0;
-		float p1_x = (p1.get_x()-1)*64;
-		float p1_y = (p1.get_y()-1)*64;
-		float p3_x = (p3.get_x()-1)*64;
-		float p3_y = (p3.get_y()-1)*64;
+		float p1_x = (p1.getX()-1)*64;
+		float p1_y = (p1.getY()-1)*64;
+		float p3_x = (p3.getX()-1)*64;
+		float p3_y = (p3.getY()-1)*64;
 		animating_turn_x = p1_x;
 		animating_turn_y = p1_y;
 		
@@ -452,7 +478,7 @@ public class Car
 		   |
 		   p1
 		   */
-		if (p1.get_x() < p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p1.get_x())
+		if (p1.getX() < p3.getX() && p1.getY() < p3.getY() && p2.getX() == p1.getX())
 		{
 			direction_clockwise = true;
 			center_x = p3_x;
@@ -466,7 +492,7 @@ public class Car
 		     |
 		     v
 		   */
-		else if (p1.get_x() < p3.get_x() && p1.get_y() > p3.get_y()  && p2.get_x() == p3.get_x())
+		else if (p1.getX() < p3.getX() && p1.getY() > p3.getY()  && p2.getX() == p3.getX())
 		{
 			direction_clockwise = true;
 			center_x = p1_x;
@@ -479,7 +505,7 @@ public class Car
 		     |
 		  <-- 
 		   */
-		else if (p1.get_x() > p3.get_x() && p1.get_y() > p3.get_y()  && p2.get_x() == p1.get_x())
+		else if (p1.getX() > p3.getX() && p1.getY() > p3.getY()  && p2.getX() == p1.getX())
 		{
 			direction_clockwise = true;
 			center_x = p3_x;
@@ -493,7 +519,7 @@ public class Car
 		  | 
 		   --p1
 		   */
-		else if (p1.get_x() > p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p3.get_x())
+		else if (p1.getX() > p3.getX() && p1.getY() < p3.getY() && p2.getX() == p3.getX())
 		{
 			direction_clockwise = true;
 			center_x = p1_x;
@@ -508,7 +534,7 @@ public class Car
 		   v
 		   p3
 		   */
-		else if (p1.get_x() > p3.get_x() && p1.get_y() > p3.get_y() && p2.get_x() == p3.get_x())
+		else if (p1.getX() > p3.getX() && p1.getY() > p3.getY() && p2.getX() == p3.getX())
 		{
 			direction_clockwise = false;
 			center_x = p1_x;
@@ -522,7 +548,7 @@ public class Car
 		     |
 		     A
 		   */
-		else if (p1.get_x() > p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p1.get_x())
+		else if (p1.getX() > p3.getX() && p1.getY() < p3.getY() && p2.getX() == p1.getX())
 		{
 			direction_clockwise = false;
 			center_x = p3_x;
@@ -535,7 +561,7 @@ public class Car
 		     |
 		  >-- 
 		   */
-		else if (p1.get_x() < p3.get_x() && p1.get_y() < p3.get_y() && p2.get_x() == p3.get_x())
+		else if (p1.getX() < p3.getX() && p1.getY() < p3.getY() && p2.getX() == p3.getX())
 		{
 			direction_clockwise = false;
 			center_x = p1_x;
@@ -549,7 +575,7 @@ public class Car
 		  | 
 		   --p3
 		   */
-		else if (p1.get_x() < p3.get_x() && p1.get_y() > p3.get_y() && p2.get_x() == p1.get_x())
+		else if (p1.getX() < p3.getX() && p1.getY() > p3.getY() && p2.getX() == p1.getX())
 		{
 			direction_clockwise = false;
 			center_x = p3_x;
@@ -559,14 +585,14 @@ public class Car
 		}
 	}
 
-	public void init_animate_uturn(verilogTownGridNode p1, verilogTownGridNode p2, verilogTownGridNode p3, verilogTownGridNode p4) 
+	public void init_animate_uturn(GridNode p1, GridNode p2, GridNode p3, GridNode p4) 
 	{
 		/* sets all the variables to calulate the arc of the circle to travel on */
 		this.animate_turn = true;
 		this.animate_uturn = true;
 		fps_start = 0;
-		float p1_x = (p1.get_x()-1)*64;
-		float p1_y = (p1.get_y()-1)*64;
+		float p1_x = (p1.getX()-1)*64;
+		float p1_y = (p1.getY()-1)*64;
 		animating_turn_x = p1_x;
 		animating_turn_y = p1_y;
 		
@@ -576,7 +602,7 @@ public class Car
 		   |   |
 		   p4  p1
 		*/
-		if (p1.get_y() == p4.get_y() && p1.get_y() < p2.get_y())
+		if (p1.getY() == p4.getY() && p1.getY() < p2.getY())
 		{
 			direction_clockwise = false;
 			center_x = p1_x-32;
@@ -590,7 +616,7 @@ public class Car
 		       |
 		   p1--p2
 		*/
-		else if (p1.get_x() == p4.get_x() && p1.get_x() < p2.get_x())
+		else if (p1.getX() == p4.getX() && p1.getX() < p2.getX())
 		{
 			direction_clockwise = false;
 			center_x = p1_x;
@@ -604,7 +630,7 @@ public class Car
 		   |   |
 		   p2--p3
 		*/
-		else if (p1.get_y() == p4.get_y() && p1.get_y() > p2.get_y())
+		else if (p1.getY() == p4.getY() && p1.getY() > p2.getY())
 		{
 			direction_clockwise = false;
 			center_x = p1_x+32;
@@ -618,7 +644,7 @@ public class Car
 		   |    
 		   p3--p4
 		*/
-		else if (p1.get_x() == p4.get_x() && p1.get_x() > p2.get_x())
+		else if (p1.getX() == p4.getX() && p1.getX() > p2.getX())
 		{
 			direction_clockwise = false;
 			center_x = p1_x;
@@ -733,30 +759,26 @@ public class Car
 		return this.animate_state;
 	}
 
-	public verilogTownGridNode get_current_point() 
-	{
+	public GridNode get_current_point() {
 		return this.current_point;
 	}
-	public verilogTownGridNode get_start_point() 
-	{
+
+	public GridNode get_start_point() {
 		return this.start_point;
 	}
-	public verilogTownGridNode get_end_point() 
-	{
+
+	public GridNode get_end_point() {
 		return this.end_point;
 	}
-	public void set_end_point_and_fail_on_getting_car_accross(verilogTownGridNode point) 
-	{
+	public void set_end_point_and_fail_on_getting_car_accross(GridNode point) {
 		this.success_getting_to_end_point = false;
 		this.end_point = point;
 	}
 
-	public verilogTownGridNode get_next_point_on_path() 
-	{
+	public GridNode get_next_point_on_path() {
 		return this.path.pop();
 	}
-	public void put_next_point_back_on_path(verilogTownGridNode point) 
-	{
+	public void put_next_point_back_on_path(GridNode point) {
 		this.path.push(point);
 	}
 

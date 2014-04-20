@@ -83,6 +83,7 @@ local.properties
 *.jar
 *.war
 *.ear
+<<<<<<< HEAD
 /DEVELOPMENT_SOFTWARE/libgdx-0.9.9.zip
 /DEVELOPMENT_SOFTWARE/TortoiseGit-1.8.7.0-64bit.msi
 /DEVELOPMENT_SOFTWARE/adt-bundle-windows-x86_64-20131030.zip

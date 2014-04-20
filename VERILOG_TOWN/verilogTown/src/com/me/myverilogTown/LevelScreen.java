@@ -15,7 +15,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 
-public class LevelScreen implements Screen 
+public class LevelScreen implements Screen
 {
 	final verilogTown game;
 
@@ -46,7 +46,7 @@ public class LevelScreen implements Screen
 	private float Frame_Time_25; // amount of time for 25FPS
 	private float Next_Frame_Time; 
 
-	private verilogTownMap clevel;
+	private VerilogTownMap clevel;
 	private boolean level_done;
 
 	private float zoom_initial; // what the initial zoom ratio is so we can stop at it
@@ -62,7 +62,7 @@ public class LevelScreen implements Screen
 		this.random_number = new Random(3); // should this be rand seed?
 
 		/* init current level map data structure */
-		this.clevel = new verilogTownMap(20, 21); // firts_map
+		this.clevel = new VerilogTownMap(20, 21); // firts_map
 		/* this might be where the XML read map goes */
 		/* hard coded map */
 		clevel.verilogTownMapHardCode_first_map();

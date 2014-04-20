@@ -1,169 +1,251 @@
 package com.me.myverilogTown;
 
-import java.util.*;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class TrafficControl 
-{
-	private verilogTownGridNode traffic_corners[]; /* Each traffic point is associated with 4 corner points */
-	private TrafficSignal signal_directions[]; /* four corners */
-	private TrafficType t_type;
+public class TrafficControl {
+    private IntersectionType type = null;
 
-	private static final int NN = 0;
-	private static final int NS = 1;
-	private static final int NE = 2;
-	private static final int NW = 3;
+    /* Grid which cars going north connects from */
+    private GridNode goNorth = null;
+    private GridNode goSouth = null;
+    private GridNode goEast = null;
+    private GridNode goWest = null;
 
-	public TrafficControl()
-	{
-		int i;
-		
-		traffic_corners = new verilogTownGridNode[4];
-		signal_directions = new TrafficSignal[4];
+    /* Traffic light for cars "facing north" */
+    private TrafficSignalState facingNorth = TrafficSignalState.STOP;
+    private TrafficSignalState facingSouth = TrafficSignalState.STOP;
+    private TrafficSignalState facingEast = TrafficSignalState.STOP;
+    private TrafficSignalState facingWest = TrafficSignalState.STOP;
 
-		for (i = 0; i < 4; i++)
-		{
-			traffic_corners[i] = null;
-			signal_directions[i] = TrafficSignal.STOP;
-		}
-	}
+    public static final int PROCEED_NORTH = 0;
+    public static final int PROCEED_SOUTH = 1;
+    public static final int PROCEED_EAST = 2;
+    public static final int PROCEED_WEST = 3;
 
-	public void render_signal(TrafficSignal signal, verilogTownGridNode grid, float rot, SpriteBatch batch, Texture stop, Texture go, Texture left, Texture right, Texture forward)
-	{
-		// draw(texture, x, y, origin to rotate around x, origin to rotate around y, size of texture x, size of tecture y, scale, scale, rotate, bottom part of texture x, bottom part of texture y, top of texture x, top of texture y, flip x boolean, flip y boolean)
-		if (signal == TrafficSignal.STOP)
-		{
-			batch.draw(stop, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 0.7f, 0.7f, rot, 0, 0, 64, 64, false, false);
-		}
-		else if (signal == TrafficSignal.GO)
-		{
-			batch.draw(go, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
-		}
-		else if (signal == TrafficSignal.GO_FORWARD)
-		{
-			batch.draw(forward, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
-		}
-		else if (signal == TrafficSignal.GO_LEFT)
-		{
-			batch.draw(left, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
-		}
-		else if (signal == TrafficSignal.GO_RIGHT)
-		{
-			batch.draw(right, (grid.get_x()-1)*64, (grid.get_y()-1)*64, 32, 32, 64, 64, 1.0f, 1.0f, rot, 0, 0, 64, 64, false, false);
-		}
-	}
+    public void render_signal(TrafficSignalState signal, GridNode grid,
+            float rot, SpriteBatch batch, Texture stop, Texture go,
+            Texture left, Texture right, Texture forward) {
+        // TODO: define grid size = 64 px
+        int x = (grid.getX() - 1) * 64;
+        int y = (grid.getY() - 1) * 64;
+        Texture texture = null;
+        switch (signal) {
+            case GO:
+                texture = go;
+                break;
+            case GO_FORWARD:
+                texture = forward;
+                break;
+            case GO_LEFT:
+                texture = left;
+                break;
+            case GO_RIGHT:
+                texture = right;
+                break;
+            case STOP:
+                texture = stop;
+                break;
+            default:
+                texture = stop;
+        }
+        batch.draw(texture, x, y, 32, 32, 64, 64, 0.7f, 0.7f, rot, 0, 0,
+                64, 64, false, false);
+    }
 
-	public float rotate(int dir)
-	{
-		if (dir == NN)
-		{
-			return 0.0f;
-		}
-		else if (dir == NS)
-		{
-			return 180.0f;
-		}
-		else if (dir == NE)
-		{
-			return 90.0f;
-		}
-		else if (dir == NW)
-		{
-			return 270.0f;
-		}
+    public float rotate(int dir) {
+        switch (dir) {
+            case PROCEED_NORTH:
+                return 0f;
+            case PROCEED_SOUTH:
+                return 180f;
+            case PROCEED_EAST:
+                return 90f;
+            case PROCEED_WEST:
+                return 270f;
+            default:
+                return -45f;
+        }
+    }
 
-		return -45.0f;
-	}
+    public void render_traffic_signal(SpriteBatch batch, Texture stop,
+            Texture go, Texture left, Texture right, Texture forward) {
+        if (goNorth != null)
+            render_signal(facingNorth, goNorth, rotate(PROCEED_NORTH),
+                    batch, stop, go, left, right, forward);
+        if (goSouth != null)
+            render_signal(facingSouth, goSouth, rotate(PROCEED_SOUTH),
+                    batch, stop, go, left, right, forward);
+        if (goEast != null)
+            render_signal(facingEast, goEast, rotate(PROCEED_EAST),
+                    batch, stop, go, left, right, forward);
+        if (goWest != null)
+            render_signal(facingWest, goWest, rotate(PROCEED_WEST),
+                    batch, stop, go, left, right, forward);
+    }
 
-	public void render_traffic_signal(SpriteBatch batch, Texture stop, Texture go, Texture left, Texture right, Texture forward)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			if (traffic_corners[i] != null)
-			{
-				render_signal(signal_directions[i], traffic_corners[i], this.rotate(i), batch, stop, go, left, right, forward);
-			}
-		}
-	}
-	
-	public void init_fourway_traffic_signal(verilogTownGridNode N, verilogTownGridNode S, verilogTownGridNode E, verilogTownGridNode W)
-	{
-		t_type = TrafficType.FOUR_WAY;	
+    /**
+     * Sets the nodes surrounding this traffic light.
+     * 
+     * @param N
+     *            The node that north-bound cars are from.
+     * @param S
+     *            The node that south-bound cars are from.
+     * @param E
+     *            The node that east-bound cars are from.
+     * @param W
+     *            The node that west-bound cars are from.
+     */
+    public void setNSEW(GridNode N, GridNode S, GridNode E, GridNode W) {
 
-		traffic_corners[NN] = N;
-		traffic_corners[NS] = S;
-		traffic_corners[NE] = E;
-		traffic_corners[NW] = W;
+        type = IntersectionType.FOUR_WAY;
 
-		N.add_traffic_signal(this, NN);
-		S.add_traffic_signal(this, NS);
-		E.add_traffic_signal(this, NE);
-		W.add_traffic_signal(this, NW);
-	}
-	/* Note the naming idicates where the car is going to */
-	public void init_nse2_traffic_signal(verilogTownGridNode N, verilogTownGridNode S, verilogTownGridNode E)
-	{
-		t_type = TrafficType.THREE_WAY_NES;	
+        this.goNorth = N;
+        this.goSouth = S;
+        this.goEast = E;
+        this.goWest = W;
 
-		traffic_corners[NN] = N;
-		traffic_corners[NS] = S;
-		traffic_corners[NE] = E;
+        goNorth.setTrafficControl(this, PROCEED_NORTH);
+        goSouth.setTrafficControl(this, PROCEED_SOUTH);
+        goEast.setTrafficControl(this, PROCEED_EAST);
+        goWest.setTrafficControl(this, PROCEED_WEST);
+    }
 
-		N.add_traffic_signal(this, NN);
-		S.add_traffic_signal(this, NS);
-		E.add_traffic_signal(this, NE);
-	}
-	public void init_sew2_traffic_signal(verilogTownGridNode S, verilogTownGridNode E, verilogTownGridNode W)
-	{
-		t_type = TrafficType.THREE_WAY_ESW;	
+    /**
+     * Sets the nodes surrounding this traffic light.
+     * 
+     * @param N
+     *            The node that north-bound cars are from.
+     * @param S
+     *            The node that south-bound cars are from.
+     * @param E
+     *            The node that east-bound cars are from.
+     */
+    public void setNSE(GridNode N, GridNode S, GridNode E) {
+        type = IntersectionType.THREE_WAY_NSE;
 
-		traffic_corners[NS] = S;
-		traffic_corners[NE] = E;
-		traffic_corners[NW] = W;
+        this.goNorth = N;
+        this.goSouth = S;
+        this.goEast = E;
 
-		S.add_traffic_signal(this, NS);
-		E.add_traffic_signal(this, NE);
-		W.add_traffic_signal(this, NW);
-	}
-	public void init_nsw2_traffic_signal(verilogTownGridNode N, verilogTownGridNode S, verilogTownGridNode W)
-	{
-		t_type = TrafficType.THREE_WAY_SWN;	
+        goNorth.setTrafficControl(this, PROCEED_NORTH);
+        goSouth.setTrafficControl(this, PROCEED_SOUTH);
+        goEast.setTrafficControl(this, PROCEED_EAST);
+    }
 
-		traffic_corners[NN] = N;
-		traffic_corners[NS] = S;
-		traffic_corners[NW] = W;
+    /**
+     * Sets the nodes surrounding this traffic light.
+     * 
+     * @param S
+     *            The node that south-bound cars are from.
+     * @param E
+     *            The node that east-bound cars are from.
+     * @param W
+     *            The node that west-bound cars are from.
+     */
+    public void setSEW(GridNode S, GridNode E, GridNode W) {
+        type = IntersectionType.THREE_WAY_SEW;
 
-		N.add_traffic_signal(this, NN);
-		S.add_traffic_signal(this, NS);
-		W.add_traffic_signal(this, NW);
-	}
-	public void init_new2_traffic_signal(verilogTownGridNode N, verilogTownGridNode E, verilogTownGridNode W)
-	{
-		t_type = TrafficType.THREE_WAY_WNE;	
+        this.goSouth = S;
+        this.goEast = E;
+        this.goWest = W;
 
-		traffic_corners[NN] = N;
-		traffic_corners[NW] = W;
-		traffic_corners[NE] = E;
+        goSouth.setTrafficControl(this, PROCEED_SOUTH);
+        goEast.setTrafficControl(this, PROCEED_EAST);
+        goWest.setTrafficControl(this, PROCEED_WEST);
+    }
 
-		N.add_traffic_signal(this, NN);
-		E.add_traffic_signal(this, NE);
-		W.add_traffic_signal(this, NW);
-	}
+    /**
+     * Sets the nodes surrounding this traffic light.
+     * 
+     * @param N
+     *            The node that north-bound cars are from.
+     * @param S
+     *            The node that sound-bound cars are from.
+     * @param W
+     *            The node that west-bound cars are from.
+     */
+    public void setNSW(GridNode N, GridNode S, GridNode W) {
+        type = IntersectionType.THREE_WAY_NSW;
 
-	public TrafficSignal get_signal(int signal_index)
-	{
-		return this.signal_directions[signal_index];
-	}
+        this.goNorth = N;
+        this.goSouth = S;
+        this.goWest = W;
 
-	public void set_all_signals_nsew(TrafficSignal N_Signal, TrafficSignal S_Signal, TrafficSignal E_Signal, TrafficSignal W_Signal)
-	{
-		signal_directions[NN] = N_Signal;
-		signal_directions[NS] = S_Signal;
-		signal_directions[NE] = E_Signal;
-		signal_directions[NW] = W_Signal;
-	}
+        goNorth.setTrafficControl(this, PROCEED_NORTH);
+        goSouth.setTrafficControl(this, PROCEED_SOUTH);
+        goWest.setTrafficControl(this, PROCEED_WEST);
+    }
+
+    /**
+     * Sets the nodes surrounding this traffic light.
+     * 
+     * @param N
+     *            The node that north-bound cars are from.
+     * @param E
+     *            The node that east-bound cars are from.
+     * @param W
+     *            The node that west-bound cars are from.
+     */
+    public void setNEW(GridNode N, GridNode E, GridNode W) {
+        type = IntersectionType.THREE_WAY_NEW;
+
+        this.goNorth = N;
+        this.goWest = W;
+        this.goEast = E;
+
+        goNorth.setTrafficControl(this, PROCEED_NORTH);
+        goEast.setTrafficControl(this, PROCEED_EAST);
+        goWest.setTrafficControl(this, PROCEED_WEST);
+    }
+
+    /**
+     * Returns the state of the traffic light the car will see when entering
+     * this intersection from the given direction.
+     * 
+     * @param direction
+     *            The direction which the car is entering from.
+     * @return The state of the traffic signal.
+     */
+    public TrafficSignalState getSignalWhen(int direction) {
+        switch (direction) {
+            case PROCEED_NORTH:
+                return facingNorth;
+            case PROCEED_SOUTH:
+                return facingSouth;
+            case PROCEED_EAST:
+                return facingEast;
+            case PROCEED_WEST:
+                return facingWest;
+            default:
+                return TrafficSignalState.NO_SIGNAL;
+        }
+    }
+
+    /**
+     * Sets the status of the traffic signals.
+     * 
+     * @param northSignal
+     *            The status of the signal for cars going north.
+     * @param southSignal
+     *            The status of the signal for cars going south.
+     * @param eastSignal
+     *            The status of the signal for cars going east.
+     * @param westSignal
+     *            The status of the signal for cars going west.
+     */
+    public void setSignalsStatus(
+            TrafficSignalState northSignal,
+            TrafficSignalState southSignal,
+            TrafficSignalState eastSignal,
+            TrafficSignalState westSignal) {
+        this.facingNorth = northSignal;
+        this.facingSouth = southSignal;
+        this.facingEast = eastSignal;
+        this.facingWest = westSignal;
+    }
+
+    public IntersectionType getIntersectionType() {
+        return type;
+    }
 }
