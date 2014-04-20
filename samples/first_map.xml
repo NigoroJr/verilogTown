@@ -285,6 +285,7 @@
         </grid>
         <grid x="6" y="4">
             <type>INTER_TURN_S2WS</type>
+            <intersection>THREE_WAY_NEW</intersection>
         </grid>
         <grid x="7" y="4">
             <type>STRAIGHT_ROAD_W2W</type>
@@ -435,6 +436,7 @@
         </grid>
         <grid x="12" y="6">
             <type>STRAIGHT_ROAD_S2S</type>
+            <intersection>THREE_WAY_NSW</intersection>
         </grid>
         <grid x="13" y="6">
             <type>INTER_TURN_W2NW</type>
@@ -600,6 +602,7 @@
         </grid>
         <grid x="1" y="9">
             <type>STRAIGHT_ROAD_S2S</type>
+            <intersection>THREE_WAY_NSW</intersection>
         </grid>
         <grid x="2" y="9">
             <type>INTER_TURN_W2NW</type>
@@ -633,6 +636,7 @@
         </grid>
         <grid x="12" y="9">
             <type>INTER_TURN_S2WS</type>
+            <intersection>THREE_WAY_NEW</intersection>
         </grid>
         <grid x="13" y="9">
             <type>STRAIGHT_ROAD_W2W</type>
@@ -648,6 +652,7 @@
         </grid>
         <grid x="17" y="9">
             <type>INTER_TURN_S2WS</type>
+            <intersection>THREE_WAY_SEW</intersection>
         </grid>
         <grid x="18" y="9">
             <type>INTER_TURN_W2NW</type>
@@ -930,6 +935,7 @@
         </grid>
         <grid x="1" y="14">
             <type>STRAIGHT_ROAD_S2S</type>
+            <intersection>THREE_WAY_NSW</intersection>
         </grid>
         <grid x="2" y="14">
             <type>INTER_TURN_W2NW</type>
@@ -951,6 +957,7 @@
         </grid>
         <grid x="8" y="14">
             <type>INTER_TURN_S2WS</type>
+            <intersection>THREE_WAY_SEW</intersection>
         </grid>
         <grid x="9" y="14">
             <type>INTER_TURN_W2NW</type>
@@ -978,6 +985,7 @@
         </grid>
         <grid x="17" y="14">
             <type>INTER_TURN_S2WS</type>
+            <intersection>FOUR_WAY</intersection>
         </grid>
         <grid x="18" y="14">
             <type>INTER_TURN_W2NW</type>
@@ -1332,6 +1340,7 @@
         </grid>
         <grid x="3" y="20">
             <type>INTER_TURN_S2WS</type>
+            <intersection>THREE_WAY_SEW</intersection>
         </grid>
         <grid x="4" y="20">
             <type>INTER_TURN_W2NW</type>
@@ -1347,6 +1356,7 @@
         </grid>
         <grid x="8" y="20">
             <type>INTER_TURN_S2WS</type>
+            <intersection>THREE_WAY_NEW</intersection>
         </grid>
         <grid x="9" y="20">
             <type>STRAIGHT_ROAD_W2W</type>
@@ -1374,6 +1384,7 @@
         </grid>
         <grid x="17" y="20">
             <type>INTER_TURN_S2WS</type>
+            <intersection>THREE_WAY_NSE</intersection>
         </grid>
         <grid x="18" y="20">
             <type>INTER_TURN_W2NW</type>

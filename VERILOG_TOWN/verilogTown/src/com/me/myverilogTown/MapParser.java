@@ -11,6 +11,8 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class MapParser {
     /*
@@ -28,6 +30,8 @@ public class MapParser {
     public static final String fileName = "../../samples/first_map.xml";
 
     private GridNode grids[][];
+    private ArrayList<TrafficControl> trafficSignals = new ArrayList<TrafficControl>();
+    private ArrayList<Intersection> intersections = new ArrayList<Intersection>();
 
     public MapParser() {
         this(fileName);
@@ -58,8 +62,7 @@ public class MapParser {
 
         NodeList level = doc.getElementsByTagName("level");
         Node map = level.item(0).getChildNodes().item(1);
-        Node intersection = level.item(0).getChildNodes().item(3);
-        Node car = level.item(0).getChildNodes().item(5);
+        Node car = level.item(0).getChildNodes().item(3);
 
         int levelNum = Integer.parseInt(level.item(0).getAttributes()
                 .getNamedItem("lv").getTextContent());
@@ -79,12 +82,11 @@ public class MapParser {
             for (int j = 0; j < grids[0].length; j++)
                 setDestination(grids[i][j]);
 
-        // DEBUG
-        for (int j = 0; j < grids[0].length; j++) {
-            for (int i = 0; i < grids.length; i++) {
-                System.out.print(grids[i][j].getType().toString().substring(0, 1));
-            }
-            System.out.println();
+        // After setting all the grids, set the intersections
+        Collections.sort(intersections);
+        for (int i = 0; i < intersections.size(); i++) {
+            Intersection inter = intersections.get(i);
+            setIntersection(inter.type, inter.x, inter.y);
         }
     }
 
@@ -103,18 +105,70 @@ public class MapParser {
 
             NodeList childrenOfGrid = grid.getChildNodes();
 
-            // Iterate through child nodes of <grid>
-            for (int j = 0; j < childrenOfGrid.getLength(); j++) {
-                Node type = childrenOfGrid.item(j);
+            processGrid(childrenOfGrid, x, y);
+        }
+    }
 
-                if (type.getNodeType() == Node.ELEMENT_NODE) {
-                    String gridType = type.getTextContent();
+    /**
+     * Processes elements of grid tags.
+     * 
+     * @param childrenOfGrid
+     *            Elements of grid tag.
+     * @param x
+     *            The x coordinate of the grid.
+     * @param y
+     *            The y coordinate of the grid.
+     */
+    private void processGrid(NodeList childrenOfGrid, int x, int y) {
+        // Iterate through child nodes of <grid>
+        for (int j = 0; j < childrenOfGrid.getLength(); j++) {
+            Node type = childrenOfGrid.item(j);
 
-                    grids[x][y] =
-                            new GridNode(x, y, getGridType(gridType));
-                }
+            if (type.getNodeType() == Node.ELEMENT_NODE
+                    && type.getNodeName().equals("type")) {
+                String gridType = type.getTextContent();
+
+                grids[x][y] = new GridNode(x, y, getGridType(gridType));
+            }
+            else if (type.getNodeType() == Node.ELEMENT_NODE
+                    && type.getNodeName().equals("intersection")) {
+                String intersectionType = type.getTextContent();
+
+                // Don't set intersections yet because not all the grids hasn't
+                // been instantiated
+                intersections.add(new Intersection(intersectionType, x, y));
             }
         }
+    }
+
+    private void setIntersection(String intersectionType, int x, int y) {
+        TrafficControl signal = new TrafficControl();
+        /* Traffic going North */
+        GridNode n = grids[x + 1][y - 2];
+        /* Traffic going South */
+        GridNode s = grids[x][y + 1];
+        /* Traffic going East */
+        GridNode e = grids[x - 1][y - 1];
+        /* Traffic going West */
+        GridNode w = grids[x + 2][y];
+        switch (intersectionType) {
+            case "FOUR_WAY":
+                signal.setNSEW(n, s, e, w);
+                break;
+            case "THREE_WAY_NSE":
+                signal.setNSE(n, s, e);
+                break;
+            case "THREE_WAY_SEW":
+                signal.setSEW(s, e, w);
+                break;
+            case "THREE_WAY_NSW":
+                signal.setNSW(n, s, w);
+                break;
+            case "THREE_WAY_NEW":
+                signal.setNEW(n, e, w);
+                break;
+        }
+        trafficSignals.add(signal);
     }
 
     /**
@@ -288,5 +342,42 @@ public class MapParser {
 
     public GridNode[][] getGridArray() {
         return grids;
+    }
+
+    public TrafficControl[] getTrafficControls() {
+        TrafficControl[] ret = new TrafficControl[0];
+        return trafficSignals.toArray(ret);
+    }
+
+    /**
+     * Tiny class that holds information about an intersection. This class is
+     * used in order to hold information About the intersection, which is
+     * represented
+     * 
+     * @author Naoki
+     * 
+     */
+    private class Intersection implements Comparable<Intersection> {
+        String type;
+        int x;
+        int y;
+
+        Intersection(String type, int x, int y) {
+            this.type = type;
+            this.x = x;
+            this.y = y;
+        }
+
+        /**
+         * Order the intersections from top-left to bottom-right.
+         * Note that top-left is [map.length - 1][0] and bottom-left is [0][0]
+         */
+        @Override
+        public int compareTo(Intersection that) {
+            if (that.y == this.y)
+                return this.x - that.x;
+            else
+                return that.y - this.y;
+        }
     }
 }
