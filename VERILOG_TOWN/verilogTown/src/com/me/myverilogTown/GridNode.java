@@ -118,12 +118,30 @@ public class GridNode {
         return signal != null;
     }
 
+    /**
+     * Sets a car on this grid.
+     * 
+     * @param car
+     *            The car that is currently on this grid.
+     */
     public void setCar(Car car) {
         this.car = car;
     }
 
+    /**
+     * Returns the car that is currently on the grid.
+     * 
+     * @return The car that is currently on this grid.
+     */
     public Car getCar() {
         return car;
+    }
+
+    /**
+     * Removes the car from this grid if there is one.
+     */
+    public void removeCar() {
+        setCar(null);
     }
 
     /**
@@ -142,13 +160,23 @@ public class GridNode {
             return TrafficSignalState.NO_SIGNAL;
     }
 
-    public void setTrafficControl(TrafficControl traffic_signal, int index) {
-        this.signal = traffic_signal;
-        this.signal_index = index;
+    public TrafficControl getTrafficControl() {
+        return signal;
     }
 
-    /* hooks up the associated traffic signal */
-    public void addTrafficSignal(TrafficControl traffic_signal, int index) {
+    /**
+     * Relates this grid to the given traffic light. The <code>location</code>
+     * variable is given to inform of the relative location of this grid with
+     * respect to the intersection.
+     * 
+     * @param traffic_signal
+     *            The traffic light that this grid relates to.
+     * @param location
+     *            The location of this grid with respect to the traffic light.
+     *            Read this as "this grid is on the {location} side of
+     *            {traffic_signal}".
+     */
+    public void setTrafficControl(TrafficControl traffic_signal, int location) {
         this.signal = traffic_signal;
         this.signal_index = index;
     }

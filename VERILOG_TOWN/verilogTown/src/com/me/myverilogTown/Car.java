@@ -325,8 +325,8 @@ public class Car
 
 	public void set_current_point_end(GridNode from, GridNode to) 
 	{
-		from.setCar(null);
-		to.setCar(null);
+		from.removeCar();
+		to.removeCar();
 		this.current_point = to;
 	}
 
@@ -376,7 +376,7 @@ public class Car
 		GridNode crash_point = this.get_current_point();
 
 		Gdx.app.log("Car", "crash done");
-		crash_point.setCar(null);
+		crash_point.removeCar();;
 		this.set_is_crashed();
 		this.set_is_done_path();
 
