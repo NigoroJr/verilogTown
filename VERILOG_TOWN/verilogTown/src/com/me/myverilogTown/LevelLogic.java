@@ -1,9 +1,6 @@
 package com.me.myverilogTown;
 
 import java.util.*;
-import java.util.Random.*;
-
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
 
 public class LevelLogic
