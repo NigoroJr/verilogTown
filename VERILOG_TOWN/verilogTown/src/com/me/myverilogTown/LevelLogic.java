@@ -82,28 +82,28 @@ public class LevelLogic
 
 					/* check the future */
 					GridNode current_spot = cars[car_index].get_current_point();
-					TrafficSignal signal = current_spot.getTrafficSignal(); 
+					TrafficSignalState signal = current_spot.getTrafficSignal();
 
-					if (signal == TrafficSignal.NO_SIGNAL)
+					if (signal == TrafficSignalState.NO_SIGNAL)
 					{
 						/* IF - you're at a stop light and you can GO then just do what you want OR you're not at a traffic light */
 						cars[car_index].set_animate_state(CarAnimateStates.MOVING);
 						car_has_free_movement(cars[car_index], current_spot, clevel);
 					}
-					else if (signal == TrafficSignal.GO)
+					else if (signal == TrafficSignalState.GO)
 					{
 						/* IF - you're at a stop light and you can GO then just do what you want OR you're not at a traffic light */
 						cars[car_index].set_animate_state(CarAnimateStates.MOVING);
 						car_has_free_movement(cars[car_index], current_spot, clevel);
 					}
-					else if (	signal == TrafficSignal.GO_RIGHT ||  
-							signal == TrafficSignal.GO_LEFT ||  
-							signal == TrafficSignal.GO_FORWARD)   
+					else if (	signal == TrafficSignalState.GO_RIGHT ||
+							signal == TrafficSignalState.GO_LEFT ||
+							signal == TrafficSignalState.GO_FORWARD)
 					{
 						cars[car_index].set_animate_state(CarAnimateStates.MOVING);
 						car_has_forced_movement(cars[car_index], current_spot, signal, clevel); 
 					}
-					else if (signal == TrafficSignal.STOP)
+					else if (signal == TrafficSignalState.STOP)
 					{
 						cars[car_index].set_processed(true);
 						cars[car_index].set_animate_state(CarAnimateStates.STOPPED);
@@ -172,7 +172,7 @@ public class LevelLogic
 		Gdx.app.log("LevelLogic-starts", "At x="+ x +" y="+ y + " ax=" + ax + " ay=" + ay);
 	}
 
-	private void car_has_forced_movement(Car the_car, GridNode current_spot, TrafficSignal signal, VerilogTownMap clevel)
+	private void car_has_forced_movement(Car the_car, GridNode current_spot, TrafficSignalState signal, VerilogTownMap clevel)
 	{
 		int x;
 		int y;

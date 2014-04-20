@@ -190,9 +190,9 @@ public class VerilogTownMap
 	}
 
 	/* returns the grid point through the intersection for a given turn */
-	GridNode get_turn(GridNode current, TrafficSignal signal, Direction direction)
+	GridNode get_turn(GridNode current, TrafficSignalState signal, Direction direction)
 	{
-		if (signal == TrafficSignal.GO_FORWARD)
+		if (signal == TrafficSignalState.GO_FORWARD)
 		{
 			if (direction == Direction.N)
 			{
@@ -211,7 +211,7 @@ public class VerilogTownMap
 				return current.getWest().getWest().getWest();
 			}
 		}
-		else if (signal == TrafficSignal.GO_LEFT)
+		else if (signal == TrafficSignalState.GO_LEFT)
 		{
 			if (direction == Direction.N)
 			{
@@ -230,7 +230,7 @@ public class VerilogTownMap
 				return current.getWest().getWest().getSouth().getSouth();
 			}
 		}
-		else if (signal == TrafficSignal.GO_RIGHT)
+		else if (signal == TrafficSignalState.GO_RIGHT)
 		{
 			if (direction == Direction.N)
 			{
@@ -291,145 +291,135 @@ public class VerilogTownMap
 	void verilogTownMapHardCode_first_map()
 	{
 		this.initTrafficSignals(11);
-		/* Traffic signals in order of top left down to bottom right - the current organization is where a grid point is going to... */
-		this.traffic_signals[0].init_sew2_traffic_signal(this.grid[3][21], this.grid[5][20], this.grid[2][19]);
-		this.traffic_signals[1].init_new2_traffic_signal(this.grid[9][18], this.grid[10][20], this.grid[7][19]);
-		this.traffic_signals[2].init_nsw2_traffic_signal(this.grid[18][18], this.grid[17][21], this.grid[16][19]);
-		this.traffic_signals[3].init_nse2_traffic_signal(this.grid[2][12], this.grid[1][15], this.grid[3][14]);
-		this.traffic_signals[4].init_sew2_traffic_signal(this.grid[8][15], this.grid[10][14], this.grid[7][13]);
-		this.traffic_signals[5].init_fourway_traffic_signal(this.grid[18][12], this.grid[17][15], this.grid[19][14], this.grid[16][13]);
-		this.traffic_signals[6].init_nse2_traffic_signal(this.grid[2][7], this.grid[1][10], this.grid[3][9]);
-		this.traffic_signals[7].init_new2_traffic_signal(this.grid[13][7], this.grid[14][9], this.grid[11][8]);
-		this.traffic_signals[8].init_sew2_traffic_signal(this.grid[17][10], this.grid[19][9], this.grid[16][8]);
-		this.traffic_signals[9].init_nse2_traffic_signal(this.grid[13][4], this.grid[12][7], this.grid[14][6]);
-		this.traffic_signals[10].init_new2_traffic_signal(this.grid[7][2], this.grid[8][4], this.grid[5][3]);
 
-		grid = new MapParser().getGridArray();
+        MapParser parser = new MapParser();
+		grid = parser.getGridArray();
+        traffic_signals = parser.getTrafficControls();
 	}
 
 	void cycle_signal(int light_index, int which)
 	{
 		if (which == 0)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 1)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 2)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.STOP);
 		else if (which == 3)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO);
 	}
 
 	void crash_signal(int light_index, int which)
 	{
 		if (which == 0)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.STOP);
 		else if (which == 1)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.GO);
 		else if (which == 2)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.GO);
 		else if (which == 3)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.GO);
 	}
 	void cycle_signal_2(int light_index, int which)
 	{
 		if (which == 0)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 1)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 2)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.STOP);
 		else if (which == 3)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO);
 		else if (which == 4)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 5)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 6)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP);
 		else if (which == 7)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_RIGHT);
 		else if (which == 8)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 9)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 10)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP);
 		else if (which == 11)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT);
 		else if (which == 12)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 13)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 14)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP);
 		else if (which == 15)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT);
 	}
 	void cycle_signal_3(int light_index, int which)
 	{
 		if (which == 0)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 1)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 2)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.STOP);
 		else if (which == 3)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO);
 		else if (which == 4)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 5)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 6)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP);
 		else if (which == 7)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_RIGHT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_RIGHT);
 		else if (which == 8)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 9)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 10)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP);
 		else if (which == 11)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT);
 		else if (which == 12)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 13)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 14)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP);
 		else if (which == 15)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT);
 		else if (which == 16)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_FORWARD, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.GO_FORWARD, TrafficSignalState.STOP);
 		else if (which == 17)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_RIGHT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.GO_RIGHT);
 		else if (which == 18)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 19)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 20)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.GO_RIGHT, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 21)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.GO_LEFT, TrafficSignal.GO_LEFT, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.GO_LEFT, TrafficSignalState.GO_LEFT, TrafficSignalState.GO_LEFT);
 		else if (which == 22)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_RIGHT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.GO_RIGHT);
 		else if (which == 23)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.STOP);
 		else if (which == 24)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.GO);
 		else if (which == 25)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.STOP);
 		else if (which == 26)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT);
 		else if (which == 27)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.GO_LEFT, TrafficSignal.GO, TrafficSignal.STOP, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.GO_LEFT, TrafficSignalState.GO, TrafficSignalState.STOP, TrafficSignalState.STOP);
 		else if (which == 28)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.GO_RIGHT, TrafficSignal.STOP);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.GO_RIGHT, TrafficSignalState.STOP);
 		else if (which == 29)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO_LEFT, TrafficSignal.GO);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT, TrafficSignalState.GO);
 		else if (which == 30)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.STOP, TrafficSignal.GO, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.GO_LEFT);
 		else if (which == 31)
-			traffic_signals[light_index].set_all_signals_nsew(TrafficSignal.STOP, TrafficSignal.GO_RIGHT, TrafficSignal.GO, TrafficSignal.GO_LEFT);
+			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO_RIGHT, TrafficSignalState.GO, TrafficSignalState.GO_LEFT);
 	}
 }

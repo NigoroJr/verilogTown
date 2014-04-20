@@ -126,11 +126,20 @@ public class GridNode {
         return car;
     }
 
-    public TrafficSignal getTrafficSignal() {
-        if (this.signal_index != -1)
-            return (this.signal.get_signal(this.signal_index));
+    /**
+     * Returns the traffic signal on this grid. NO_SIGNAL is returned if there
+     * is no signal on this grid.
+     * 
+     * @return The status of the traffic signal on this grid.
+     */
+    public TrafficSignalState getTrafficSignal() {
+        // TODO: getSignalOn(location)
+        // return signal == null ? TrafficSignal.NO_SIGNAL :
+        // signal.get_signal(location);
+        if (location != -1)
+            return (signal.getSignalWhen(location));
         else
-            return TrafficSignal.NO_SIGNAL;
+            return TrafficSignalState.NO_SIGNAL;
     }
 
     public void setTrafficControl(TrafficControl traffic_signal, int index) {
