@@ -14,8 +14,7 @@ public class VerilogTownMap
 	private int grid_y; 
 	public GridNode grid[][];
 	private int markPathCount; // used as a count for a mark path idetifier
-	public TrafficControl traffic_signals[];
-	public int num_traffic_signals;
+	private TrafficControl traffic_signals[];
 
 	/* Constructor */
 	public VerilogTownMap(int size_x, int size_y) 
@@ -253,27 +252,15 @@ public class VerilogTownMap
 		return null;
 	}
 
-	void initTrafficSignals(int number)
-	{
-		int i;
-
-		this.traffic_signals = new TrafficControl[number];
-		this.num_traffic_signals = number;
-
-		for (i = 0; i < number; i++)
-		{
-			this.traffic_signals[i] = new TrafficControl();
-		}
-	}
 	int get_num_traffic_signals()
 	{
-		return this.num_traffic_signals;
+		return traffic_signals.length;
 	}
 	
 
 	void display_traffic_lights()
 	{
-		for (int i = 0; i < this.num_traffic_signals ; i++)
+		for (int i = 0; i < traffic_signals.length; i++)
 		{
 			Gdx.app.log("verilogTownMap-Traffic Light", " N="+ traffic_signals[i].getSignalWhen(TrafficControl.PROCEED_NORTH) +" S="+ traffic_signals[i].getSignalWhen(1) +" E="+ traffic_signals[i].getSignalWhen(2) +" W="+ traffic_signals[i].getSignalWhen(3));
 		}
@@ -281,17 +268,15 @@ public class VerilogTownMap
 
 	void render_traffic_signal_lights(SpriteBatch batch, Texture stop, Texture go, Texture left, Texture right, Texture forward)
 	{
-		for (int i = 0; i < this.num_traffic_signals; i++)
+		for (int i = 0; i < traffic_signals.length; i++)
 		{
 			this.traffic_signals[i].render_traffic_signal(batch, stop, go, left, right, forward);
 		}
 	}
 
-	/* hard code initialization of firt_map.png */
+	/* initialization of firt_map.png from XML */
 	void verilogTownMapHardCode_first_map()
 	{
-		this.initTrafficSignals(11);
-
         MapParser parser = new MapParser();
 		grid = parser.getGridArray();
         traffic_signals = parser.getTrafficControls();
