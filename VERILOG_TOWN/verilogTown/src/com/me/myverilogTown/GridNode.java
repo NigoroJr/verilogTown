@@ -12,7 +12,11 @@ public class GridNode {
     private GridNode west;
 
     private TrafficControl signal = null;;
-    private int signal_index = -1;
+    /**
+     * Location of the traffic light with respect to the intersection.
+     * Read this as "traffic light on the {location} side of the intersection."
+     */
+    private int location = -1;
 
     private Car car = null;
 
@@ -178,6 +182,6 @@ public class GridNode {
      */
     public void setTrafficControl(TrafficControl traffic_signal, int location) {
         this.signal = traffic_signal;
-        this.signal_index = index;
+        this.location = location;
     }
 }
