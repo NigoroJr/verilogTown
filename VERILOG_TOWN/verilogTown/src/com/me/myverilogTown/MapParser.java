@@ -74,7 +74,6 @@ public class MapParser {
                 .getNamedItem("size_y").getTextContent());
         grids = new GridNode[mapSizeX][mapSizeY];
 
-        // TODO: init() to NON_ROAD??
         readMap(map.getChildNodes());
 
         // Relate nodes by setting destinations
@@ -90,6 +89,12 @@ public class MapParser {
         }
     }
 
+    /**
+     * Reads the "map" tag in the XML file.
+     * 
+     * @param map
+     *            The child nodes of the map tag.
+     */
     public void readMap(NodeList map) {
         for (int i = 0; i < map.getLength(); i++) {
 
@@ -141,6 +146,35 @@ public class MapParser {
         }
     }
 
+    /**
+     * Given an intersection, this method sets the entering points of the
+     * intersection. There are either 3 (for three-way intersections) or 4
+     * (four-way) entering points. An intersection is represented by the
+     * top-left grid of the four grids as shown in the figure below. The four
+     * arrows represents the direction in which the cars are entering.
+     * 
+     * <pre>
+     * <code>
+     *    ||| |
+     *    |v| |
+     * ---+-+-+---
+     *    |X| |<-
+     * ---+-+-+---
+     * -> | | |
+     * ---+-+-+---
+     *    | |^|
+     *    | |||
+     * </code>
+     * </pre>
+     * 
+     * @param intersectionType
+     *            The type of the intersection. For example, THREE_WAY_NSE means
+     *            that the intersection is three-way, with cars <em>leaving</em>
+     *            the intersection going north, south, and east.
+     * @param x
+     *            The x coordinate of the intersection.
+     * @param y
+     */
     private void setIntersection(String intersectionType, int x, int y) {
         TrafficControl signal = new TrafficControl();
         /* Traffic going North */
@@ -241,7 +275,7 @@ public class MapParser {
     }
 
     /**
-     * Takes in the String and returns a GridType
+     * Takes in the String and returns a GridType.
      * 
      * @param gridType
      *            The type of the grid in String.
@@ -340,19 +374,29 @@ public class MapParser {
         return ret;
     }
 
+    /**
+     * Returns the map parsed from the XML file.
+     * 
+     * @return The map as a list of GridNode.
+     */
     public GridNode[][] getGridArray() {
         return grids;
     }
 
+    /**
+     * Returns an array of all the intersections in this map.
+     * 
+     * @return The list of intersections.
+     */
     public TrafficControl[] getTrafficControls() {
         TrafficControl[] ret = new TrafficControl[0];
         return trafficSignals.toArray(ret);
     }
 
     /**
-     * Tiny class that holds information about an intersection. This class is
-     * used in order to hold information About the intersection, which is
-     * represented
+     * Tiny class that holds information about an intersection while parser
+     * reads the XML. Later, after all the grids are read, grids are hooked up
+     * to the intersections.
      * 
      * @author Naoki
      * 
