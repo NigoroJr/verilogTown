@@ -61,8 +61,17 @@ public class MapParser {
         doc.getDocumentElement().normalize();
 
         NodeList level = doc.getElementsByTagName("level");
-        Node map = level.item(0).getChildNodes().item(1);
-        Node car = level.item(0).getChildNodes().item(3);
+        NodeList mapProperties = level.item(0).getChildNodes();
+        Node map = null;
+        Node cars = null;
+        for (int i = 0; i < mapProperties.getLength(); i++) {
+            Node node = mapProperties.item(i);
+
+            if (node.getNodeName().equals("map"))
+                map = node;
+            else if (node.getNodeName().equals("cars"))
+                cars = node;
+        }
 
         int levelNum = Integer.parseInt(level.item(0).getAttributes()
                 .getNamedItem("lv").getTextContent());
