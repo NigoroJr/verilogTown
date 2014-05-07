@@ -88,6 +88,7 @@ public class LevelScreen implements Screen
 
 		/* NOTE - for graphics "paint.net" pretty good.  Need to save as 8-bit png file */
 
+		// TODO: Delete if not planning on using
 		car_sheet_texture = new Texture("data/car_sheet.png");
 		car_sheet_texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 

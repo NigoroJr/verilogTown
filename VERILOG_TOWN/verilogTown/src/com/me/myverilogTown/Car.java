@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -59,10 +60,23 @@ public class Car
 	private float animating_turn_y;
 	private float turn_rotation;
 
+	/**
+	 * Sets the start and end grid and the start time of this car.
+	 * TODO: starting_time is frames?
+	 * TODO: setSpeed method
+	 * 
+	 * @param start The grid where this car starts from.
+	 * @param end The grid where this car heads to.
+	 * @param starting_time Time when this car starts.
+	 */
+	public Car(GridNode start, GridNode end, int starting_time) {
+	    // TODO: better constructor
+	    this(start, end, starting_time, 0, 0, 64, 64, 0, 4, new Texture("data/car_sheet.png"), new Random());
+	}
+
 	public Car(GridNode start, 
 				GridNode end, 
 				int starting_time, 
-				VerilogTownMap level,
 				int position_x, 
 				int position_y, 
 				float width, 
@@ -93,6 +107,8 @@ public class Car
 		this.xScale = 1;
 		this.yScale = 1;
 		this.carTexture = texture;
+		// TODO: Better way to set texture
+		carTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		this.animate_state = CarAnimateStates.STOPPED;
 		this.at_signal = false;
 		this.animate_turn = false;
