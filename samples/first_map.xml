@@ -1533,6 +1533,106 @@
     </map>
     <intersection>
     </intersection>
-    <car>
-    </car>
+    <cars>
+        <car>
+            <start x="7" y="0"/>
+            <end x="4" y="22"/>
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="15" y="0"/>
+            <end x="4" y="22"/>
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="21" y="9"/>
+            <end x="4" y="22"/>
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="21" y="14"/>
+            <end x="14" y="0"/>
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="3" y="22"/>
+            <end x="14" y="0"/>
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="17" y="22"/>
+            <end x="14" y="0"/>
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="7" y="0"/>
+            <end x="4" y="21"/>
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="15" y="0"/>
+            <end x="4" y="22"/>
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="21" y="9"/>
+            <end x="14" y="0"/>
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="21" y="14"/>
+            <end x="18" y="22"/>
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="7" y="0"/>
+            <end x="4" y="22"/>
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="15" y="0"/>
+            <end x="4" y="22"/>
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="21" y="9"/>
+            <end x="4" y="22"/>
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="21" y="14"/>
+            <end x="14" y="0"/>
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="3" y="22"/>
+            <end x="14" y="0"/>
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="17" y="22"/>
+            <end x="14" y="0"/>
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="7" y="0"/>
+            <end x="14" y="0"/>
+            <delay>400</delay>
+        </car>
+        <car>
+            <start x="15" y="0"/>
+            <end x="4" y="22"/>
+            <delay>400</delay>
+        </car>
+        <car>
+            <start x="21" y="9"/>
+            <end x="14" y="0"/>
+            <delay>400</delay>
+        </car>
+        <car>
+            <start x="21" y="14"/>
+            <end x="14" y="0"/>
+            <delay>400</delay>
+        </car>
+    </cars>
 </level>
