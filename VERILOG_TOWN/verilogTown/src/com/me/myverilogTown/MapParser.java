@@ -29,6 +29,7 @@ public class MapParser {
      */
     public static final String fileName = "../../samples/first_map.xml";
 
+    private int levelNumber;
     private GridNode grids[][];
     private ArrayList<TrafficControl> trafficSignals = new ArrayList<TrafficControl>();
     private ArrayList<Intersection> intersections = new ArrayList<Intersection>();
@@ -73,7 +74,7 @@ public class MapParser {
                 cars = node;
         }
 
-        int levelNum = Integer.parseInt(level.item(0).getAttributes()
+        this.levelNumber = Integer.parseInt(level.item(0).getAttributes()
                 .getNamedItem("lv").getTextContent());
 
         // Get size of the map
@@ -381,6 +382,15 @@ public class MapParser {
         }
 
         return ret;
+    }
+
+    /**
+     * Returns the level number of this map.
+     * 
+     * @return The level number of this map.
+     */
+    public int getLevelNumber() {
+        return levelNumber;
     }
 
     /**
