@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class VerilogTownMap 
 {
+    // TODO: encapsulate!
+    public MapParser parser = new MapParser();
+
 	/* Assume grid size is 1 larger on all edges to accomodate invisible starting points */
 	private int grid_x;
 	private int grid_y; 
@@ -277,7 +280,6 @@ public class VerilogTownMap
 	/* initialization of firt_map.png from XML */
 	void verilogTownMapHardCode_first_map()
 	{
-        MapParser parser = new MapParser();
 		grid = parser.getGridArray();
         traffic_signals = parser.getTrafficControls();
 	}
