@@ -29,7 +29,6 @@ public class LevelScreen implements Screen
 	private Sprite carSprite;
 
 	private Texture level_map;
-	private Texture car_sheet_texture;
 	private Texture stop;
 	private Texture go;
 	private Texture go_forward;
@@ -87,10 +86,6 @@ public class LevelScreen implements Screen
 		zoom_initial = camera.zoom;
 
 		/* NOTE - for graphics "paint.net" pretty good.  Need to save as 8-bit png file */
-
-		// TODO: Delete if not planning on using
-		car_sheet_texture = new Texture("data/car_sheet.png");
-		car_sheet_texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
 		/* get all the textures for the lights */
 		stop = new Texture("data/stop_tran.png");

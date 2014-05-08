@@ -71,7 +71,7 @@ public class Car
 	 */
 	public Car(GridNode start, GridNode end, int starting_time) {
 	    // TODO: better constructor
-	    this(start, end, starting_time, 0, 0, 64, 64, 0, 4, new Texture("data/car_sheet.png"), new Random());
+	    this(start, end, starting_time, 0, 0, 64, 64, 0, 4);
 	}
 
 	public Car(GridNode start, 
@@ -82,9 +82,7 @@ public class Car
 				float width, 
 				float height, 
 				float rotation,
-				float speed,
-				Texture texture,
-				Random rand)
+				float speed)
 	{
 		// how do I assert(start >= 1)
 		this.start_point = start;
@@ -106,17 +104,16 @@ public class Car
 		this.rotation = rotation;
 		this.xScale = 1;
 		this.yScale = 1;
-		this.carTexture = texture;
-		// TODO: Better way to set texture
-		carTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		this.animate_state = CarAnimateStates.STOPPED;
 		this.at_signal = false;
 		this.animate_turn = false;
 		this.animate_uturn = false;
 
+		this.carTexture = new Texture("data/car_sheet.png");
+		carTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		/* breakup all the pixel pictures of cars to pick 1 for your sprite.  Crash is last one */
 		TextureRegion[] carFrames; 
-		TextureRegion[][] tmp = TextureRegion.split(texture, texture.getWidth()/2, texture.getHeight()/2);
+		TextureRegion[][] tmp = TextureRegion.split(carTexture, carTexture.getWidth()/2, carTexture.getHeight()/2);
 		carFrames = new TextureRegion[2 * 2];
 		int index = 0;
 		for (int i = 0; i < 2; i++)
@@ -127,7 +124,7 @@ public class Car
 			}
 		}
 
-		carSprite = new Sprite(carFrames[rand.nextInt(3)]);
+		carSprite = new Sprite(carFrames[new Random().nextInt(3)]);
 		carSprite.setPosition(this.position_x, this.position_y);
 		carSprite.setSize(width, height);
 
