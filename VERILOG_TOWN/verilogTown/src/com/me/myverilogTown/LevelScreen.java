@@ -64,7 +64,8 @@ public class LevelScreen implements Screen
 		this.clevel = new VerilogTownMap(20, 21); // firts_map
 		/* this might be where the XML read map goes */
 		/* hard coded map */
-		clevel.verilogTownMapHardCode_first_map();
+		MapParser parser = new MapParser();
+		clevel.readMap(parser);;
 
 		/* setup the sprites.  First is for the cars and Second is for the UI */
 		thebatch = new SpriteBatch();
@@ -99,9 +100,8 @@ public class LevelScreen implements Screen
 		go_left = new Texture("data/go_left_tran.png");
 		go_left.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-		// TODO: Use the parser in VerilogTownMap class
-		cars = clevel.parser.getCars();
-		// TODO: get rid of redundant variable
+		// Get parsed cars
+		cars = parser.getCars();
 		this.num_cars = cars.length;
 
 		/* initialize the level logic control */

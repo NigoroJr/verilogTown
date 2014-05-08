@@ -9,9 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class VerilogTownMap 
 {
-    // TODO: encapsulate!
-    public MapParser parser = new MapParser();
-
 	/* Assume grid size is 1 larger on all edges to accomodate invisible starting points */
 	private int grid_x;
 	private int grid_y; 
@@ -37,6 +34,16 @@ public class VerilogTownMap
 			}
 		}
 	}
+
+	/**
+	 * Reads in the map using the parser in order to populate the grid array.
+	 * 
+	 * @param parser
+	 */
+    public void readMap(MapParser parser) {
+        grid = parser.getGridArray();
+        traffic_signals = parser.getTrafficControls();
+    }
 
 	void initFindPathMarker()
 	{
@@ -260,7 +267,6 @@ public class VerilogTownMap
 		return traffic_signals.length;
 	}
 	
-
 	void display_traffic_lights()
 	{
 		for (int i = 0; i < traffic_signals.length; i++)
@@ -275,13 +281,6 @@ public class VerilogTownMap
 		{
 			this.traffic_signals[i].render_traffic_signal(batch, stop, go, left, right, forward);
 		}
-	}
-
-	/* initialization of firt_map.png from XML */
-	void verilogTownMapHardCode_first_map()
-	{
-		grid = parser.getGridArray();
-        traffic_signals = parser.getTrafficControls();
 	}
 
 	void cycle_signal(int light_index, int which)
