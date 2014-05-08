@@ -29,7 +29,6 @@ public class LevelScreen implements Screen
 	private Sprite carSprite;
 
 	private Texture level_map;
-	private Texture car_sheet_texture;
 	private Texture stop;
 	private Texture go;
 	private Texture go_forward;
@@ -65,7 +64,8 @@ public class LevelScreen implements Screen
 		this.clevel = new VerilogTownMap(20, 21); // firts_map
 		/* this might be where the XML read map goes */
 		/* hard coded map */
-		clevel.verilogTownMapHardCode_first_map();
+		MapParser parser = new MapParser();
+		clevel.readMap(parser);;
 
 		/* setup the sprites.  First is for the cars and Second is for the UI */
 		thebatch = new SpriteBatch();
@@ -88,9 +88,6 @@ public class LevelScreen implements Screen
 
 		/* NOTE - for graphics "paint.net" pretty good.  Need to save as 8-bit png file */
 
-		car_sheet_texture = new Texture("data/car_sheet.png");
-		car_sheet_texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
 		/* get all the textures for the lights */
 		stop = new Texture("data/stop_tran.png");
 		stop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -103,31 +100,9 @@ public class LevelScreen implements Screen
 		go_left = new Texture("data/go_left_tran.png");
 		go_left.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-		/* after reading the number of cars from level */
-		num_cars = 20; // hard coded more xml loading with level
-		cars = new Car[num_cars];
-
-		/* initialize cars */
-		cars[0] = new Car(clevel.grid[7][0], clevel.grid[4][22], 100, clevel, 0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[1] = new Car(clevel.grid[15][0], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[2] = new Car(clevel.grid[21][9], clevel.grid[4][22], 100, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[3] = new Car(clevel.grid[21][14], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[4] = new Car(clevel.grid[3][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[5] = new Car(clevel.grid[17][22], clevel.grid[14][0], 100, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[6] = new Car(clevel.grid[7][0], clevel.grid[4][21], 200, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[7] = new Car(clevel.grid[15][0], clevel.grid[4][22], 200, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[8] = new Car(clevel.grid[21][9], clevel.grid[14][0], 200, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[9] = new Car(clevel.grid[21][14], clevel.grid[18][22], 200, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[10] = new Car(clevel.grid[7][0], clevel.grid[4][22], 300, clevel, 0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[11] = new Car(clevel.grid[15][0], clevel.grid[4][22], 300, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[12] = new Car(clevel.grid[21][9], clevel.grid[4][22], 300, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[13] = new Car(clevel.grid[21][14], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[14] = new Car(clevel.grid[3][22], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[15] = new Car(clevel.grid[17][22], clevel.grid[14][0], 300, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[16] = new Car(clevel.grid[7][0], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[17] = new Car(clevel.grid[15][0], clevel.grid[4][22], 400, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[18] = new Car(clevel.grid[21][9], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
-		cars[19] = new Car(clevel.grid[21][14], clevel.grid[14][0], 400, clevel,0, 0, 64, 64, 0, 4, car_sheet_texture, random_number);
+		// Get parsed cars
+		cars = parser.getCars();
+		this.num_cars = cars.length;
 
 		/* initialize the level logic control */
 		levelLogic = new LevelLogic();

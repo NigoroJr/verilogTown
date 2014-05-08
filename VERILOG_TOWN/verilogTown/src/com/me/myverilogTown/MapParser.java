@@ -29,9 +29,11 @@ public class MapParser {
      */
     public static final String fileName = "../../samples/first_map.xml";
 
+    private int levelNumber;
     private GridNode grids[][];
     private ArrayList<TrafficControl> trafficSignals = new ArrayList<TrafficControl>();
     private ArrayList<Intersection> intersections = new ArrayList<Intersection>();
+    private Car[] cars;
 
     public MapParser() {
         this(fileName);
@@ -61,10 +63,19 @@ public class MapParser {
         doc.getDocumentElement().normalize();
 
         NodeList level = doc.getElementsByTagName("level");
-        Node map = level.item(0).getChildNodes().item(1);
-        Node car = level.item(0).getChildNodes().item(3);
+        NodeList mapProperties = level.item(0).getChildNodes();
+        Node map = null;
+        Node cars = null;
+        for (int i = 0; i < mapProperties.getLength(); i++) {
+            Node node = mapProperties.item(i);
 
-        int levelNum = Integer.parseInt(level.item(0).getAttributes()
+            if (node.getNodeName().equals("map"))
+                map = node;
+            else if (node.getNodeName().equals("cars"))
+                cars = node;
+        }
+
+        this.levelNumber = Integer.parseInt(level.item(0).getAttributes()
                 .getNamedItem("lv").getTextContent());
 
         // Get size of the map
@@ -87,6 +98,8 @@ public class MapParser {
             Intersection inter = intersections.get(i);
             setIntersection(inter.type, inter.x, inter.y);
         }
+
+        readCars(cars.getChildNodes());
     }
 
     /**
@@ -112,6 +125,44 @@ public class MapParser {
 
             processGrid(childrenOfGrid, x, y);
         }
+    }
+
+    public void readCars(NodeList cars) {
+        ArrayList<Car> carsList = new ArrayList<Car>();
+        for (int i = 0; i < cars.getLength(); i++) {
+            Node car = cars.item(i);
+
+            if (car.getNodeType() != Node.ELEMENT_NODE)
+                continue;
+
+            Node start = null;
+            Node end = null;
+            Node delay = null;
+            for (int j = 0; j < car.getChildNodes().getLength(); j++) {
+                Node n = car.getChildNodes().item(j);
+                if (n.getNodeName().equals("start"))
+                    start = n;
+                else if (n.getNodeName().equals("end"))
+                    end = n;
+                else if (n.getNodeName().equals("delay"))
+                    delay = n;
+            }
+
+            int s_x = Integer.parseInt(start.getAttributes()
+                    .getNamedItem("x").getTextContent());
+            int s_y = Integer.parseInt(start.getAttributes()
+                    .getNamedItem("y").getTextContent());
+            int e_x = Integer.parseInt(end.getAttributes().getNamedItem("x")
+                    .getTextContent());
+            int e_y = Integer.parseInt(end.getAttributes().getNamedItem("y")
+                    .getTextContent());
+            int delayOffset = Integer.parseInt(delay.getTextContent());
+
+            Car c = new Car(grids[s_x][s_y], grids[e_x][e_y], delayOffset);
+            carsList.add(c);
+        }
+
+        this.cars = carsList.toArray(new Car[0]);
     }
 
     /**
@@ -375,6 +426,15 @@ public class MapParser {
     }
 
     /**
+     * Returns the level number of this map.
+     * 
+     * @return The level number of this map.
+     */
+    public int getLevelNumber() {
+        return levelNumber;
+    }
+
+    /**
      * Returns the map parsed from the XML file.
      * 
      * @return The map as a list of GridNode.
@@ -391,6 +451,15 @@ public class MapParser {
     public TrafficControl[] getTrafficControls() {
         TrafficControl[] ret = new TrafficControl[0];
         return trafficSignals.toArray(ret);
+    }
+
+    /**
+     * Returns the array of the cars.
+     * 
+     * @return The array of the cars that appear in this lever.
+     */
+    public Car[] getCars() {
+        return cars;
     }
 
     /**
