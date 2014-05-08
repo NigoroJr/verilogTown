@@ -60,9 +60,9 @@ public class TrafficControl {
             case PROCEED_SOUTH:
                 return 180f;
             case PROCEED_EAST:
-                return 90f;
+                return 270;
             case PROCEED_WEST:
-                return 270f;
+                return 90;
             default:
                 return -45f;
         }
