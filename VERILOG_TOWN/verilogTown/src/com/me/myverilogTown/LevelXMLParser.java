@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MapParser {
+public class LevelXMLParser {
     /*
      * The CWD is...
      * 
@@ -35,11 +35,11 @@ public class MapParser {
     private ArrayList<Intersection> intersections = new ArrayList<Intersection>();
     private Car[] cars;
 
-    public MapParser() {
+    public LevelXMLParser() {
         this(fileName);
     }
 
-    public MapParser(String fileName) {
+    public LevelXMLParser(String fileName) {
         File file = new File(fileName);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;

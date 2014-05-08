@@ -40,7 +40,7 @@ public class VerilogTownMap
 	 * 
 	 * @param parser
 	 */
-    public void readMap(MapParser parser) {
+    public void readMap(LevelXMLParser parser) {
         grid = parser.getGridArray();
         traffic_signals = parser.getTrafficControls();
     }
