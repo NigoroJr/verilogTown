@@ -5,7 +5,7 @@
 #
 ####################################
 
-WORKING_DIR="../WORKING_DIR" # peter's working DIR is a relative address just one directory below the GIT repository
+WORKING_DIR="../WORKING_DIR2" # peter's working DIR is a relative address just one directory below the GIT repository
 # The place where your project is...can be hard or relative
 dest1="VERILOG_TOWN/verilogTown/src/com/me/myverilogTown/"
 dest2="VERILOG_TOWN/verilogTown-desktop/src/com/me/myverilogTown/"
