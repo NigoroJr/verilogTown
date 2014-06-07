@@ -1,0 +1,21 @@
+Supports:
+- always @(*)
+- always @(posedge clk or negedge rst)
+- If else
+- Case with default
+- assign
+- expressions and order of operation
+- parameters with constants
+- variables and ports with range [msb_constant : lsb_constant]
+- RHS = [constant]
+- RHS values
+- RHS numbers (binary, hex, octal, and decimal)
+- LHS variable only
+
+Not Simulatable
+- All vectors must be 30 or less
+
+Not supported Yet
+- ? 
+- Module instantiations
+
