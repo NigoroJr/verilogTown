@@ -1,10 +1,10 @@
 package com.me.myverilogTown;
 
+import java.net.URISyntaxException;
 import java.util.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.*;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,6 +14,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.math.Vector3;
 
 public class LevelScreen implements Screen
 {
@@ -23,6 +29,7 @@ public class LevelScreen implements Screen
 	private int num_cars;
 
 	private OrthographicCamera camera;
+	private OrthographicCamera uiCamera;
 	private SpriteBatch thebatch;
 	private SpriteBatch uibatch;
 	private LevelLogic levelLogic;
@@ -30,14 +37,31 @@ public class LevelScreen implements Screen
 
 	private Texture level_map;
 	private Texture stop;
+	private Texture stop_highlighted;
 	private Texture go;
 	private Texture go_forward;
 	private Texture go_right;
 	private Texture go_left;
+	private Texture intersection;
+	private Texture top_score_bar;
+	private Texture check_mark;
+	private Texture[] numbers;
+	private Texture border;
+	private Texture colon1;
+	private Texture colon2;
+	private Texture crash;
+	private Texture letterT;
+	private Texture letterI;
+	private Texture letterM;
+	private Texture letterE;
 
 	private int LEVEL_WIDTH;
 	private int LEVEL_HEIGHT;
-	private int toggle;
+	private int SCORE_BAR_WIDTH;
+	private int SCORE_BAR_HEIGHT;
+	private Integer toggle;
+	private int success_cars;
+	private int crash_cars;
 	private Random random_number;
 	private Rectangle glViewport;
 
@@ -49,6 +73,14 @@ public class LevelScreen implements Screen
 	private boolean level_done;
 
 	private float zoom_initial; // what the initial zoom ratio is so we can stop at it
+	
+	private double lastTime;
+	private double playTime;
+	
+	private InputHandler inputProcessor;
+	
+	boolean lastButtonPressed = false;
+	boolean currentButtonPressed = false;
 
 	public LevelScreen(final verilogTown gam) 
 	{
@@ -60,12 +92,16 @@ public class LevelScreen implements Screen
 		this.level_done = false;
 		this.random_number = new Random(3); // should this be rand seed?
 
+		LevelXMLParser parser = new LevelXMLParser();
 		/* init current level map data structure */
-		this.clevel = new VerilogTownMap(20, 21); // firts_map
+		int visibleGridX = parser.grids.length - 2;
+		int visibleGridY = parser.grids[0].length - 3;
+		
+		this.clevel = new VerilogTownMap(visibleGridX, visibleGridY); // firts_map
 		/* this might be where the XML read map goes */
 		/* hard coded map */
-		LevelXMLParser parser = new LevelXMLParser();
-		clevel.readMap(parser);;
+		
+		clevel.readMap(parser);
 
 		/* setup the sprites.  First is for the cars and Second is for the UI */
 		thebatch = new SpriteBatch();
@@ -76,13 +112,21 @@ public class LevelScreen implements Screen
 
 		/* create the camera for the SpriteBatch */
 		camera = new OrthographicCamera();
+		uiCamera = new OrthographicCamera();
 		/* set the level hegiht parameters */
-		LEVEL_HEIGHT = 1280;
-		LEVEL_WIDTH = 1280;
+		LEVEL_HEIGHT = 64 * visibleGridY;
+		LEVEL_WIDTH = 64 * visibleGridX;
+		/* set the score bar parameters */
+		SCORE_BAR_WIDTH = LEVEL_HEIGHT;
+		SCORE_BAR_HEIGHT = 100;
 		/* make the viewport to the level size */
-		camera.setToOrtho(false, LEVEL_WIDTH, LEVEL_HEIGHT);
-		camera.position.set(LEVEL_WIDTH / 2, LEVEL_HEIGHT / 2, 0);
-		glViewport = new Rectangle(0, 0, LEVEL_WIDTH, LEVEL_HEIGHT);
+		camera.setToOrtho(false, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+		camera.position.set((LEVEL_WIDTH) / 2, (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) / 2, 0);
+		glViewport = new Rectangle(0, 0, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+		
+		uiCamera.setToOrtho(false, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+		uiCamera.position.set((LEVEL_WIDTH) / 2, (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) / 2, 0);
+		glViewport = new Rectangle(0, 0, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
 		/* record the starting parameters */
 		zoom_initial = camera.zoom;
 
@@ -91,6 +135,8 @@ public class LevelScreen implements Screen
 		/* get all the textures for the lights */
 		stop = new Texture("data/stop_tran.png");
 		stop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		stop_highlighted = new Texture("data/stop_tran_highlighted.png");
+		stop_highlighted.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go = new Texture("data/go_tran.png");
 		go.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go_forward = new Texture("data/go_forward_tran.png");
@@ -99,6 +145,34 @@ public class LevelScreen implements Screen
 		go_right.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go_left = new Texture("data/go_left_tran.png");
 		go_left.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		top_score_bar = new Texture("data/score_bar.jpg");
+		top_score_bar.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		numbers = new Texture[10];
+		for(int i = 0; i < 10; i++){
+			String temp = "data/red_num_" + i + ".png";
+			numbers[i] = new Texture(temp);
+			numbers[i].setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		}
+		check_mark = new Texture("data/checkmark.png");
+		check_mark.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		border = new Texture("data/border.png");
+		border.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		colon1 = new Texture("data/dot.png");
+		colon1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		colon2 = new Texture("data/dot.png");
+		colon2.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		crash = new Texture("data/skeleton.png");
+		crash.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		letterT = new Texture("data/Letter-T.png");
+		letterT.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		letterI = new Texture("data/Letter-I.png");
+		letterI.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		letterM = new Texture("data/Letter-M.png");
+		letterM.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		letterE = new Texture("data/Letter-E.png");
+		letterE.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		inputProcessor = new InputHandler(camera, LEVEL_WIDTH, LEVEL_HEIGHT, SCORE_BAR_HEIGHT);
 
 		// Get parsed cars
 		cars = parser.getCars();
@@ -118,7 +192,6 @@ public class LevelScreen implements Screen
 	{
 		boolean fps_tick = false;
 		GL10 gl = Gdx.graphics.getGL10();
-
         	
 		Time += Gdx.graphics.getDeltaTime();
 		Next_Frame_Time += Gdx.graphics.getDeltaTime();
@@ -129,6 +202,7 @@ public class LevelScreen implements Screen
 			fps_tick = true;
 		}
 
+		Gdx.input.setInputProcessor(inputProcessor);
 		/* check for button presses */
 		handle_inputs();
 
@@ -137,6 +211,9 @@ public class LevelScreen implements Screen
 			/* IF - tick happends and simulating then simulate a time frame */
 			/*Gdx.app.log("Time Since last simulation:", "="+ Time);*/
 			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number);
+			this.success_cars = levelLogic.success_cars;
+			this.crash_cars = levelLogic.crash_cars;
+			this.playTime += Gdx.graphics.getDeltaTime();
 		}
 		else if (this.level_done == true)
 		{
@@ -154,12 +231,14 @@ public class LevelScreen implements Screen
 
 		/* use the camera on this batch ... does zooms and translates */
 		thebatch.setProjectionMatrix(camera.combined);
+		uibatch.setProjectionMatrix(uiCamera.combined);
 
 		if (this.level_done == true)
 		{
 			/* LEVEL COMPLETE */
 			thebatch.begin();
-			thebatch.draw(level_map, 0, 0);
+			thebatch.draw(level_map, 0, 0, 1280, 1280);
+			
 			for (int i = 0; i < num_cars; i++)
 			{
 				if (cars[i].get_is_running() || cars[i].get_is_crashed())
@@ -171,16 +250,18 @@ public class LevelScreen implements Screen
 			}
 	
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			
 			this.game.font.draw(thebatch, "Level Done", 100, 150);
 			this.game.font.draw(thebatch, "Score", 100, 100);
-
+			
 			thebatch.end();
 		}
 		else
 		{
 			/* Normal animation of simulation */
 			thebatch.begin();
-			thebatch.draw(level_map, 0, 0);
+			thebatch.draw(level_map, 0, 0, 1280, 1280);
+			
 			for (int i = 0; i < num_cars; i++)
 			{
 				if (cars[i].get_is_running() || cars[i].get_is_crashed())
@@ -204,15 +285,145 @@ public class LevelScreen implements Screen
 	
 			/* update the traffic light images */
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			
 			thebatch.end();
 		}
 
 		/* Draw the UI ontop of the level map */
-		uibatch.begin();
-		uibatch.draw(stop, 0, 0);
-		uibatch.end();
+		draw_score_bar();
+		
+		
+		
+		//determine the type of tile that the mouse is click
+		double pixOfWindowX = LEVEL_WIDTH * camera.zoom;
+		double pixOfWindowY = (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) * camera.zoom;
+		
+		double sizeOfWindowX = Gdx.graphics.getWidth();
+		double sizeOfWindowY = Gdx.graphics.getHeight();
+		
+		double mousePositionX = Gdx.input.getX();
+		double mousePositionY = Gdx.input.getY();
+		
+		double centerX = camera.position.x;
+		double centerY = camera.position.y;
+		
+		double realX = (centerX - pixOfWindowX/2) + ((mousePositionX/sizeOfWindowX) * pixOfWindowX);
+		double realY = (centerY - pixOfWindowY/2) + ((1-mousePositionY/sizeOfWindowY) * pixOfWindowY);
+		
+		realX = Math.min(realX, LEVEL_WIDTH);
+		realY = Math.min(realY, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+		
+		int gridX = 0, gridY = 0;	
+		
+		if(realY <= LEVEL_HEIGHT){
+			gridX = (int)(realX / 64);
+			gridY = (int)(realY / 64);
+		}
+		
+		int counter;
+		for(counter = 0; counter < clevel.traffic_signals.length; counter++){
+			if (clevel.grid[gridX+1][gridY+1].signal == clevel.traffic_signals[counter])
+				break;
+		}
+		
+		//traffic lights highlighting 
+		
+		if(clevel.grid[gridX+1][gridY+1].signal != null && toggle == 0){
+			thebatch.begin();
+			clevel.traffic_signals[counter].render_highlighted_stop(thebatch,stop_highlighted);
+			thebatch.end();
+			draw_score_bar();
+		}
+		
+		lastButtonPressed = currentButtonPressed;
+		currentButtonPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+		if(!currentButtonPressed && (clevel.grid[gridX+1][gridY+1].signal != null) && lastButtonPressed
+				&& (Time - lastTime) >= 0.6 && toggle == 0){
+			String path = "";
+			String pathOfVerilogFile = "";
+			try {
+				path = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			} catch (URISyntaxException e2) {
+				e2.printStackTrace();
+			}
+			int firstIndex = path.indexOf("/")+1;
+	    	int lastIndex = path.lastIndexOf("/")+1;
+	    	path = path.substring(firstIndex, lastIndex);
+	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+	    	pathOfVerilogFile = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+	    	path = path + "VerilogEditor.jar";
+	    	//System.out.println(path);
+			String name = "Traffic_signal_set_" + counter;
+			List<String> list = new ArrayList<String>();
+			list.add("java");
+			list.add("-jar");
+			list.add(path);
+			//list.add("D:/Program Files/eclipse-java/program/verilogTownStuff/myverilogTown/VerilogEditor.jar");
+			list.add(name);
+			list.add(pathOfVerilogFile);
+			try{
+				ProcessBuilder proc = new ProcessBuilder(list);
+				//proc.directory(new File("C:\\"));
+				Process p = proc.start();
+			}catch(Exception e){
+				System.out.println("Error invoking the verilog editor");
+			}
+			lastTime = Time;
+		}
 	}
 
+	public void draw_score_bar(){
+		uibatch.begin();
+		
+		uibatch.draw(top_score_bar, 0, LEVEL_HEIGHT, LEVEL_WIDTH, 100);
+		
+		uibatch.draw(check_mark, 70, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 140, LEVEL_HEIGHT + 18);
+		int successedCars3 = success_cars / 100;
+		uibatch.draw(numbers[successedCars3], 140, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 210, LEVEL_HEIGHT + 18);
+		int successedCars2 = (success_cars - successedCars3 * 100) / 10;
+		uibatch.draw(numbers[successedCars2], 210, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 280, LEVEL_HEIGHT + 18);
+		int successedCars1 = success_cars % 10;
+		uibatch.draw(numbers[successedCars1], 280, LEVEL_HEIGHT + 18);
+		
+		uibatch.draw(crash, 380, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 450, LEVEL_HEIGHT + 18);
+		int crashedCars3 = crash_cars / 100;
+		uibatch.draw(numbers[crashedCars3], 450, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 520, LEVEL_HEIGHT + 18);
+		int crashedCars2 = (crash_cars - crashedCars3 * 100) / 10;
+		uibatch.draw(numbers[crashedCars2], 520, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 590, LEVEL_HEIGHT + 18);
+		int crashedCars1 = crash_cars % 10;
+		uibatch.draw(numbers[crashedCars1], 590, LEVEL_HEIGHT + 18);
+		
+		uibatch.draw(letterT, 700, LEVEL_HEIGHT + 18);
+		uibatch.draw(letterI, 763, LEVEL_HEIGHT + 18);
+		uibatch.draw(letterM, 826, LEVEL_HEIGHT + 18);
+		uibatch.draw(letterE, 889, LEVEL_HEIGHT + 18);
+		int playTimeSecond = (int)playTime % 60;
+		int playTimeMinute = (int)playTime / 60;
+		uibatch.draw(border, 959, LEVEL_HEIGHT + 18);
+		uibatch.draw(numbers[playTimeMinute / 10], 959, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 1029, LEVEL_HEIGHT + 18);
+		uibatch.draw(numbers[playTimeMinute % 10], 1029, LEVEL_HEIGHT + 18);
+		
+		uibatch.draw(colon1, 1090, LEVEL_HEIGHT + 22);
+		uibatch.draw(colon2, 1090, LEVEL_HEIGHT + 46);
+		
+		uibatch.draw(border, 1114, LEVEL_HEIGHT + 18);
+		uibatch.draw(numbers[playTimeSecond / 10], 1114, LEVEL_HEIGHT + 18);
+		uibatch.draw(border, 1184, LEVEL_HEIGHT + 18);
+		uibatch.draw(numbers[playTimeSecond % 10], 1184, LEVEL_HEIGHT + 18);
+		
+		uibatch.end();
+	}
+	
+	
+	
 	public void handle_inputs()
 	{
 		/* Polling solution at present */
@@ -231,12 +442,15 @@ public class LevelScreen implements Screen
 				camera.zoom += 0.02;
 				zoom_limit_to_border();
 			}
+			//System.out.println("camera zoom: "+camera.zoom);
 		}
 		/* Zoom in */
 		if(Gdx.input.isKeyPressed(Keys.Q)) 
 		{
-			camera.zoom -= 0.02;
+			if(camera.zoom >= 0.1)
+				camera.zoom -= 0.02;
 			zoom_limit_to_border();
+			//System.out.println("camera zoom: "+camera.zoom);
 		}
 
 		/* Panning functions */
@@ -244,21 +458,26 @@ public class LevelScreen implements Screen
 		{
 			camera.translate(-3, 0, 0);
 			zoom_limit_to_border();
+			//System.out.println("camera position x: " + camera.position.x +"camera position y: " + camera.position.y);
 		}
 		if(Gdx.input.isKeyPressed(Keys.RIGHT)) 
 		{
 			camera.translate(3, 0, 0);
 			zoom_limit_to_border();
+			//System.out.println("camera position x: " + camera.position.x +"camera position y: " + camera.position.y);
 		}
 		if(Gdx.input.isKeyPressed(Keys.DOWN)) 
 		{
 			camera.translate(0, -3, 0);
 			zoom_limit_to_border();
+			//System.out.println("camera position x: " + camera.position.x +"camera position y: " + camera.position.y);
 		}
 		if(Gdx.input.isKeyPressed(Keys.UP)) 
 		{
 			camera.translate(0, 3, 0);
 			zoom_limit_to_border();
+			//System.out.println("camera position x: " + camera.position.x +"camera position y: " + camera.position.y);
+			//System.out.println("mouse position x: " + Gdx.input.getX() + "mouse position y: " + Gdx.input.getY());
 		}
 	}
 
@@ -273,13 +492,13 @@ public class LevelScreen implements Screen
 	
 		Vector2 camMin = new Vector2(camera.viewportWidth, camera.viewportHeight);
 		camMin.scl(camera.zoom/2); //bring to center and scale by the zoom level
-		Vector2 camMax = new Vector2(LEVEL_WIDTH, LEVEL_HEIGHT);
+		Vector2 camMax = new Vector2(LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
 		camMax.sub(camMin); //bring to center
 
 		/* keep camera within borders */
 		camX = Math.min(camMax.x, Math.max(camX, camMin.x));
-		camY = Math.min(camMax.y, Math.max(camY, camMin.y));
-
+		camY = Math.min(camMax.y - (1 - camera.zoom) * SCORE_BAR_HEIGHT, Math.max(camY, camMin.y));
+		
 		/* reset position */
 		camera.position.set(camX, camY, camera.position.z);
 	}
@@ -313,5 +532,126 @@ public class LevelScreen implements Screen
 	public void dispose() 
 	{
 
+	}
+}
+
+class InputHandler extends InputAdapter{
+	private OrthographicCamera camera;
+	private int LEVEL_WIDTH;
+	private int LEVEL_HEIGHT;
+	private int SCORE_BAR_HEIGHT;
+	
+	float pixOfWindowX;
+	float pixOfWindowY;
+	float sizeOfWindowX;
+	float sizeOfWindowY;
+	float lastMousePositionX;
+	float lastMousePositionY;
+	float currentMousePositionX;
+	float currentMousePositionY;
+	float centerX;
+	float centerY;
+	float currentRealX;
+	float currentRealY;
+	float lastRealX;
+	float lastRealY;	
+	int gridX;
+	int gridY;
+	
+	public InputHandler(OrthographicCamera camera, int LEVEL_WIDTH,
+						int LEVEL_HEIGHT, int SCORE_BAR_HEIGHT){
+		this.camera = camera;
+		this.LEVEL_WIDTH = LEVEL_WIDTH;
+		this.LEVEL_HEIGHT = LEVEL_HEIGHT;
+		this.SCORE_BAR_HEIGHT = SCORE_BAR_HEIGHT;
+	}
+	@Override
+	public boolean scrolled(int amount){
+		if(amount == -1){
+			System.out.println("amount == " + amount);
+			System.out.println("zoom == " + camera.zoom);
+			if((camera.zoom - 0.04) >= 0.2)
+				camera.zoom -= 0.04;
+			else
+				camera.zoom = 0.2f;
+			zoom_limit_to_border();
+		}		
+		else if(amount == 1){
+			System.out.println("amount == " + amount);
+			System.out.println("zoom == " + camera.zoom);
+			if((camera.zoom + 0.04) > 1)
+				camera.zoom = 1;
+			else
+				camera.zoom += 0.04;
+			zoom_limit_to_border();
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer){
+		lastMousePositionX = currentMousePositionX;
+		lastMousePositionY = currentMousePositionY;
+
+		currentMousePositionX = screenX;
+		currentMousePositionY = screenY;
+		
+		get_real_xy();
+		
+		if(lastRealX != 0 && lastRealY != 0)
+			camera.translate((lastRealX - currentRealX), (lastRealY - currentRealY), 0);
+		zoom_limit_to_border();
+
+		return true;
+	}
+	
+	@Override
+	public boolean mouseMoved(int screenX, int screenY){
+		lastMousePositionX = currentMousePositionX;
+		lastMousePositionY = currentMousePositionY;
+		currentMousePositionX = screenX;
+		currentMousePositionY = screenY;
+		
+		return true;
+	}
+	
+	private void get_real_xy(){
+		pixOfWindowX = LEVEL_WIDTH * camera.zoom;
+		pixOfWindowY = (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) * camera.zoom;
+		sizeOfWindowX = Gdx.graphics.getWidth();
+		sizeOfWindowY = Gdx.graphics.getHeight();
+		centerX = camera.position.x;
+		centerY = camera.position.y;
+		currentRealX = (centerX - pixOfWindowX/2) + ((currentMousePositionX/sizeOfWindowX) * pixOfWindowX);
+		currentRealY = (centerY - pixOfWindowY/2) + ((1-currentMousePositionY/sizeOfWindowY) * pixOfWindowY);
+		currentRealX = Math.min(currentRealX, LEVEL_WIDTH);
+		currentRealY = Math.min(currentRealY, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+		
+		lastRealX = (centerX - pixOfWindowX/2) + ((lastMousePositionX/sizeOfWindowX) * pixOfWindowX);
+		lastRealY = (centerY - pixOfWindowY/2) + ((1-lastMousePositionY/sizeOfWindowY) * pixOfWindowY);
+		lastRealX = Math.min(lastRealX, LEVEL_WIDTH);
+		lastRealY = Math.min(lastRealY, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+	}
+	
+	private void zoom_limit_to_border()
+	{
+		/* keeps any move on a zoomed region to the limit of the map */
+		float camX;
+		float camY;
+
+		camX = camera.position.x;
+		camY = camera.position.y;
+	
+		Vector2 camMin = new Vector2(camera.viewportWidth, camera.viewportHeight);
+		camMin.scl(camera.zoom/2); //bring to center and scale by the zoom level
+		Vector2 camMax = new Vector2(LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+		camMax.sub(camMin); //bring to center
+
+		/* keep camera within borders */
+		camX = Math.min(camMax.x, Math.max(camX, camMin.x));
+		camY = Math.min(camMax.y - (1 - camera.zoom) * 100, Math.max(camY, camMin.y));
+		
+		/* reset position */
+		camera.position.set(camX, camY, camera.position.z);
 	}
 }

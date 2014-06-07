@@ -125,9 +125,12 @@ public class Car
 		}
 
 		carSprite = new Sprite(carFrames[new Random().nextInt(3)]);
+		
+		//carSprite = new Sprite(new Texture("data/testCar.png"));
+		
 		carSprite.setPosition(this.position_x, this.position_y);
 		carSprite.setSize(width, height);
-
+		
 		crashSprite = new Sprite(carFrames[3]); // crash sprite is last
 		crashSprite.setSize(width, height);
 	}

@@ -10,7 +10,8 @@ public class verilogTown extends Game
     public SpriteBatch batch;
     public BitmapFont font;
 
-    public void create()
+    @Override
+	public void create()
     {
         batch = new SpriteBatch();
 
@@ -23,12 +24,14 @@ public class verilogTown extends Game
 
     }
 
-    public void render()
+    @Override
+	public void render()
     {
         super.render(); // important!
     }
 
-    public void dispose()
+    @Override
+	public void dispose()
     {
         batch.dispose();
         font.dispose();

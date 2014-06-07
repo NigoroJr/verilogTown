@@ -11,7 +11,7 @@ public class GridNode {
     private GridNode east;
     private GridNode west;
 
-    private TrafficControl signal = null;;
+    public TrafficControl signal = null;
     /**
      * Location of the traffic light with respect to the intersection.
      * Read this as "traffic light on the {location} side of the intersection."

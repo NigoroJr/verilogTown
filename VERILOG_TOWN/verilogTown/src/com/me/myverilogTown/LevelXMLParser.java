@@ -30,7 +30,7 @@ public class LevelXMLParser {
     public static final String fileName = "../../samples/first_map.xml";
 
     private int levelNumber;
-    private GridNode grids[][];
+    public GridNode grids[][];
     private ArrayList<TrafficControl> trafficSignals = new ArrayList<TrafficControl>();
     private ArrayList<Intersection> intersections = new ArrayList<Intersection>();
     private Car[] cars;
@@ -236,21 +236,27 @@ public class LevelXMLParser {
         GridNode e = grids[x - 1][y - 1];
         /* Traffic going West */
         GridNode w = grids[x + 2][y];
+        //Grids of the intersection
+        GridNode interUpperLeft = grids[x][y];
+        GridNode interUpperRight = grids[x+1][y];
+        GridNode interLowerLeft = grids[x][y-1];
+        GridNode interLowerRight = grids[x+1][y-1];
+        
         switch (intersectionType) {
             case "FOUR_WAY":
-                signal.setNSEW(n, s, e, w);
+                signal.setNSEW(n, s, e, w, interUpperLeft, interUpperRight, interLowerLeft, interLowerRight);
                 break;
             case "THREE_WAY_NSE":
-                signal.setNSE(n, s, e);
+                signal.setNSE(n, s, e, interUpperLeft, interUpperRight, interLowerLeft, interLowerRight);
                 break;
             case "THREE_WAY_SEW":
-                signal.setSEW(s, e, w);
+                signal.setSEW(s, e, w, interUpperLeft, interUpperRight, interLowerLeft, interLowerRight);
                 break;
             case "THREE_WAY_NSW":
-                signal.setNSW(n, s, w);
+                signal.setNSW(n, s, w, interUpperLeft, interUpperRight, interLowerLeft, interLowerRight);
                 break;
             case "THREE_WAY_NEW":
-                signal.setNEW(n, e, w);
+                signal.setNEW(n, e, w, interUpperLeft, interUpperRight, interLowerLeft, interLowerRight);
                 break;
         }
         trafficSignals.add(signal);

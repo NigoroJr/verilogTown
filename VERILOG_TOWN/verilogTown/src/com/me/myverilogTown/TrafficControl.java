@@ -1,7 +1,17 @@
 package com.me.myverilogTown;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class TrafficControl {
     private IntersectionType type = null;
@@ -11,6 +21,10 @@ public class TrafficControl {
     private GridNode goSouth = null;
     private GridNode goEast = null;
     private GridNode goWest = null;
+    private GridNode internalUpperLeft = null;
+    private GridNode internalUpperRight = null;
+    private GridNode internalLowerLeft = null;
+    private GridNode internalLowerRight = null;
 
     /* Traffic light for cars "facing north" */
     private TrafficSignalState facingNorth = TrafficSignalState.STOP;
@@ -22,7 +36,8 @@ public class TrafficControl {
     public static final int PROCEED_SOUTH = 1;
     public static final int PROCEED_EAST = 2;
     public static final int PROCEED_WEST = 3;
-
+    public static final int INTERNAL = 4;
+    
     public void render_signal(TrafficSignalState signal, GridNode grid,
             float rot, SpriteBatch batch, Texture stop, Texture go,
             Texture left, Texture right, Texture forward) {
@@ -83,6 +98,35 @@ public class TrafficControl {
             render_signal(facingWest, goWest, rotate(PROCEED_WEST),
                     batch, stop, go, left, right, forward);
     }
+    
+    public void render_highlighted_stop(SpriteBatch batch, Texture stop_highlighted){
+    	 if (goNorth != null){
+    		 batch.draw(stop_highlighted, (goNorth.getX() - 1) * 64, (goNorth.getY() - 1) * 64, 
+    				 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
+    	 }
+         if (goSouth != null){
+        	 batch.draw(stop_highlighted, (goSouth.getX() - 1) * 64, (goSouth.getY() - 1) * 64, 
+    				 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
+         }
+         if (goEast != null){
+        	 batch.draw(stop_highlighted, (goEast.getX() - 1) * 64, (goEast.getY() - 1) * 64, 
+    				 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
+         }
+         if (goWest != null){
+        	 batch.draw(stop_highlighted, (goWest.getX() - 1) * 64, (goWest.getY() - 1) * 64, 
+    				 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
+         }
+    }
+        
+        
+       /* button.addListener(new ClickListener(){
+        	@Override
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+        		Gdx.app.log("button is pressed", "button is pressed");
+				return true;
+			}
+        });*/	
+    		
 
     /**
      * Sets the nodes surrounding this traffic light.
@@ -96,7 +140,8 @@ public class TrafficControl {
      * @param W
      *            The node that west-bound cars are from.
      */
-    public void setNSEW(GridNode N, GridNode S, GridNode E, GridNode W) {
+    public void setNSEW(GridNode N, GridNode S, GridNode E, GridNode W, 
+    					GridNode IUL, GridNode IUR, GridNode ILL, GridNode ILR){
 
         type = IntersectionType.FOUR_WAY;
 
@@ -104,11 +149,19 @@ public class TrafficControl {
         this.goSouth = S;
         this.goEast = E;
         this.goWest = W;
+        this.internalUpperLeft = IUL;
+        this.internalUpperRight = IUR;
+        this.internalLowerLeft = ILL;
+        this.internalLowerRight = ILR;
 
         goNorth.setTrafficControl(this, PROCEED_NORTH);
         goSouth.setTrafficControl(this, PROCEED_SOUTH);
         goEast.setTrafficControl(this, PROCEED_EAST);
         goWest.setTrafficControl(this, PROCEED_WEST);
+        internalUpperLeft.setTrafficControl(this, INTERNAL);
+        internalUpperRight.setTrafficControl(this, INTERNAL);
+        internalLowerLeft.setTrafficControl(this, INTERNAL);
+        internalLowerRight.setTrafficControl(this, INTERNAL);
     }
 
     /**
@@ -121,16 +174,25 @@ public class TrafficControl {
      * @param E
      *            The node that east-bound cars are from.
      */
-    public void setNSE(GridNode N, GridNode S, GridNode E) {
+    public void setNSE(GridNode N, GridNode S, GridNode E,
+    				GridNode IUL, GridNode IUR, GridNode ILL, GridNode ILR) {
         type = IntersectionType.THREE_WAY_NSE;
 
         this.goNorth = N;
         this.goSouth = S;
         this.goEast = E;
-
+        this.internalUpperLeft = IUL;
+        this.internalUpperRight = IUR;
+        this.internalLowerLeft = ILL;
+        this.internalLowerRight = ILR;
+        
         goNorth.setTrafficControl(this, PROCEED_NORTH);
         goSouth.setTrafficControl(this, PROCEED_SOUTH);
         goEast.setTrafficControl(this, PROCEED_EAST);
+        internalUpperLeft.setTrafficControl(this, INTERNAL);
+        internalUpperRight.setTrafficControl(this, INTERNAL);
+        internalLowerLeft.setTrafficControl(this, INTERNAL);
+        internalLowerRight.setTrafficControl(this, INTERNAL);
     }
 
     /**
@@ -143,16 +205,25 @@ public class TrafficControl {
      * @param W
      *            The node that west-bound cars are from.
      */
-    public void setSEW(GridNode S, GridNode E, GridNode W) {
+    public void setSEW(GridNode S, GridNode E, GridNode W,
+    				GridNode IUL, GridNode IUR, GridNode ILL, GridNode ILR) {
         type = IntersectionType.THREE_WAY_SEW;
 
         this.goSouth = S;
         this.goEast = E;
         this.goWest = W;
-
+        this.internalUpperLeft = IUL;
+        this.internalUpperRight = IUR;
+        this.internalLowerLeft = ILL;
+        this.internalLowerRight = ILR;
+        
         goSouth.setTrafficControl(this, PROCEED_SOUTH);
         goEast.setTrafficControl(this, PROCEED_EAST);
         goWest.setTrafficControl(this, PROCEED_WEST);
+        internalUpperLeft.setTrafficControl(this, INTERNAL);
+        internalUpperRight.setTrafficControl(this, INTERNAL);
+        internalLowerLeft.setTrafficControl(this, INTERNAL);
+        internalLowerRight.setTrafficControl(this, INTERNAL);
     }
 
     /**
@@ -165,16 +236,25 @@ public class TrafficControl {
      * @param W
      *            The node that west-bound cars are from.
      */
-    public void setNSW(GridNode N, GridNode S, GridNode W) {
+    public void setNSW(GridNode N, GridNode S, GridNode W,
+    		GridNode IUL, GridNode IUR, GridNode ILL, GridNode ILR) {
         type = IntersectionType.THREE_WAY_NSW;
 
         this.goNorth = N;
         this.goSouth = S;
         this.goWest = W;
+        this.internalUpperLeft = IUL;
+        this.internalUpperRight = IUR;
+        this.internalLowerLeft = ILL;
+        this.internalLowerRight = ILR;
 
         goNorth.setTrafficControl(this, PROCEED_NORTH);
         goSouth.setTrafficControl(this, PROCEED_SOUTH);
         goWest.setTrafficControl(this, PROCEED_WEST);
+        internalUpperLeft.setTrafficControl(this, INTERNAL);
+        internalUpperRight.setTrafficControl(this, INTERNAL);
+        internalLowerLeft.setTrafficControl(this, INTERNAL);
+        internalLowerRight.setTrafficControl(this, INTERNAL);
     }
 
     /**
@@ -187,16 +267,25 @@ public class TrafficControl {
      * @param W
      *            The node that west-bound cars are from.
      */
-    public void setNEW(GridNode N, GridNode E, GridNode W) {
+    public void setNEW(GridNode N, GridNode E, GridNode W,
+    		GridNode IUL, GridNode IUR, GridNode ILL, GridNode ILR) {
         type = IntersectionType.THREE_WAY_NEW;
 
         this.goNorth = N;
         this.goWest = W;
         this.goEast = E;
+        this.internalUpperLeft = IUL;
+        this.internalUpperRight = IUR;
+        this.internalLowerLeft = ILL;
+        this.internalLowerRight = ILR;
 
         goNorth.setTrafficControl(this, PROCEED_NORTH);
         goEast.setTrafficControl(this, PROCEED_EAST);
         goWest.setTrafficControl(this, PROCEED_WEST);
+        internalUpperLeft.setTrafficControl(this, INTERNAL);
+        internalUpperRight.setTrafficControl(this, INTERNAL);
+        internalLowerLeft.setTrafficControl(this, INTERNAL);
+        internalLowerRight.setTrafficControl(this, INTERNAL);
     }
 
     /**
@@ -248,4 +337,35 @@ public class TrafficControl {
     public IntersectionType getIntersectionType() {
         return type;
     }
+    
+    public int getX(){
+    	if(goNorth != null){
+    		return (goNorth.getX()-2)*64+41;
+    	}
+    	else if(goSouth != null){
+    		return (goSouth.getX()-1)*64+41;
+    	}
+    	else
+    		return 0;
+    }
+    
+    public int getY(){
+    	if(goNorth != null){
+    		return (goNorth.getY()*64)+32;
+    	}
+    	else if(goSouth != null){
+    		return (goSouth.getY()-3)*64+41;
+    	}
+    	else
+    		return 0;
+    }
+    
+    
+ 
+		/*batch.draw(intersection, ((goNorth.getX()-2)*64)+41, (goNorth.getY()*64)+32, 0, 0, 
+				64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false);*/
+
+		/*batch.draw(intersection, (goSouth.getX()-1)*64+41, (goSouth.getY()-3)*64+41, 0, 0, 
+		64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false);*/
+
 }

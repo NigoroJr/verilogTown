@@ -14,7 +14,7 @@ public class VerilogTownMap
 	private int grid_y; 
 	public GridNode grid[][];
 	private int markPathCount; // used as a count for a mark path idetifier
-	private TrafficControl traffic_signals[];
+	public TrafficControl traffic_signals[];
 
 	/* Constructor */
 	public VerilogTownMap(int size_x, int size_y) 

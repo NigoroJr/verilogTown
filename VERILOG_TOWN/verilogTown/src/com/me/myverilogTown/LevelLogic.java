@@ -7,6 +7,8 @@ public class LevelLogic
 {
 	private int time_step;
 	private int count_cars_done;
+	public int success_cars = 0;
+	public int crash_cars = 0;
 	Queue<Integer> car_processing_q;
 	Queue<Integer> car_crashing_q;
 	
@@ -76,6 +78,7 @@ public class LevelLogic
 					{
 						/* IF done path then record this detail and skip the rest of the processing */
 						count_cars_done++;
+						success_cars++;
 						continue;
 					}
 				}
@@ -132,6 +135,7 @@ public class LevelLogic
 							i++;
 							cars[j].crashed();
 							count_cars_done+=2;
+							crash_cars+=2;
 							break; // break from j loop
 						}
 					}

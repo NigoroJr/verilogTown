@@ -8,8 +8,8 @@ public class Main {
         LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
         cfg.title = "verilogTown";
         cfg.useGL20 = false;
-        cfg.width = 1280;
-        cfg.height = 1280;
+        cfg.width = 600;
+        cfg.height = 600;
 
         new LwjglApplication(new verilogTown(), cfg);
     }
