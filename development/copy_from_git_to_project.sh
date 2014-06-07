@@ -16,11 +16,13 @@ dest3="$WORKING_DIR/verilogTown-android/assets/data/"
 backup_files1="VERILOG_TOWN/verilogTown/src/com/me/myverilogTown/*.java"
 backup_files2="VERILOG_TOWN/verilogTown-desktop/src/com/me/myverilogTown/*.java"
 backup_files3="VERILOG_TOWN/verilogTown-android/assets/data/*.png"
-backup_files4="VERILOG_TOWN/verilogTown-android/assets/data/*.mp3"
+backup_files4="VERILOG_TOWN/verilogTown-android/assets/data/*.jpg"
+backup_files5="VERILOG_TOWN/verilogTown-android/assets/data/*.mp3"
 backup2_files1="$WORKING_DIR/verilogTown/src/com/me/myverilogTown/*.java"
 backup2_files2="$WORKING_DIR/verilogTown-desktop/src/com/me/myverilogTown/*.java"
 backup2_files3="$WORKING_DIR/verilogTown-android/assets/data/*.png"
-backup2_files4="$WORKING_DIR/verilogTown-android/assets/data/*.mp3"
+backup2_files4="$WORKING_DIR/verilogTown-android/assets/data/*.jpg"
+backup2_files5="$WORKING_DIR/verilogTown-android/assets/data/*.mp3"
 
 # Where to backup to.
 back_dest="LOCAL_BACKUPS"
@@ -37,8 +39,8 @@ date
 echo
 
 # Backup the files using tar.
-echo "tar -czf $back_dest/$archive_file $backup_files1 $backup_files2 $backup_files3 $backup_files4"
-`tar -czf $back_dest/$archive_file $backup_files1 $backup_files2 $backup_files3 $backup_files4`
+echo "tar -czf $back_dest/$archive_file $backup_files1 $backup_files2 $backup_files3 $backup_files4 $backup_files5"
+`tar -czf $back_dest/$archive_file $backup_files1 $backup_files2 $backup_files3 $backup_files4 $backup_files5`
 echo "tar -czf $back_dest/$archive_file2 $backup2_files1 $backup2_files2 "
 `tar -czf $back_dest/$archive_file2 $backup2_files1 $backup2_files2`
 
@@ -59,3 +61,5 @@ echo "cp $backup_files3 $dest3"
 `cp $backup_files3 $dest3`
 echo "cp $backup_files4 $dest3"
 `cp $backup_files4 $dest3`
+echo "cp $backup_files5 $dest3"
+`cp $backup_files5 $dest3`
