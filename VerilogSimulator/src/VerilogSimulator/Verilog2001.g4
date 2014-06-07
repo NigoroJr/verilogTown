@@ -1,4 +1,4 @@
-/* Dervied from Verilog 2001 but simplified by Peter Jamieson 2014 *
+/* Dervied from Verilog 2001 but simplified by Peter Jamieson 2014 */
 grammar Verilog2001;
 
 inst_name : topmodule_identifier ( '.' instance_identifier )* ;

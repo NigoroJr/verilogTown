@@ -14,7 +14,6 @@ public class Parse
 {
 	private ParseTree root_tree;
 	private SimVisitor visitor;
-	DumpTree dump;
 
 	private ArrayList<ParsePort> ports_list;
 	private ArrayList<ParseRegWire> vars_list;
