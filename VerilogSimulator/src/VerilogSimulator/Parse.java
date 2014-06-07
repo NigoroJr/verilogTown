@@ -3,12 +3,19 @@ package VerilogSimulator;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.*;
+
+import javax.swing.*;
 
 public class Parse
 {
@@ -22,8 +29,10 @@ public class Parse
 
 	private ArrayList<Integer> output_vector_list;
 
-	int depth = 0;
-	boolean on = false;
+	private Boolean is_compiled = false;
+	private Boolean is_no_parse_errors = true;
+
+	private JTextPane errorText;
 
 	public Parse() 
 	{
@@ -31,6 +40,17 @@ public class Parse
 		hash_vars = new Hashtable<String, ParseRegWire>();
 		ports_list = new ArrayList<ParsePort>();
 		vars_list = new ArrayList<ParseRegWire>();
+	}
+	
+	/* Constructor for Editor ... needs error pane to display syntax errors */
+	public Parse(JTextPane errorText) 
+	{
+		hash_ports = new Hashtable<String, ParsePort>();
+		hash_vars = new Hashtable<String, ParseRegWire>();
+		ports_list = new ArrayList<ParsePort>();
+		vars_list = new ArrayList<ParseRegWire>();
+
+		this.errorText = errorText;
 	}
 
 	public void compileFile(String fileName) throws IOException
@@ -47,57 +67,72 @@ public class Parse
 		root_tree = parser.module_declaration();
 		/* first pass to make all the symbol tables */
 		walker.walk(listener, root_tree);
+		is_compiled = true;
+	}
 
-	//	System.out.println(root_tree.toStringTree(parser));
+	public void compileFileForEditor(String fileName) throws IOException
+	{
+		ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(fileName));
+		Verilog2001Lexer lexer = new Verilog2001Lexer(input);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		Verilog2001Parser parser = new Verilog2001Parser(tokens);
+		ParseTreeWalker walker = new ParseTreeWalker();
+		ParseListener listener = new ParseListener(parser, ports_list, vars_list, hash_ports, hash_vars); 
 
-		/* visitor pass for simulation */
-	/*
-		System.out.println("1 Cycle");
-		sim_cycle("0", "00000000", "000000000000000000000000000000");
-		for (int i=0; i < 4; i++)
+		this.visitor = new SimVisitor(ports_list, vars_list, hash_ports, hash_vars);
+
+		is_no_parse_errors = true;
+
+		parser.removeErrorListeners();
+		parser.addErrorListener(new VerboseListenerE());
+		root_tree = parser.module_declaration();
+		/* first pass to make all the symbol tables */
+		walker.walk(listener, root_tree);
+
+		if (is_no_parse_errors)
 		{
-			System.out.println("Out:"+i+" Val:"+output_vector_list.get(i));
+			is_compiled = true;
 		}
-		System.out.println("Combo 1 Cycle");
-		sim_cycle("1", "10001000", "000000000000000000000000000000");
-		for (int i=0; i < 4; i++)
+		else
 		{
-			System.out.println("Out:"+i+" Val:"+output_vector_list.get(i));
+			is_compiled = false;
 		}
-		System.out.println("2 Cycle");
-		sim_cycle("1", "10000000", "000000000000000000000000000000");
-		for (int i=0; i < 4; i++)
-		{
-			System.out.println("Out:"+i+" Val:"+output_vector_list.get(i));
-		}
-	*/
-	/*	System.out.println("Reset Cycle");
-		sim_cycle("0", "00000000", "000000000000000000000000000000");
-		for (int i=0; i < 4; i++)
-		{
-			System.out.println("Out:"+i+" Val:"+output_vector_list.get(i));
-		}
-		for (int i = 0; i <600; i++)
-		{
-			System.out.println(i+" Cycle");
-			sim_cycle("1", "00000000", "000000000000000000000000000000");
-			for (int j=0; j < 4; j++)
-			{
-				System.out.println("Out:"+j+" Val:"+output_vector_list.get(j));
-			}
-		}
-	*/
 	}
 
 	public ArrayList<Integer> sim_cycle(String rst, String light_sensors, String general_sensors)
 	{
-		visitor.next_sim_cycle();
-		visitor.update_vector_inputs(rst, light_sensors, general_sensors);
-		visitor.visit(root_tree);
-		visitor.clean_sim_cycle();
-		output_vector_list = visitor.update_vector_ouputs();
+		if (is_compiled)
+		{
+			visitor.next_sim_cycle();
+			visitor.update_vector_inputs(rst, light_sensors, general_sensors);
+			visitor.visit(root_tree);
+			visitor.clean_sim_cycle();
+			output_vector_list = visitor.update_vector_ouputs();
+	
+			return output_vector_list;
+		}
 
-		return output_vector_list;
+		return null;
+	}
+
+	public Boolean is_compiled_yet()
+	{
+		return is_compiled;
+	}
+	
+	public class VerboseListenerE extends BaseErrorListener 
+	{
+		@Override
+		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
+		{
+			String old_text;
+			List<String> stack = ((Parser)recognizer).getRuleInvocationStack();
+			Collections.reverse(stack);
+			old_text = errorText.getText();
+			errorText.setText(old_text+"\nError at line "+line+":"+charPositionInLine+" at "+ offendingSymbol+": "+msg);
+			/* flag found parse error */
+			is_no_parse_errors = false;
+		}
 	}
 }
 
