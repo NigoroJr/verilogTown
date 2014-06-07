@@ -48,7 +48,7 @@ public class Parse
 		/* first pass to make all the symbol tables */
 		walker.walk(listener, root_tree);
 
-		System.out.println(root_tree.toStringTree(parser));
+	//	System.out.println(root_tree.toStringTree(parser));
 
 		/* visitor pass for simulation */
 	/*
@@ -71,7 +71,7 @@ public class Parse
 			System.out.println("Out:"+i+" Val:"+output_vector_list.get(i));
 		}
 	*/
-		System.out.println("Reset Cycle");
+	/*	System.out.println("Reset Cycle");
 		sim_cycle("0", "00000000", "000000000000000000000000000000");
 		for (int i=0; i < 4; i++)
 		{
@@ -86,16 +86,18 @@ public class Parse
 				System.out.println("Out:"+j+" Val:"+output_vector_list.get(j));
 			}
 		}
-
+	*/
 	}
 
-	public void sim_cycle(String rst, String light_sensors, String general_sensors)
+	public ArrayList<Integer> sim_cycle(String rst, String light_sensors, String general_sensors)
 	{
 		visitor.next_sim_cycle();
 		visitor.update_vector_inputs(rst, light_sensors, general_sensors);
 		visitor.visit(root_tree);
 		visitor.clean_sim_cycle();
 		output_vector_list = visitor.update_vector_ouputs();
+
+		return output_vector_list;
 	}
 }
 
