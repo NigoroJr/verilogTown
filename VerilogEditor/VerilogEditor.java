@@ -474,7 +474,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 			FileWriter out = new FileWriter(verilogFiles);
 			out.write(codeText.getText());
 			out.close();
-			errorText("Saving complete.");
+			errorText.setText("Saving complete.");
 		}
 		catch (Exception e1)
 		{
@@ -661,7 +661,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 			{
 				ArrayList<Integer> output_vector_list = Compiler.sim_cycle(simulateBin.substring(0,1), simulateBin.substring(1, 9), simulateBin.substring(9, 40));
 			
-				errorText.setText("Simulation Cycle\nReset is: " + simulateBin.substring(0,1) + " Sensors Light: " + simulateBin.substring(1, 9)+" General Sensors: " + simulateBin.substring(9, 40)+"\n"+"Out0 Val:"+output_vector_list.get(0) + " Out1 Val:"+output_vector_list.get(1) +" Out:2 Val:"+output_vector_list.get(2) +" Out3 Val:"+output_vector_list.get(3));
+				errorText.setText("Simulation Cycle\nReset is: " + simulateBin.substring(0,1) + " Sensors Light: " + simulateBin.substring(1, 9)+" General Sensors: " + simulateBin.substring(9, 40)+"\nOut0 Val:"+output_vector_list.get(0) + "\nOut1 Val:"+output_vector_list.get(1) +"\nOut:2 Val:"+output_vector_list.get(2) +"\nOut3 Val:"+output_vector_list.get(3)+"\nDebugVector:"+Integer.toBinaryString(output_vector_list.get(4)));
 			}
 			else
 			{
@@ -1275,6 +1275,8 @@ class searchAndReplaceDialog extends JDialog
 			replaceAllFunction(textArea, fromStr, toStr);
 		}
 		else
-		return;
+		{
+			return;
+		}
 	}
 }

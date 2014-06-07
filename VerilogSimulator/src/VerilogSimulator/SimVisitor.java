@@ -25,6 +25,7 @@ public class SimVisitor extends Verilog2001BaseVisitor<Value>
 	private Integer outS;
 	private Integer outE;
 	private Integer outW;
+	private Integer debug;
 
 	public SimVisitor (ArrayList<ParsePort> ports_list, ArrayList<ParseRegWire> vars_list, Hashtable<String, ParsePort> hash_ports, Hashtable<String, ParseRegWire> hash_vars)
 	{
@@ -47,6 +48,7 @@ public class SimVisitor extends Verilog2001BaseVisitor<Value>
 		this.output_vector_list.add(outS);
 		this.output_vector_list.add(outE);
 		this.output_vector_list.add(outW);
+		this.output_vector_list.add(debug);
 	}
 
 /* -------------------------------------------------------------------------------------	
@@ -120,6 +122,8 @@ Simulate
 		output_vector_list.set(2, out_port.getValue(new_val_idx));
 		out_port = hash_ports.get("outW");
 		output_vector_list.set(3, out_port.getValue(new_val_idx));
+		out_port = hash_ports.get("debug_port");
+		output_vector_list.set(4, out_port.getValue(new_val_idx));
 		
 		return output_vector_list;
 	}
