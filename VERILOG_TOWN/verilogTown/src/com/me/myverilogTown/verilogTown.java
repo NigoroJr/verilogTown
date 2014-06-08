@@ -7,33 +7,32 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class verilogTown extends Game
 {
-    public SpriteBatch batch;
-    public BitmapFont font;
+	public SpriteBatch batch;
+	public BitmapFont font;
 
-    @Override
+	@Override
 	public void create()
-    {
-        batch = new SpriteBatch();
+	{
+		batch = new SpriteBatch();
 
-        Texture.setEnforcePotImages(false); // turns off power of 2 restriction
-                                            // in textures...some OpenGl thing
+		Texture.setEnforcePotImages(false); // turns off power of 2 restriction
+		// in textures...some OpenGl thing
 
-        // Use LibGDX's default Arial font.
-        font = new BitmapFont();
-        this.setScreen(new MainMenu(this));
+		// Use LibGDX's default Arial font.
+		font = new BitmapFont();
+		this.setScreen(new MainMenu(this));
+	}
 
-    }
-
-    @Override
+	@Override
 	public void render()
-    {
-        super.render(); // important!
-    }
+	{
+		super.render(); // important!
+	}
 
-    @Override
+	@Override
 	public void dispose()
-    {
-        batch.dispose();
-        font.dispose();
-    }
+	{
+		batch.dispose();
+		font.dispose();
+	}
 }

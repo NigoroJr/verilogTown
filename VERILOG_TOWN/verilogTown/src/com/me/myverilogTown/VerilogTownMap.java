@@ -40,10 +40,11 @@ public class VerilogTownMap
 	 * 
 	 * @param parser
 	 */
-    public void readMap(LevelXMLParser parser) {
-        grid = parser.getGridArray();
-        traffic_signals = parser.getTrafficControls();
-    }
+	public void readMap(LevelXMLParser parser) 
+	{
+		grid = parser.getGridArray();
+		traffic_signals = parser.getTrafficControls();
+	}
 
 	void initFindPathMarker()
 	{
@@ -61,8 +62,8 @@ public class VerilogTownMap
 			int y;
 
 			traverse = path.pop();
-		       	y = traverse.getY();
-		       	x = traverse.getX();
+			y = traverse.getY();
+			x = traverse.getX();
 
 			Gdx.app.log("verilogTownMap-showPath", "Stack x="+ x +" y="+ y);
 		}
@@ -262,12 +263,12 @@ public class VerilogTownMap
 		return null;
 	}
 
-	int get_num_traffic_signals()
+	public int get_num_traffic_signals()
 	{
 		return traffic_signals.length;
 	}
 	
-	void display_traffic_lights()
+	public void display_traffic_lights()
 	{
 		for (int i = 0; i < traffic_signals.length; i++)
 		{
@@ -281,6 +282,16 @@ public class VerilogTownMap
 		{
 			this.traffic_signals[i].render_traffic_signal(batch, stop, go, left, right, forward);
 		}
+	}
+
+	public String read_traffic_signal (int light_index)
+	{
+		return traffic_signals[light_index].read_traffic_signal();
+	}
+
+	public void set_traffic_signal(int light_index, int N, int S, int E, int W)
+	{
+		traffic_signals[light_index].setSignalsStatus(TrafficSignalState.fromInt(N), TrafficSignalState.fromInt(S),TrafficSignalState.fromInt(E),TrafficSignalState.fromInt(W));
 	}
 
 	void cycle_signal(int light_index, int which)

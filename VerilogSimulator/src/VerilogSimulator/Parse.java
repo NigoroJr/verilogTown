@@ -99,6 +99,36 @@ public class Parse
 		}
 	}
 
+	public void compileFileForGame(String fileName) throws IOException
+	{
+		ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(fileName));
+		Verilog2001Lexer lexer = new Verilog2001Lexer(input);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		Verilog2001Parser parser = new Verilog2001Parser(tokens);
+		ParseTreeWalker walker = new ParseTreeWalker();
+		ParseListener listener = new ParseListener(parser, ports_list, vars_list, hash_ports, hash_vars); 
+
+		this.visitor = new SimVisitor(ports_list, vars_list, hash_ports, hash_vars);
+
+		is_no_parse_errors = true;
+
+		parser.removeErrorListeners();
+		parser.addErrorListener(new VerboseListenerGame());
+		root_tree = parser.module_declaration();
+
+		/* first pass to make all the symbol tables */
+		walker.walk(listener, root_tree);
+
+		if (is_no_parse_errors)
+		{
+			is_compiled = true;
+		}
+		else
+		{
+			is_compiled = false;
+		}
+	}
+
 	public ArrayList<Integer> sim_cycle(String rst, String light_sensors, String general_sensors)
 	{
 		if (is_compiled)
@@ -130,6 +160,16 @@ public class Parse
 			Collections.reverse(stack);
 			old_text = errorText.getText();
 			errorText.setText(old_text+"\nError at line "+line+":"+charPositionInLine+" at "+ offendingSymbol+": "+msg);
+			/* flag found parse error */
+			is_no_parse_errors = false;
+		}
+	}
+
+	public class VerboseListenerGame extends BaseErrorListener 
+	{
+		@Override
+		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
+		{
 			/* flag found parse error */
 			is_no_parse_errors = false;
 		}

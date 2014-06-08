@@ -1,7 +1,10 @@
 package com.me.myverilogTown;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
+
+import VerilogSimulator.Parse;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.*;
@@ -59,7 +62,7 @@ public class LevelScreen implements Screen
 	private int LEVEL_HEIGHT;
 	private int SCORE_BAR_WIDTH;
 	private int SCORE_BAR_HEIGHT;
-	private Integer toggle;
+	private Boolean isSimulationPaused;
 	private int success_cars;
 	private int crash_cars;
 	private Random random_number;
@@ -71,6 +74,7 @@ public class LevelScreen implements Screen
 
 	private VerilogTownMap clevel;
 	private boolean level_done;
+	private boolean simulation_started;
 
 	private float zoom_initial; // what the initial zoom ratio is so we can stop at it
 	
@@ -78,18 +82,23 @@ public class LevelScreen implements Screen
 	private double playTime;
 	
 	private InputHandler inputProcessor;
+
+	private Parse[] Compiler;
+	private String pathOfVerilogFile = "";
+	private String pathOfVerilogDir = "";
+	private String path = "";
 	
 	boolean lastButtonPressed = false;
 	boolean currentButtonPressed = false;
 
 	public LevelScreen(final verilogTown gam) 
 	{
-		/* set a toggle for simulation on off */
-		this.toggle = 0;
+		this.isSimulationPaused = true;
 
 		/* initialize the level */
 		this.game = gam;
 		this.level_done = false;
+		this.simulation_started = false;
 		this.random_number = new Random(3); // should this be rand seed?
 
 		LevelXMLParser parser = new LevelXMLParser();
@@ -98,16 +107,15 @@ public class LevelScreen implements Screen
 		int visibleGridY = parser.grids[0].length - 3;
 		
 		this.clevel = new VerilogTownMap(visibleGridX, visibleGridY); // firts_map
-		/* this might be where the XML read map goes */
-		/* hard coded map */
-		
+
+		/* XML read map goes here */
 		clevel.readMap(parser);
 
 		/* setup the sprites.  First is for the cars and Second is for the UI */
 		thebatch = new SpriteBatch();
 		uibatch = new SpriteBatch();
 
-		/* initialize the map */
+		/* initialize the map - should be provided by XML read */
 		level_map = new Texture("data/first_map.png"); 
 
 		/* create the camera for the SpriteBatch */
@@ -181,6 +189,16 @@ public class LevelScreen implements Screen
 		/* initialize the level logic control */
 		levelLogic = new LevelLogic();
 
+		/* Setup the paths of the verilog files and the jar */
+		setupPaths();
+
+		/* initialize the simulators for the Verilog */
+		Compiler = new Parse[clevel.get_num_traffic_signals()];
+		for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
+		{
+			Compiler[i] = new Parse();
+		}
+
 		/* initialize the time */
 		Time = 0f;
 		Frame_Time_25 = 1/25; // 25 FPS
@@ -192,7 +210,7 @@ public class LevelScreen implements Screen
 	{
 		boolean fps_tick = false;
 		GL10 gl = Gdx.graphics.getGL10();
-        	
+
 		Time += Gdx.graphics.getDeltaTime();
 		Next_Frame_Time += Gdx.graphics.getDeltaTime();
 
@@ -206,11 +224,11 @@ public class LevelScreen implements Screen
 		/* check for button presses */
 		handle_inputs();
 
-		if (fps_tick = true && toggle == 1 && this.level_done == false)
+		if (fps_tick = true && !isSimulationPaused && simulation_started && this.level_done == false)
 		{
 			/* IF - tick happends and simulating then simulate a time frame */
 			/*Gdx.app.log("Time Since last simulation:", "="+ Time);*/
-			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number);
+			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number, Compiler);
 			this.success_cars = levelLogic.success_cars;
 			this.crash_cars = levelLogic.crash_cars;
 			this.playTime += Gdx.graphics.getDeltaTime();
@@ -251,9 +269,6 @@ public class LevelScreen implements Screen
 	
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
 			
-			this.game.font.draw(thebatch, "Level Done", 100, 150);
-			this.game.font.draw(thebatch, "Score", 100, 100);
-			
 			thebatch.end();
 		}
 		else
@@ -292,8 +307,6 @@ public class LevelScreen implements Screen
 		/* Draw the UI ontop of the level map */
 		draw_score_bar();
 		
-		
-		
 		//determine the type of tile that the mouse is click
 		double pixOfWindowX = LEVEL_WIDTH * camera.zoom;
 		double pixOfWindowY = (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) * camera.zoom;
@@ -315,20 +328,22 @@ public class LevelScreen implements Screen
 		
 		int gridX = 0, gridY = 0;	
 		
-		if(realY <= LEVEL_HEIGHT){
+		if(realY <= LEVEL_HEIGHT)
+		{
 			gridX = (int)(realX / 64);
 			gridY = (int)(realY / 64);
 		}
 		
 		int counter;
-		for(counter = 0; counter < clevel.traffic_signals.length; counter++){
+		for(counter = 0; counter < clevel.get_num_traffic_signals(); counter++)
+		{
 			if (clevel.grid[gridX+1][gridY+1].signal == clevel.traffic_signals[counter])
 				break;
 		}
 		
 		//traffic lights highlighting 
-		
-		if(clevel.grid[gridX+1][gridY+1].signal != null && toggle == 0){
+		if(clevel.grid[gridX+1][gridY+1].signal != null && !simulation_started && isSimulationPaused)
+		{
 			thebatch.begin();
 			clevel.traffic_signals[counter].render_highlighted_stop(thebatch,stop_highlighted);
 			thebatch.end();
@@ -337,31 +352,20 @@ public class LevelScreen implements Screen
 		
 		lastButtonPressed = currentButtonPressed;
 		currentButtonPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
-		if(!currentButtonPressed && (clevel.grid[gridX+1][gridY+1].signal != null) && lastButtonPressed
-				&& (Time - lastTime) >= 0.6 && toggle == 0){
-			String path = "";
-			String pathOfVerilogFile = "";
-			try {
-				path = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-			} catch (URISyntaxException e2) {
-				e2.printStackTrace();
-			}
-			int firstIndex = path.indexOf("/")+1;
-	    	int lastIndex = path.lastIndexOf("/")+1;
-	    	path = path.substring(firstIndex, lastIndex);
-	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
-	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
-	    	pathOfVerilogFile = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
-	    	path = path + "VerilogEditor.jar";
-	    	//System.out.println(path);
-			String name = "Traffic_signal_set_" + counter;
+		if(!currentButtonPressed && (clevel.grid[gridX+1][gridY+1].signal != null) && lastButtonPressed && (Time - lastTime) >= 0.6 && !simulation_started && isSimulationPaused)
+		{
+			/* Open the editor from an external jar */
+			String jar_path;
+			String verilogFileName = "Traffic_signal_set_" + counter;
+
+	    		jar_path = path + "VerilogEditor.jar";
 			List<String> list = new ArrayList<String>();
 			list.add("java");
 			list.add("-jar");
-			list.add(path);
+			list.add(jar_path);
 			//list.add("D:/Program Files/eclipse-java/program/verilogTownStuff/myverilogTown/VerilogEditor.jar");
-			list.add(name);
-			list.add(pathOfVerilogFile);
+			list.add(verilogFileName);
+			list.add(pathOfVerilogDir);
 			try{
 				ProcessBuilder proc = new ProcessBuilder(list);
 				//proc.directory(new File("C:\\"));
@@ -369,11 +373,35 @@ public class LevelScreen implements Screen
 			}catch(Exception e){
 				System.out.println("Error invoking the verilog editor");
 			}
+
 			lastTime = Time;
 		}
 	}
 
-	public void draw_score_bar(){
+	public void setupPaths()
+	{
+		int firstIndex;
+	    	int lastIndex;
+
+		try {
+			path = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+		} catch (URISyntaxException e2) {
+			e2.printStackTrace();
+		}
+
+		firstIndex = path.indexOf("/")+1;
+	    	lastIndex = path.lastIndexOf("/")+1;
+	    	path = path.substring(firstIndex, lastIndex);
+	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+
+	    	pathOfVerilogFile = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1) + "VerilogFiles/";
+	    	pathOfVerilogDir = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+		//System.out.println(path);
+	}
+
+	public void draw_score_bar()
+	{
 		uibatch.begin();
 		
 		uibatch.draw(top_score_bar, 0, LEVEL_HEIGHT, LEVEL_WIDTH, 100);
@@ -422,18 +450,62 @@ public class LevelScreen implements Screen
 		uibatch.end();
 	}
 	
-	
-	
 	public void handle_inputs()
 	{
 		/* Polling solution at present */
 
 		/* Sim on and off */
-		if((Gdx.input.isKeyPressed(Keys.S) && toggle == 0) || (Gdx.input.isKeyPressed(Keys.X) && toggle == 1)) 
+		if((Gdx.input.isKeyPressed(Keys.S) && isSimulationPaused) || (Gdx.input.isKeyPressed(Keys.X) && !isSimulationPaused)) 
 		{
-			toggle = (toggle+1) % 2;
-			Gdx.app.log("LevelScreen", "Toggle="+toggle);
+			if (!simulation_started)
+			{
+				boolean problem_with_compile = false;
+
+				String verilogFileName;
+				/* Check if all the verilog compiles properly */
+				for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
+				{
+					System.out.println(pathOfVerilogFile + "Traffic_signal_set_" + i);
+					try {
+						Compiler[i].compileFileForGame(pathOfVerilogFile + "Traffic_signal_set_" + i + ".txt");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					if (!Compiler[i].is_compiled_yet())
+					{
+						/* NOTE - tell user there's an error in file 'i' */
+						problem_with_compile = true;
+						break;
+					}
+				}
+
+				if (!problem_with_compile)
+				{
+					/* Recorded that the simulation has started */
+					simulation_started = true;
+
+					/* If compiled simulate first 2 cycles to reset system */
+					for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
+					{
+						Compiler[i].sim_cycle("0", "00000000", "000000000000000000000000000000");
+						Compiler[i].sim_cycle("0", "00000000", "000000000000000000000000000000");
+					}
+				}
+			}
+
+			if (isSimulationPaused && simulation_started)
+			{
+				isSimulationPaused = false;
+			}
+			else
+			{
+				isSimulationPaused = true;
+			}
+			Gdx.app.log("LevelScreen", "isSimulationPaused="+isSimulationPaused);
 		}
+
 		/* Zoom out */
 		if(Gdx.input.isKeyPressed(Keys.A)) 
 		{
@@ -444,6 +516,7 @@ public class LevelScreen implements Screen
 			}
 			//System.out.println("camera zoom: "+camera.zoom);
 		}
+
 		/* Zoom in */
 		if(Gdx.input.isKeyPressed(Keys.Q)) 
 		{

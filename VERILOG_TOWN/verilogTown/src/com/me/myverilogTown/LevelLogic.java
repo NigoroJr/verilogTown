@@ -2,11 +2,13 @@ package com.me.myverilogTown;
 
 import java.util.*;
 import com.badlogic.gdx.Gdx;
+import VerilogSimulator.Parse;
 
 public class LevelLogic
 {
 	private int time_step;
 	private int count_cars_done;
+	private int num_general_sensors;
 	public int success_cars = 0;
 	public int crash_cars = 0;
 	Queue<Integer> car_processing_q;
@@ -17,27 +19,36 @@ public class LevelLogic
 		/* init a simple time step where a unit is the maximum time it takes a car's front to travel through a grid point */
 		time_step = 0;
 		count_cars_done = 0;
+		num_general_sensors = 30;
 
 		/* Queues to do processing steps */
 		car_processing_q = new LinkedList<Integer>();
 		car_crashing_q = new LinkedList<Integer>();
 	}
 
-	public boolean update(Car cars[], int num_cars, VerilogTownMap clevel, Random randomno)
+	public boolean update(Car cars[], int num_cars, VerilogTownMap clevel, Random randomno, Parse Compiler[])
 	{
+		ArrayList<Integer> light_values;
+		String general_sensors;
 		/* increment time */
 		time_step ++; // a second of time at 25 FPS
 
-		/* simulation of traffic lights.  This is where the Verilog simulation would go */
-		if (time_step % 50 == 0)
+		general_sensors = "";
+		/* setup general sensors - NOT DONE */
+		for (int i = 0; i < num_general_sensors; i++)
 		{
-			for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
-			{
-				//clevel.crash_signal(i, randomno.nextInt(4)); // Trying to cause crashes
-				clevel.cycle_signal_3(i, randomno.nextInt(32)); // Random all signals randoms
-				//clevel.cycle_signal_2(i, randomno.nextInt(16)); // Random all signals one at a time
-				//clevel.cycle_signal(i, randomno.nextInt(4)); // All GO
-			}
+			/* Check sensor */
+			general_sensors = general_sensors + "0";
+		}
+
+		/* simulation of traffic lights.  This is where the Verilog simulation would go */
+		for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
+		{
+			/* simulate twice for clock and combinational */
+			light_values = Compiler[i].sim_cycle("1", clevel.read_traffic_signal(i), general_sensors);
+			light_values = Compiler[i].sim_cycle("1", clevel.read_traffic_signal(i), general_sensors);
+
+			clevel.set_traffic_signal(i, light_values.get(0), light_values.get(1), light_values.get(2), light_values.get(3));
 		}
 	
 		/* load up a queue with what needs to be processed */
