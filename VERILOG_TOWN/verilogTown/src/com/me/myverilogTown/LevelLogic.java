@@ -1,7 +1,6 @@
 package com.me.myverilogTown;
 
 import java.util.*;
-import com.badlogic.gdx.Gdx;
 import VerilogSimulator.Parse;
 
 public class LevelLogic
@@ -175,9 +174,6 @@ public class LevelLogic
 
 	private void car_starts(Car the_car, VerilogTownMap clevel)
 	{
-		int x;
-		int y;
-
 		/* set the starting point */
 		the_car.set_current_point(null, the_car.get_start_point(), null, clevel);
 		/* setup the path */
@@ -191,12 +187,8 @@ public class LevelLogic
 
 	private void car_has_forced_movement(Car the_car, GridNode current_spot, TrafficSignalState signal, VerilogTownMap clevel)
 	{
-		int x;
-		int y;
 		GridNode next_spot;
 		GridNode turn_via_point;
-		GridNode second_spot;
-		GridNode third_spot;
 
 		/* get the turn unless it's illegal */
 		turn_via_point = clevel.get_turn(current_spot, signal, the_car.get_direction());
@@ -229,8 +221,6 @@ public class LevelLogic
 
 	private void car_has_free_movement(Car the_car, GridNode current_spot, VerilogTownMap clevel)
 	{
-		int x;
-		int y;
 		GridNode next_spot;
 		
 		next_spot = the_car.get_next_point_on_path();

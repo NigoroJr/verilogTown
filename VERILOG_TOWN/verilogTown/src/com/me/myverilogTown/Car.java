@@ -5,11 +5,8 @@ import java.util.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 
 public class Car
 {
@@ -18,15 +15,9 @@ public class Car
 	private GridNode current_point;
 	private GridNode way_point;
 	private int start_time;
-	private boolean success_getting_to_end_point;
 	private boolean is_crashed;
 	private boolean is_done_path;
 	private boolean is_start_path;
-	private boolean is_processed;
-	private GridNode location;
-	private int x;
-	private int y;
-	private GridNode next_spot;
 	private Stack<GridNode> path;
 	
 	/* Necessary for displaying car */
@@ -91,7 +82,6 @@ public class Car
 		this.way_point = null;
 		this.animation_direction = null;
 		this.direction = null;
-		this.success_getting_to_end_point = true;
 		this.is_crashed = false;
 		this.is_done_path = false;
 		this.is_start_path = false;
@@ -787,7 +777,6 @@ public class Car
 		return this.end_point;
 	}
 	public void set_end_point_and_fail_on_getting_car_accross(GridNode point) {
-		this.success_getting_to_end_point = false;
 		this.end_point = point;
 	}
 

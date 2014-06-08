@@ -13,16 +13,11 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.math.Vector3;
 
 public class LevelScreen implements Screen
 {
@@ -36,7 +31,6 @@ public class LevelScreen implements Screen
 	private SpriteBatch thebatch;
 	private SpriteBatch uibatch;
 	private LevelLogic levelLogic;
-	private Sprite carSprite;
 
 	private Texture level_map;
 	private Texture stop;
@@ -45,7 +39,6 @@ public class LevelScreen implements Screen
 	private Texture go_forward;
 	private Texture go_right;
 	private Texture go_left;
-	private Texture intersection;
 	private Texture top_score_bar;
 	private Texture check_mark;
 	private Texture[] numbers;
@@ -224,7 +217,7 @@ public class LevelScreen implements Screen
 		/* check for button presses */
 		handle_inputs();
 
-		if (fps_tick = true && !isSimulationPaused && simulation_started && this.level_done == false)
+		if (fps_tick == true && !isSimulationPaused && simulation_started && this.level_done == false)
 		{
 			/* IF - tick happends and simulating then simulate a time frame */
 			/*Gdx.app.log("Time Since last simulation:", "="+ Time);*/
@@ -397,7 +390,6 @@ public class LevelScreen implements Screen
 
 	    	pathOfVerilogFile = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1) + "VerilogFiles/";
 	    	pathOfVerilogDir = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
-		//System.out.println(path);
 	}
 
 	public void draw_score_bar()
@@ -461,11 +453,9 @@ public class LevelScreen implements Screen
 			{
 				boolean problem_with_compile = false;
 
-				String verilogFileName;
 				/* Check if all the verilog compiles properly */
 				for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
 				{
-					System.out.println(pathOfVerilogFile + "Traffic_signal_set_" + i);
 					try {
 						Compiler[i].compileFileForGame(pathOfVerilogFile + "Traffic_signal_set_" + i + ".txt");
 					} catch (IOException e) {
@@ -503,7 +493,7 @@ public class LevelScreen implements Screen
 			{
 				isSimulationPaused = true;
 			}
-			Gdx.app.log("LevelScreen", "isSimulationPaused="+isSimulationPaused);
+			//Gdx.app.log("LevelScreen", "isSimulationPaused="+isSimulationPaused);
 		}
 
 		/* Zoom out */
