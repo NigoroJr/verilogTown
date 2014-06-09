@@ -96,3 +96,4 @@ local.properties
 gen/
 
 !antlr-4.2-complete.jar
+VERILOG_TOWN/VerilogFiles

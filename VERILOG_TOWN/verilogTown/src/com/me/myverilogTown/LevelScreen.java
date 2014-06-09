@@ -79,7 +79,6 @@ public class LevelScreen implements Screen
 	private Parse[] Compiler;
 	private String pathOfVerilogFile = "";
 	private String pathOfVerilogDir = "";
-	private String path = "";
 	
 	boolean lastButtonPressed = false;
 	boolean currentButtonPressed = false;
@@ -351,7 +350,7 @@ public class LevelScreen implements Screen
 			String jar_path;
 			String verilogFileName = "Traffic_signal_set_" + counter;
 
-	    		jar_path = path + "VerilogEditor.jar";
+			jar_path = this.pathOfVerilogDir + "VerilogEditor.jar";
 			List<String> list = new ArrayList<String>();
 			list.add("java");
 			list.add("-jar");
@@ -373,23 +372,14 @@ public class LevelScreen implements Screen
 
 	public void setupPaths()
 	{
-		int firstIndex;
-	    	int lastIndex;
-
 		try {
-			path = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			pathOfVerilogDir = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 		} catch (URISyntaxException e2) {
 			e2.printStackTrace();
 		}
+		pathOfVerilogDir += "../../";
 
-		firstIndex = path.indexOf("/")+1;
-	    	lastIndex = path.lastIndexOf("/")+1;
-	    	path = path.substring(firstIndex, lastIndex);
-	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
-	    	path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
-
-	    	pathOfVerilogFile = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1) + "VerilogFiles/";
-	    	pathOfVerilogDir = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+		pathOfVerilogFile = pathOfVerilogDir + "VerilogFiles/";
 	}
 
 	public void draw_score_bar()
