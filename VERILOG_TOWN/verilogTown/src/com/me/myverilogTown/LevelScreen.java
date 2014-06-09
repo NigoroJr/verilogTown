@@ -351,6 +351,9 @@ public class LevelScreen implements Screen
 			String verilogFileName = "Traffic_signal_set_" + counter;
 
 			jar_path = this.pathOfVerilogDir + "VerilogEditor.jar";
+			String OSName = System.getProperty("os.name");
+			if(OSName.startsWith("Windows"))
+				jar_path = jar_path.substring(1);
 			List<String> list = new ArrayList<String>();
 			list.add("java");
 			list.add("-jar");
