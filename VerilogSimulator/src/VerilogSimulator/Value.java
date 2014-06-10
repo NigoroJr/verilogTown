@@ -1,24 +1,48 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2014 Peter Jamieson, Naoki Mizuno, and Boyu Zhang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+
 package VerilogSimulator;
 
-public class Value 
+public class Value
 {
-	public static Value VOID = new Value(new Object());
-	private Object value;
-	private int size;
+	public static Value		VOID	= new Value(new Object());
+	private Object			value;
+	private int				size;
 
-	private ParseRegWire regWire;
-	private ParsePort port;
-	private int idx;
-	private ValueType v_type;
-	
-	public Value(Object value) 
+	private ParseRegWire	regWire;
+	private ParsePort		port;
+	private int				idx;
+	private ValueType		v_type;
+
+	public Value(Object value)
 	{
 		this.value = value;
 		this.size = -1;
 		this.v_type = ValueType.NULL_T;
 	}
 
-	public Value(Object value, int size) 
+	public Value(Object value, int size)
 	{
 		this.value = value;
 		this.size = size;
@@ -29,12 +53,13 @@ public class Value
 		{
 			if (size > 30)
 				this.size = 30;
-			
+
 			/* Mask based on size */
 			mask = (1 << (size)) - 1;
 			this.value = asInt() & mask;
 		}
 	}
+
 	public Value(ValueType v, ParsePort port, ParseRegWire regWire, int idx)
 	{
 		this.value = null;
@@ -86,37 +111,38 @@ public class Value
 
 	public int getIntegerBit(int idx)
 	{
-		int mask = (1 << (size-1));
+		int mask = (1 << (size - 1));
 		int ac_value = asInt();
 		return ((ac_value & mask) > 0) ? 1 : 0;
 	}
-	
-	public Boolean asBoolean() 
+
+	public Boolean asBoolean()
 	{
 		if (value instanceof Integer)
 		{
-			if ((int)value == 0)
+			if ((int) value == 0)
 				return false;
 			else
 				return true;
 		}
 
-		return (Boolean)value;
+		return (Boolean) value;
 	}
-	
-	public int asInt() 
+
+	public int asInt()
 	{
 		if (value instanceof Boolean)
 		{
-			if ((Boolean)value == true)
+			if ((Boolean) value == true)
 				return 1;
 			else
 				return 0;
 		}
 
-		return (int)value;
+		return (int) value;
 	}
-	public String asString() 
+
+	public String asString()
 	{
 		return String.valueOf(value);
 	}
@@ -125,27 +151,27 @@ public class Value
 	{
 		return this.size;
 	}
-	
+
 	@Override
-	public boolean equals(Object o) 
+	public boolean equals(Object o)
 	{
-		if(value == o) 
+		if (value == o)
 		{
 			return true;
 		}
-		
-		if(value == null || o == null || o.getClass() != value.getClass()) 
+
+		if (value == null || o == null || o.getClass() != value.getClass())
 		{
 			return false;
 		}
-		
-		Value that = (Value)o;
-	
+
+		Value that = (Value) o;
+
 		return this.value.equals(that.value);
 	}
-	
+
 	@Override
-	public String toString() 
+	public String toString()
 	{
 		return String.valueOf(value);
 	}

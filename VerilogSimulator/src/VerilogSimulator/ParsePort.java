@@ -1,14 +1,38 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2014 Peter Jamieson, Naoki Mizuno, and Boyu Zhang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+
 package VerilogSimulator;
 
 public class ParsePort extends Parse
 {
-	private String name;
-	private int busSize;
-	private PortType type;
-	private RegWireType r_type;
-	private int []value;
-	private int cycle_update_time;
-	
+	private String		name;
+	private int			busSize;
+	private PortType	type;
+	private RegWireType	r_type;
+	private int[]		value;
+	private int			cycle_update_time;
+
 	public ParsePort()
 	{
 		this.busSize = 0;
@@ -42,12 +66,13 @@ public class ParsePort extends Parse
 		assert (this.type == PortType.OUTPUT);
 		this.r_type = t;
 	}
+
 	public String getName()
 	{
 		return name;
 	}
-	
-	public int getBusSize() 
+
+	public int getBusSize()
 	{
 		return busSize;
 	}
@@ -80,12 +105,14 @@ public class ParsePort extends Parse
 			this.value[idx] = value & mask;
 		}
 	}
+
 	public void setBitValue(int idx, int bitIdx, int bit_value, int cycle_time)
 	{
 		int mask = (1 << this.busSize) - 1; // mask for the full number
 		int bitMask = (bit_value << bitIdx); // 0 or 1 in the bit spot
 		int bitLoc = (1 << bitIdx); // all 0s except a 1 in the bit spot
-		int demask = ((1 << this.busSize) - 1) ^ bitLoc; // all 1s except bit spot
+		int demask = ((1 << this.busSize) - 1) ^ bitLoc; // all 1s except bit
+															// spot
 
 		this.cycle_update_time = cycle_time;
 
@@ -111,12 +138,12 @@ public class ParsePort extends Parse
 	{
 		if (type == PortType.OUTPUT)
 		{
-			if (cycle_time != this.cycle_update_time) 
+			if (cycle_time != this.cycle_update_time)
 			{
 				/* IF there has been no update for this value */
 				if (r_type == RegWireType.COMBINATIONAL)
 				{
-					System.out.println("Error: Inferring latch");	
+					System.out.println("Error: Inferring latch");
 				}
 				else if (r_type == RegWireType.SEQUENTIAL)
 				{

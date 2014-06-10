@@ -1,3 +1,29 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2014 Peter Jamieson, Naoki Mizuno, and Boyu Zhang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+
+package src;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -493,10 +519,17 @@ public class VerilogEditor extends JFrame implements ActionListener
 			out.close();
 			
 			/* print out what we're compiling */
-			errorText.setText("Compiling"+path + "VerilogFiles/" + name + ".txt");
+			errorText.setText("Compiling "+path + "VerilogFiles/" + name + ".txt");
 
 			/* parse the base file */
 			Compiler.compileFileForEditor(path + "VerilogFiles/" + name + ".txt");
+
+			if (Compiler.is_compiled_yet())
+			{
+				/* Reset the system - takes a double simulation */
+				Compiler.sim_cycle("0", "00000000", "000000000000000000000000000000");
+				Compiler.sim_cycle("1", "00000000", "000000000000000000000000000000");
+			}
 		}
 		catch (Exception e1)
 		{
@@ -659,9 +692,14 @@ public class VerilogEditor extends JFrame implements ActionListener
 
 			if (Compiler.is_compiled_yet())
 			{
-				ArrayList<Integer> output_vector_list = Compiler.sim_cycle(simulateBin.substring(0,1), simulateBin.substring(1, 9), simulateBin.substring(9, 40));
+				ArrayList<Integer> output_vector_list;
+
+				/* first sim is for the clock cycle */
+				output_vector_list = Compiler.sim_cycle("1", simulateBin.substring(1, 9), simulateBin.substring(9, 40));
+				/* first sim is for the combinational propagation */
+				output_vector_list = Compiler.sim_cycle("1", simulateBin.substring(1, 9), simulateBin.substring(9, 40));
 			
-				errorText.setText("Simulation Cycle\nReset is: " + simulateBin.substring(0,1) + " Sensors Light: " + simulateBin.substring(1, 9)+" General Sensors: " + simulateBin.substring(9, 40)+"\nOut0 Val:"+output_vector_list.get(0) + "\nOut1 Val:"+output_vector_list.get(1) +"\nOut:2 Val:"+output_vector_list.get(2) +"\nOut3 Val:"+output_vector_list.get(3)+"\nDebugVector:"+Integer.toBinaryString(output_vector_list.get(4)));
+				errorText.setText("Simulation Cycle\nReset is: " + simulateBin.substring(0,1) + "\nClock Cycle:"+output_vector_list.get(5)+ " Sensors Light: " + simulateBin.substring(1, 9)+" General Sensors: " + simulateBin.substring(9, 40)+"\nOut0 Val:"+output_vector_list.get(0) + "\nOut1 Val:"+output_vector_list.get(1) +"\nOut:2 Val:"+output_vector_list.get(2) +"\nOut3 Val:"+output_vector_list.get(3)+"\nDebugVector:"+Integer.toBinaryString(output_vector_list.get(4)));
 			}
 			else
 			{

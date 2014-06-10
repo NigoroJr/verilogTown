@@ -1,3 +1,27 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2014 Peter Jamieson, Naoki Mizuno, and Boyu Zhang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+
 package com.me.myverilogTown;
 
 import java.util.*;
@@ -5,27 +29,29 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class VerilogTownMap 
+public class VerilogTownMap
 {
-	/* Assume grid size is 1 larger on all edges to accomodate invisible starting points */
-	private int grid_x;
-	private int grid_y; 
-	public GridNode grid[][];
-	private int markPathCount; // used as a count for a mark path idetifier
-	public TrafficControl traffic_signals[];
+	/* Assume grid size is 1 larger on all edges to accomodate invisible
+	 * starting points */
+	private int				grid_x;
+	private int				grid_y;
+	public GridNode			grid[][];
+	private int				markPathCount;		// used as a count for a mark
+												// path idetifier
+	public TrafficControl	traffic_signals[];
 
 	/* Constructor */
-	public VerilogTownMap(int size_x, int size_y) 
+	public VerilogTownMap(int size_x, int size_y)
 	{
-		this.grid_x = size_x+2;
-		this.grid_y = size_y+2;
+		this.grid_x = size_x + 2;
+		this.grid_y = size_y + 2;
 		this.markPathCount = 0;
 
-		this.grid = new GridNode [size_x+2][size_y+2];
+		this.grid = new GridNode[size_x + 2][size_y + 2];
 
-		for (int i = 0; i < size_x+2; i++)
+		for (int i = 0; i < size_x + 2; i++)
 		{
-			for (int j = 0; j < size_y+2; j++)
+			for (int j = 0; j < size_y + 2; j++)
 			{
 				/* Initalize to Non roads */
 				this.grid[i][j] = new GridNode(i, j, GridType.NON_ROAD);
@@ -33,12 +59,22 @@ public class VerilogTownMap
 		}
 	}
 
-	/**
-	 * Reads in the map using the parser in order to populate the grid array.
+	public void softReset()
+	{
+		for (int i = 0; i < this.grid_x; i++)
+		{
+			for (int j = 0; j < this.grid_y; j++)
+			{
+				/* Initalize to Non roads */
+				this.grid[i][j].softReset();
+			}
+		}
+	}
+
+	/** Reads in the map using the parser in order to populate the grid array.
 	 * 
-	 * @param parser
-	 */
-	public void readMap(LevelXMLParser parser) 
+	 * @param parser */
+	public void readMap(LevelXMLParser parser)
 	{
 		grid = parser.getGridArray();
 		traffic_signals = parser.getTrafficControls();
@@ -46,7 +82,7 @@ public class VerilogTownMap
 
 	void initFindPathMarker()
 	{
-		markPathCount ++;
+		markPathCount++;
 	}
 
 	void showPath(Stack<GridNode> path)
@@ -54,7 +90,7 @@ public class VerilogTownMap
 		GridNode traverse;
 
 		/* debugging to see if path is good */
-		while(!path.empty())
+		while (!path.empty())
 		{
 			int x;
 			int y;
@@ -63,13 +99,17 @@ public class VerilogTownMap
 			y = traverse.getY();
 			x = traverse.getX();
 
-			Gdx.app.log("verilogTownMap-showPath", "Stack x="+ x +" y="+ y);
+			Gdx.app.log("verilogTownMap-showPath", "Stack x=" + x + " y=" + y);
 		}
 	}
 
-	Stack<GridNode> backTraversePath(Stack<GridNode> existing_path, GridNode end, GridNode start, GridNode current)
+	Stack<GridNode> backTraversePath(
+			Stack<GridNode> existing_path,
+			GridNode end,
+			GridNode start,
+			GridNode current)
 	{
-		Stack<GridNode> path; 
+		Stack<GridNode> path;
 
 		if (existing_path == null)
 		{
@@ -113,57 +153,60 @@ public class VerilogTownMap
 	}
 
 	/* given a start and end finds path between two in the form of a stack */
-	Stack<GridNode> findPath(Stack<GridNode> existing_path, GridNode start, GridNode end, Car the_car)
+	Stack<GridNode> findPath(
+			Stack<GridNode> existing_path,
+			GridNode start,
+			GridNode end,
+			Car the_car)
 	{
 		Queue<GridNode> queue = new LinkedList<GridNode>();
 		GridNode current;
 		GridNode possible_end = null;
 
-		/* initialize QUEUE with start for BFS and get a new marker */	
+		/* initialize QUEUE with start for BFS and get a new marker */
 		queue.add(start);
 		this.initFindPathMarker();
 
 		/* while QUEUE not empty */
 		while ((current = queue.poll()) != null)
 		{
-			if (possible_end == null && 
-					(current.getType() == GridType.END_S2SEDGE || 
-					 current.getType() == GridType.END_N2NEDGE || 
-					 current.getType() == GridType.END_E2EEDGE || 
-					 current.getType() == GridType.END_W2WEDGE)
-				)
+			if (possible_end == null && (current.getType() == GridType.END_S2SEDGE || current.getType() == GridType.END_N2NEDGE || current.getType() == GridType.END_E2EEDGE || current.getType() == GridType.END_W2WEDGE))
 			{
-				/* IF - you find a possible end path from here then record just in case we can't find */
+				/* IF - you find a possible end path from here then record just
+				 * in case we can't find */
 				possible_end = current;
 			}
 
-			/* special case if destination/end if end then start adding path back to stack */
+			/* special case if destination/end if end then start adding path
+			 * back to stack */
 			if (current.getNorth() == end)
 			{
-				while(!queue.isEmpty())
+				while (!queue.isEmpty())
 					queue.remove();
 				return backTraversePath(existing_path, end, start, current);
 			}
 			else if (current.getSouth() == end)
 			{
-				while(!queue.isEmpty())
+				while (!queue.isEmpty())
 					queue.remove();
 				return backTraversePath(existing_path, end, start, current);
 			}
 			else if (current.getEast() == end)
 			{
-				while(!queue.isEmpty())
+				while (!queue.isEmpty())
 					queue.remove();
 				return backTraversePath(existing_path, end, start, current);
 			}
 			else if (current.getWest() == end)
 			{
-				while(!queue.isEmpty())
+				while (!queue.isEmpty())
 					queue.remove();
 				return backTraversePath(existing_path, end, start, current);
 			}
 
-			/* add all children (that's why no else if) to QUEUE and mark as to be visited (because wave based then this will be the shortest path) */
+			/* add all children (that's why no else if) to QUEUE and mark as to
+			 * be visited (because wave based then this will be the shortest
+			 * path) */
 			if (current.getNorth() != null && !current.getNorth().isAlreadyVisited(markPathCount))
 			{
 				queue.add(current.getNorth());
@@ -191,14 +234,17 @@ public class VerilogTownMap
 		the_car.set_end_point_and_fail_on_getting_car_accross(possible_end);
 		Gdx.app.log("verilogTownMap-findPath", "Car couldn't find path so forcing to new end");
 
-		while(!queue.isEmpty())
+		while (!queue.isEmpty())
 			queue.remove();
-		/* refind the path based on the new forced end */ 
+		/* refind the path based on the new forced end */
 		return findPath(existing_path, start, possible_end, the_car);
 	}
 
 	/* returns the grid point through the intersection for a given turn */
-	GridNode get_turn(GridNode current, TrafficSignalState signal, Direction direction)
+	GridNode get_turn(
+			GridNode current,
+			TrafficSignalState signal,
+			Direction direction)
 	{
 		if (signal == TrafficSignalState.GO_FORWARD)
 		{
@@ -265,16 +311,22 @@ public class VerilogTownMap
 	{
 		return traffic_signals.length;
 	}
-	
+
 	public void display_traffic_lights()
 	{
 		for (int i = 0; i < traffic_signals.length; i++)
 		{
-			Gdx.app.log("verilogTownMap-Traffic Light", " N="+ traffic_signals[i].getSignalWhen(TrafficControl.PROCEED_NORTH) +" S="+ traffic_signals[i].getSignalWhen(1) +" E="+ traffic_signals[i].getSignalWhen(2) +" W="+ traffic_signals[i].getSignalWhen(3));
+			Gdx.app.log("verilogTownMap-Traffic Light", " N=" + traffic_signals[i].getSignalWhen(TrafficControl.PROCEED_NORTH) + " S=" + traffic_signals[i].getSignalWhen(1) + " E=" + traffic_signals[i].getSignalWhen(2) + " W=" + traffic_signals[i].getSignalWhen(3));
 		}
 	}
 
-	void render_traffic_signal_lights(SpriteBatch batch, Texture stop, Texture go, Texture left, Texture right, Texture forward)
+	void render_traffic_signal_lights(
+			SpriteBatch batch,
+			Texture stop,
+			Texture go,
+			Texture left,
+			Texture right,
+			Texture forward)
 	{
 		for (int i = 0; i < traffic_signals.length; i++)
 		{
@@ -282,14 +334,14 @@ public class VerilogTownMap
 		}
 	}
 
-	public String read_traffic_signal (int light_index)
+	public String read_traffic_signal(int light_index)
 	{
 		return traffic_signals[light_index].read_traffic_signal();
 	}
 
 	public void set_traffic_signal(int light_index, int N, int S, int E, int W)
 	{
-		traffic_signals[light_index].setSignalsStatus(TrafficSignalState.fromInt(N), TrafficSignalState.fromInt(S),TrafficSignalState.fromInt(E),TrafficSignalState.fromInt(W));
+		traffic_signals[light_index].setSignalsStatus(TrafficSignalState.fromInt(N), TrafficSignalState.fromInt(S), TrafficSignalState.fromInt(E), TrafficSignalState.fromInt(W));
 	}
 
 	void cycle_signal(int light_index, int which)
@@ -315,6 +367,7 @@ public class VerilogTownMap
 		else if (which == 3)
 			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.GO, TrafficSignalState.GO, TrafficSignalState.GO);
 	}
+
 	void cycle_signal_2(int light_index, int which)
 	{
 		if (which == 0)
@@ -350,6 +403,7 @@ public class VerilogTownMap
 		else if (which == 15)
 			traffic_signals[light_index].setSignalsStatus(TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.STOP, TrafficSignalState.GO_LEFT);
 	}
+
 	void cycle_signal_3(int light_index, int which)
 	{
 		if (which == 0)
