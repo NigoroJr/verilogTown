@@ -230,7 +230,12 @@ public class MapEditor extends JDialog
 		{
 			e.printStackTrace();
 		}
+		Element level = doc.createElement("level");
+		level.setAttribute("lv", Integer.toString(levelNumber));
+
 		Element map = doc.createElement("map");
+		map.setAttribute("size_x", Integer.toString(sizeX));
+		map.setAttribute("size_y", Integer.toString(sizeY));
 
 		// Add start/end points
 		boolean noIntersectionOnEdge = addStartEnd(doc, map);
@@ -244,10 +249,11 @@ public class MapEditor extends JDialog
 			for (int j = 0; j < gridGroups[0].length; j++)
 				gridGroups[i][j].addElement(doc, map);
 
-		doc.appendChild(map);
+		level.appendChild(map);
 
 		// TODO: car info
 
+		doc.appendChild(level);
 		// Write out
 		Transformer transformer = null;
 		try
