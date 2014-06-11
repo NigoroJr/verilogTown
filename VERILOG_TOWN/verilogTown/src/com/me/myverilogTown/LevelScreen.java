@@ -568,6 +568,17 @@ public class LevelScreen implements Screen
 			// System.out.println("camera zoom: "+camera.zoom);
 		}
 
+		/* Back to main menu */
+		if (Gdx.input.isKeyPressed(Keys.M))
+		{
+			// Only allow going back to menu when simulation hasn't started
+			if (!simulation_started)
+			{
+				this.dispose();
+				game.setScreen(new MainMenu(game));
+			}
+		}
+
 		/* Panning functions */
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
 		{
