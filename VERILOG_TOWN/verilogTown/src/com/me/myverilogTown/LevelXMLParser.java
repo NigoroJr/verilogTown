@@ -46,7 +46,7 @@ public class LevelXMLParser
 	public static final String			fileName		= "../../samples/first_map.xml";
 
 	private int							levelNumber;
-	public GridNode						grids[][];
+	private GridNode					grids[][];
 	private ArrayList<TrafficControl>	trafficSignals	= new ArrayList<TrafficControl>();
 	private ArrayList<Intersection>		intersections	= new ArrayList<Intersection>();
 	private Car[]						cars;

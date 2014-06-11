@@ -122,8 +122,8 @@ public class LevelScreen implements Screen
 
 		parser = new LevelXMLParser();
 		/* init current level map data structure */
-		int visibleGridX = parser.grids.length - 2;
-		int visibleGridY = parser.grids[0].length - 3;
+		int visibleGridX = parser.getGridArray().length - 2;
+		int visibleGridY = parser.getGridArray()[0].length - 3;
 
 		this.clevel = new VerilogTownMap(visibleGridX, visibleGridY); // firts_map
 
