@@ -34,7 +34,7 @@ import com.badlogic.gdx.Input;
 public class MainMenu implements Screen
 
 {
-	final verilogTown			game;
+	public final verilogTown	game;
 	private OrthographicCamera	camera;
 	private Texture				title;
 	private Texture				level1_normal;
@@ -50,26 +50,26 @@ public class MainMenu implements Screen
 	private Texture				credits_mouse_on;
 	private Texture				credits_pressed;
 
-	private final int			MAINMENU_WIDTH	= 1280;
-	private final int			MAINMENU_HEIGHT	= 1280;
+	private static final int	MAINMENU_WIDTH	= 1280;
+	private static final int	MAINMENU_HEIGHT	= 1280;
 
 	private boolean				currentPressed	= false;
 	private boolean				lastPressed		= false;
 
-	double						pixOfWindowX;
-	double						pixOfWindowY;
+	public double				pixOfWindowX;
+	public double				pixOfWindowY;
 
-	double						sizeOfWindowX;
-	double						sizeOfWindowY;
+	public double				sizeOfWindowX;
+	public double				sizeOfWindowY;
 
-	double						mousePositionX;
-	double						mousePositionY;
+	public double				mousePositionX;
+	public double				mousePositionY;
 
-	double						centerX;
-	double						centerY;
+	public double				centerX;
+	public double				centerY;
 
-	double						realX;
-	double						realY;
+	public double				realX;
+	public double				realY;
 
 	public MainMenu(final verilogTown gam)
 	{

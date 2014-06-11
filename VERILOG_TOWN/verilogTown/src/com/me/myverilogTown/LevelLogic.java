@@ -34,8 +34,8 @@ public class LevelLogic
 	private int		num_general_sensors;
 	public int		success_cars	= 0;
 	public int		crash_cars		= 0;
-	Queue<Integer>	car_processing_q;
-	Queue<Integer>	car_crashing_q;
+	private Queue<Integer>	car_processing_q;
+	private Queue<Integer>	car_crashing_q;
 
 	public LevelLogic()
 	{
