@@ -53,8 +53,8 @@ public class MainMenu implements Screen
 	private static final int	MAINMENU_WIDTH	= 1280;
 	private static final int	MAINMENU_HEIGHT	= 1280;
 
-	private boolean				currentPressed	= false;
-	private boolean				lastPressed		= false;
+	private boolean				isPressed		= false;
+	private boolean				wasPressed		= false;
 
 	public double				pixOfWindowX;
 	public double				pixOfWindowY;
@@ -120,8 +120,8 @@ public class MainMenu implements Screen
 		realX = Math.min(realX, MAINMENU_WIDTH);
 		realY = Math.min(realY, MAINMENU_HEIGHT);
 
-		lastPressed = currentPressed;
-		currentPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+		wasPressed = isPressed;
+		isPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
 
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
@@ -134,11 +134,12 @@ public class MainMenu implements Screen
 		game.batch.draw(title, 325, 900);
 		if (realX >= 514 && realX <= 763 && realY >= 805 && realY <= 863)
 		{
-			if (currentPressed)
+			if (isPressed)
 			{
 				game.batch.draw(level1_pressed, 512, 700);
 			}
-			else if (!currentPressed && lastPressed)
+			// If clicked
+			else if (!isPressed && wasPressed)
 			{
 				game.setScreen(new LevelScreen((game)));
 			}
@@ -152,11 +153,12 @@ public class MainMenu implements Screen
 
 		if (realX >= 514 && realX <= 763 && realY >= 705 && realY <= 763)
 		{
-			if (currentPressed)
+			if (isPressed)
 			{
 				game.batch.draw(level2_pressed, 512, 600);
 			}
-			else if (!currentPressed && lastPressed)
+			// If clicked
+			else if (!isPressed && wasPressed)
 			{
 				game.setScreen(new LevelScreen((game)));
 			}
@@ -172,11 +174,12 @@ public class MainMenu implements Screen
 
 		if (realX >= 514 && realX <= 763 && realY >= 605 && realY <= 663)
 		{
-			if (currentPressed)
+			if (isPressed)
 			{
 				game.batch.draw(tutorial_pressed, 512, 500);
 			}
-			else if (!currentPressed && lastPressed)
+			// If clicked
+			else if (!isPressed && wasPressed)
 			{
 				// show the tutorial screen here
 			}
@@ -192,11 +195,11 @@ public class MainMenu implements Screen
 
 		if (realX >= 514 && realX <= 763 && realY >= 505 && realY <= 563)
 		{
-			if (currentPressed)
+			if (isPressed)
 			{
 				game.batch.draw(credits_pressed, 512, 400);
 			}
-			else if (!currentPressed && lastPressed)
+			else if (!isPressed && wasPressed)
 			{
 				// show the credits screen here
 			}
