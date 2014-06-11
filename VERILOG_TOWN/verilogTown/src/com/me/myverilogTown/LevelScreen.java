@@ -305,23 +305,6 @@ public class LevelScreen implements Screen
 		{
 			/* ELSE - level is done. Probably cleanup here */
 		}
-
-		// Camera --------------------- /
-		gl.glClearColor(0, 0, 0, 1);
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		/* gl.glViewport((int) glViewport.x, (int) glViewport.y, (int)
-		 * glViewport.width, (int) glViewport.height); -- seems to cause
-		 * clipping of full map */
-
-		// tell the camera to update its matrices.
-		camera.update();
-		/* camera.apply(gl); -- With the above glViewport, seems to cutoff some
-		 * of map */
-
-		/* use the camera on this batch ... does zooms and translates */
-		thebatch.setProjectionMatrix(camera.combined);
-		uibatch.setProjectionMatrix(uiCamera.combined);
-
 		
 		//TODO this if block should be removed because after the level is done the last frame will stay there
 		if (this.level_done == true && simulation_started)
