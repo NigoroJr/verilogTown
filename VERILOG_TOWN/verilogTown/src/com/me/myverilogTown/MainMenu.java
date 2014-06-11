@@ -75,7 +75,7 @@ public class MainMenu implements Screen
 	{
 		game = gam;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 1280, 1280);
+		camera.setToOrtho(false, MAINMENU_WIDTH, MAINMENU_HEIGHT);
 
 		title = new Texture(Gdx.files.internal("ASSET_RESOURCES/title2.png"));
 
