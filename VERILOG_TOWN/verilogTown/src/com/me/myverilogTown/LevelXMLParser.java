@@ -40,9 +40,6 @@ import java.util.Collections;
 
 public class LevelXMLParser
 {
-	/* The CWD is...
-	 * 
-	 * | +-- verilogTown | | | +-- HERE! | +-- verilogTown-android | +-- ... */
 	public static final String			fileName		= "../../samples/first_map.xml";
 
 	private int							levelNumber;
@@ -80,8 +77,6 @@ public class LevelXMLParser
 			e.printStackTrace();
 		}
 
-		// optional, but recommended
-		// http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
 		doc.getDocumentElement().normalize();
 
 		NodeList level = doc.getElementsByTagName("level");

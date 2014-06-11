@@ -156,14 +156,34 @@ public class TrafficControl
 
 	/** Sets the nodes surrounding this traffic light.
 	 * 
+	 * <pre>
+	 * <code>
+	 *    | 4 |   |
+	 * ---+---+---+---
+	 *    | 0 | 1 | 7
+	 * ---+---+---+---
+	 *  5 | 2 | 3 |
+	 * ---+---+---+---
+	 *    |   | 6 |
+	 * </code>
+	 * </pre>
+	 * 
 	 * @param N
-	 *            The node that north-bound cars are from.
+	 *            (6) The node that north-bound cars are from.
 	 * @param S
-	 *            The node that south-bound cars are from.
+	 *            (4) The node that south-bound cars are from.
 	 * @param E
-	 *            The node that east-bound cars are from.
+	 *            (5) The node that east-bound cars are from.
 	 * @param W
-	 *            The node that west-bound cars are from. */
+	 *            (7) The node that west-bound cars are from.
+	 * @param IUL
+	 *            (0) The upper-left node in the intersection.
+	 * @param IUR
+	 *            (1) The upper-right node in the intersection.
+	 * @param ILL
+	 *            (2) The lower-left node in the intersection.
+	 * @param ILR
+	 *            (3) The lower-left node in the intersection. */
 	public void setNSEW(
 			GridNode N,
 			GridNode S,
@@ -198,12 +218,32 @@ public class TrafficControl
 
 	/** Sets the nodes surrounding this traffic light.
 	 * 
+	 * <pre>
+	 * <code>
+	 *    | 4 |   |
+	 * ---+---+---+---
+	 *    | 0 | 1 | 7
+	 * ---+---+---+---
+	 *  5 | 2 | 3 |
+	 * ---+---+---+---
+	 *    |   | 6 |
+	 * </code>
+	 * </pre>
+	 * 
 	 * @param N
-	 *            The node that north-bound cars are from.
+	 *            (6) The node that north-bound cars are from.
 	 * @param S
-	 *            The node that south-bound cars are from.
+	 *            (4) The node that south-bound cars are from.
 	 * @param E
-	 *            The node that east-bound cars are from. */
+	 *            (5) The node that east-bound cars are from.
+	 * @param IUL
+	 *            (0) The upper-left node in the intersection.
+	 * @param IUR
+	 *            (1) The upper-right node in the intersection.
+	 * @param ILL
+	 *            (2) The lower-left node in the intersection.
+	 * @param ILR
+	 *            (3) The lower-left node in the intersection. */
 	public void setNSE(
 			GridNode N,
 			GridNode S,
@@ -234,12 +274,32 @@ public class TrafficControl
 
 	/** Sets the nodes surrounding this traffic light.
 	 * 
+	 * <pre>
+	 * <code>
+	 *    | 4 |   |
+	 * ---+---+---+---
+	 *    | 0 | 1 | 7
+	 * ---+---+---+---
+	 *  5 | 2 | 3 |
+	 * ---+---+---+---
+	 *    |   | 6 |
+	 * </code>
+	 * </pre>
+	 * 
 	 * @param S
-	 *            The node that south-bound cars are from.
+	 *            (4) The node that south-bound cars are from.
 	 * @param E
-	 *            The node that east-bound cars are from.
+	 *            (5) The node that east-bound cars are from.
 	 * @param W
-	 *            The node that west-bound cars are from. */
+	 *            (7) The node that west-bound cars are from.
+	 * @param IUL
+	 *            (0) The upper-left node in the intersection.
+	 * @param IUR
+	 *            (1) The upper-right node in the intersection.
+	 * @param ILL
+	 *            (2) The lower-left node in the intersection.
+	 * @param ILR
+	 *            (3) The lower-left node in the intersection. */
 	public void setSEW(
 			GridNode S,
 			GridNode E,
@@ -270,12 +330,32 @@ public class TrafficControl
 
 	/** Sets the nodes surrounding this traffic light.
 	 * 
+	 * <pre>
+	 * <code>
+	 *    | 4 |   |
+	 * ---+---+---+---
+	 *    | 0 | 1 | 7
+	 * ---+---+---+---
+	 *  5 | 2 | 3 |
+	 * ---+---+---+---
+	 *    |   | 6 |
+	 * </code>
+	 * </pre>
+	 * 
 	 * @param N
-	 *            The node that north-bound cars are from.
+	 *            (6) The node that north-bound cars are from.
 	 * @param S
-	 *            The node that sound-bound cars are from.
+	 *            (4) The node that south-bound cars are from.
 	 * @param W
-	 *            The node that west-bound cars are from. */
+	 *            (7) The node that west-bound cars are from.
+	 * @param IUL
+	 *            (0) The upper-left node in the intersection.
+	 * @param IUR
+	 *            (1) The upper-right node in the intersection.
+	 * @param ILL
+	 *            (2) The lower-left node in the intersection.
+	 * @param ILR
+	 *            (3) The lower-left node in the intersection. */
 	public void setNSW(
 			GridNode N,
 			GridNode S,
@@ -306,12 +386,32 @@ public class TrafficControl
 
 	/** Sets the nodes surrounding this traffic light.
 	 * 
+	 * <pre>
+	 * <code>
+	 *    | 4 |   |
+	 * ---+---+---+---
+	 *    | 0 | 1 | 7
+	 * ---+---+---+---
+	 *  5 | 2 | 3 |
+	 * ---+---+---+---
+	 *    |   | 6 |
+	 * </code>
+	 * </pre>
+	 * 
 	 * @param N
-	 *            The node that north-bound cars are from.
+	 *            (6) The node that north-bound cars are from.
 	 * @param E
-	 *            The node that east-bound cars are from.
+	 *            (5) The node that east-bound cars are from.
 	 * @param W
-	 *            The node that west-bound cars are from. */
+	 *            (7) The node that west-bound cars are from.
+	 * @param IUL
+	 *            (0) The upper-left node in the intersection.
+	 * @param IUR
+	 *            (1) The upper-right node in the intersection.
+	 * @param ILL
+	 *            (2) The lower-left node in the intersection.
+	 * @param ILR
+	 *            (3) The lower-left node in the intersection. */
 	public void setNEW(
 			GridNode N,
 			GridNode E,
