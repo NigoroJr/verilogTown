@@ -67,6 +67,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -89,6 +90,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 	JFormattedTextField simulateInput, generalSensorInput1, 
 						generalSensorInput2, generalSensorInput3,
 						generalSensorInput4, generalSensorInput5;
+	private String newLine;
 	Parse Compiler;
 	/**
 	* @param args
@@ -106,6 +108,11 @@ public class VerilogEditor extends JFrame implements ActionListener
 	{
 		super("Verilog Text Editor: " + name);
 		Locale.setDefault(Locale.ENGLISH);
+		
+		if(System.getProperty("os.name").startsWith("Mac"))
+			newLine = "\r";
+		else
+			newLine = "\n";
 		
 		File verilogDir = new File(path + "VerilogFiles");
 		if  (!verilogDir.exists()  && !verilogDir.isDirectory())
@@ -179,10 +186,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		//something strange with the JTextPane's new line character.
 		//For more information see here: 
 		//http://docs.oracle.com/javase/7/docs/api/javax/swing/text/DefaultEditorKit.html
-		if(System.getProperty("os.name").startsWith("Mac"))
-			codeText.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty,"\r");
-		else
-			codeText.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
+		codeText.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty, newLine);
 		//for undo and redo
 		myUndoManager1 = new MyUndo1();
 		codeText.getDocument().addUndoableEditListener(myUndoManager1);
@@ -211,7 +215,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 				if((temp = br.readLine()) != null)
 					line = temp;
 				while ((temp = br.readLine()) != null)
-					line = line + "\n" + temp;
+					line = line + newLine + temp;
 				Document docCode = codeText.getDocument();
 				docCode.insertString(0, line, null);
 		
@@ -283,6 +287,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		JMenu fileMenu = new JMenu("File");
 		JMenu editMenu = new JMenu("Edit");
 		JMenu simulationMenu = new JMenu("Simulation");
+		JMenu headerMenu = new JMenu("Template");
 		
 		JMenuItem saveMenuItem = new JMenuItem("Save");
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
@@ -318,9 +323,18 @@ public class VerilogEditor extends JFrame implements ActionListener
 		resetMenuItem.setAccelerator(KeyStroke.getKeyStroke('R',InputEvent.CTRL_MASK));
 		resetMenuItem.addActionListener(this);
 		
+		JMenuItem comboHeaderMenuItem = new JMenuItem("Combinational");
+		comboHeaderMenuItem.setAccelerator(KeyStroke.getKeyStroke('1',InputEvent.CTRL_MASK));
+		comboHeaderMenuItem.addActionListener(this);
+		
+		JMenuItem seqHeaderMenuItem = new JMenuItem("Sequential");
+		seqHeaderMenuItem.setAccelerator(KeyStroke.getKeyStroke('2',InputEvent.CTRL_MASK));
+		seqHeaderMenuItem.addActionListener(this);
+		
 		menubar.add(fileMenu);
 		menubar.add(editMenu);
 		menubar.add(simulationMenu);
+		menubar.add(headerMenu);
 		fileMenu.add(verifyMenuItem);
 		fileMenu.add(uploadMenuItem);
 		fileMenu.addSeparator();
@@ -332,6 +346,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 		editMenu.add(sarMenuItem);
 		simulationMenu.add(simulateMenuItem);
 		simulationMenu.add(resetMenuItem);
+		headerMenu.add(comboHeaderMenuItem);
+		headerMenu.add(seqHeaderMenuItem);
 		
 		/* Initialize the Parser */
 		Compiler = new Parse(errorText);
@@ -351,10 +367,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 					if((temp = br.readLine()) != null)
 						fileContent = temp;
 					while ((temp = br.readLine()) != null){
-						if(System.getProperty("os.name").startsWith("Mac"))
-							fileContent = fileContent + "\r" + temp;
-						else
-							fileContent = fileContent + "\n" + temp;
+							fileContent = fileContent + newLine + temp;
 					}
 					br.close();
 					reader.close();
@@ -365,7 +378,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 				
 				
 				//this block of code is for debug
-				/*
+				
 				System.out.println("code text: ");
 				for(int i = 0; i < codeText.getText().toCharArray().length; i++){
 					if(codeText.getText().toCharArray()[i] == 0xA)
@@ -388,7 +401,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 					System.out.print((int)fileContent.toCharArray()[i] + "\t");
 				}
 				System.out.println();
-				*/
+				
 				
 				if(codeText.getText().equals(fileContent))
 					System.exit(0);
@@ -618,6 +631,12 @@ public class VerilogEditor extends JFrame implements ActionListener
 		else if(str.equals("Reset Simulation")){
 			resetButtonFunction();
 		}
+		else if(str.equals("Combinational")){
+			comboHeaderButtonFunction();
+		}
+		else if(str.equals("Sequential")){
+			seqHeaderButtonFunction();
+		}
 	}
 	
 	//save
@@ -628,7 +647,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		try
 		{
 			FileWriter out = new FileWriter(verilogFiles);
-			out.write(codeText.getText());
+			out.write(codeText.getText() + newLine);
 			out.close();
 			errorText.setText("Saving complete.");
 		}
@@ -846,6 +865,14 @@ public class VerilogEditor extends JFrame implements ActionListener
 		//put the reset simualtion code at here
 	}
 	
+	public void comboHeaderButtonFunction(){
+		codeText.setText(readHeaderFile("header/stop_light_combo.txt"));
+	}
+	
+	public void seqHeaderButtonFunction(){
+		codeText.setText(readHeaderFile("header/stop_light_seq.txt"));
+	}
+	
 	public void closingPopFunction(){
 		String[] str = {"Content changed.", "Do you want to save this file?"};
 		int selection = JOptionPane.showConfirmDialog(this, str, 
@@ -861,6 +888,29 @@ public class VerilogEditor extends JFrame implements ActionListener
 			break;
 		}
 		}
+	}
+	
+	public String readHeaderFile(String fileName){
+		String headerContent = "";
+		try
+		{
+			InputStream reader = this.getClass().getResourceAsStream("/" + fileName);
+			BufferedReader br = new BufferedReader(new InputStreamReader(reader));
+			String temp = null;
+			headerContent = br.readLine();
+			while ((temp = br.readLine()) != null){
+				if(System.getProperty("os.name").startsWith("Mac"))
+					headerContent = headerContent + "\r" + temp;
+				else
+					headerContent = headerContent + "\n" + temp;
+			}
+			br.close();
+			reader.close();
+		} catch (IOException e1)
+		{
+			e1.printStackTrace();
+		}
+		return headerContent;
 	}
 }
 
