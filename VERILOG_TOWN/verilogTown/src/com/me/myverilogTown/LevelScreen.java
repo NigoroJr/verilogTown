@@ -45,7 +45,6 @@ import com.badlogic.gdx.InputAdapter;
 
 public class LevelScreen implements Screen
 {
-<<<<<<< HEAD
 	public final VerilogTown	game;
 
 	private Car					cars[];
@@ -60,6 +59,7 @@ public class LevelScreen implements Screen
 	private Texture				level_map;
 	private Texture				stop;
 	private Texture				stop_highlighted;
+	private Texture				stop_compiled_failed;
 	private Texture				go;
 	private Texture				go_forward;
 	private Texture				go_right;
@@ -110,10 +110,10 @@ public class LevelScreen implements Screen
 	private boolean				currentButtonPressed	= false;
 	private LevelXMLParser parser;
 
+	private boolean 			problem_with_compile;
+	private boolean[] 			failed_compile_traffic;
+
 	public LevelScreen(final VerilogTown gam)
-	private boolean simulation_started;
-	private boolean problem_with_compile;
-	private boolean[] failed_compile_traffic;
 	{
 		this.isSimulationPaused = true;
 		this.reset_as_front_of_loop = false;
@@ -171,8 +171,8 @@ public class LevelScreen implements Screen
 		stop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		stop_highlighted = new Texture("data/stop_tran_highlighted.png");
 		stop_highlighted.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		stop_complied_failed = new Texture("data/stop_complied_failed.png");
-		stop_complied_failed.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		stop_compiled_failed = new Texture("data/stop_compiled_failed.png");
+		stop_compiled_failed.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go = new Texture("data/go_tran.png");
 		go.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go_forward = new Texture("data/go_forward_tran.png");
@@ -285,7 +285,7 @@ public class LevelScreen implements Screen
 			thebatch.begin();
 			for(int i = 0; i < clevel.get_num_traffic_signals(); i++){
 				if(failed_compile_traffic[i])
-					clevel.traffic_signals[i].render_complied_failed_stop(thebatch, stop_complied_failed);
+					clevel.traffic_signals[i].render_complied_failed_stop(thebatch, stop_compiled_failed);
 			}
 				
 			
