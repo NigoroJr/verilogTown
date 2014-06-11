@@ -45,6 +45,7 @@ import com.badlogic.gdx.InputAdapter;
 
 public class LevelScreen implements Screen
 {
+<<<<<<< HEAD
 	public final VerilogTown	game;
 
 	private Car					cars[];
@@ -110,6 +111,9 @@ public class LevelScreen implements Screen
 	private LevelXMLParser parser;
 
 	public LevelScreen(final VerilogTown gam)
+	private boolean simulation_started;
+	private boolean problem_with_compile;
+	private boolean[] failed_compile_traffic;
 	{
 		this.isSimulationPaused = true;
 		this.reset_as_front_of_loop = false;
@@ -126,6 +130,8 @@ public class LevelScreen implements Screen
 		int visibleGridY = parser.getGridArray()[0].length - 3;
 
 		this.clevel = new VerilogTownMap(visibleGridX, visibleGridY); // firts_map
+		
+		failed_compile_traffic = new boolean[parser.getTrafficControls().length];
 
 		/* XML read map goes here */
 		clevel.readMap(parser);
@@ -165,6 +171,8 @@ public class LevelScreen implements Screen
 		stop.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		stop_highlighted = new Texture("data/stop_tran_highlighted.png");
 		stop_highlighted.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		stop_complied_failed = new Texture("data/stop_complied_failed.png");
+		stop_complied_failed.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go = new Texture("data/go_tran.png");
 		go.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		go_forward = new Texture("data/go_forward_tran.png");
@@ -237,6 +245,23 @@ public class LevelScreen implements Screen
 		}
 		GL10 gl = Gdx.graphics.getGL10();
 
+		gl.glClearColor(0, 0, 0, 1);
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		// Camera --------------------- /
+		
+	    /*   gl.glViewport((int) glViewport.x, (int) glViewport.y, (int) glViewport.width, (int) glViewport.height); -- seems to cause clipping of full map */
+
+		// tell the camera to update its matrices.
+		camera.update();
+		/*	camera.apply(gl); -- With the above glViewport, seems to cutoff some of map */
+
+		/* use the camera on this batch ... does zooms and translates */
+		thebatch.setProjectionMatrix(camera.combined);
+		uibatch.setProjectionMatrix(uiCamera.combined);
+		
+		Gdx.input.setInputProcessor(inputProcessor);
+		
 		Time += Gdx.graphics.getDeltaTime();
 		Next_Frame_Time += Gdx.graphics.getDeltaTime();
 
@@ -246,10 +271,27 @@ public class LevelScreen implements Screen
 			fps_tick = true;
 		}
 
-		Gdx.input.setInputProcessor(inputProcessor);
+		if(!simulation_started){
+			thebatch.begin();
+			thebatch.draw(level_map, 0, 0, 1280, 1280);
+			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			thebatch.end();
+		}
+		
 		/* check for button presses */
 		handle_inputs();
 
+		if(problem_with_compile){
+			thebatch.begin();
+			for(int i = 0; i < clevel.get_num_traffic_signals(); i++){
+				if(failed_compile_traffic[i])
+					clevel.traffic_signals[i].render_complied_failed_stop(thebatch, stop_complied_failed);
+			}
+				
+			
+			thebatch.end();
+		}
+		
 		if (fps_tick == true && !isSimulationPaused && simulation_started && this.level_done == false)
 		{
 			/* IF - tick happends and simulating then simulate a time frame */
@@ -280,7 +322,9 @@ public class LevelScreen implements Screen
 		thebatch.setProjectionMatrix(camera.combined);
 		uibatch.setProjectionMatrix(uiCamera.combined);
 
-		if (this.level_done == true)
+		
+		//TODO this if block should be removed because after the level is done the last frame will stay there
+		if (this.level_done == true && simulation_started)
 		{
 			/* LEVEL COMPLETE */
 			thebatch.begin();
@@ -300,7 +344,7 @@ public class LevelScreen implements Screen
 
 			thebatch.end();
 		}
-		else
+		else if(this.level_done == false && simulation_started)
 		{
 			/* Normal animation of simulation */
 			thebatch.begin();
@@ -487,7 +531,7 @@ public class LevelScreen implements Screen
 		{
 			if (!simulation_started)
 			{
-				boolean problem_with_compile = false;
+				problem_with_compile = false;
 
 				/* Check if all the verilog compiles properly */
 				for (int i = 0; i < clevel.get_num_traffic_signals(); i++)
@@ -506,8 +550,10 @@ public class LevelScreen implements Screen
 					{
 						/* NOTE - tell user there's an error in file 'i' */
 						problem_with_compile = true;
-						break;
+						failed_compile_traffic[i] = true;
 					}
+					else if(Compiler[i].is_compiled_yet())
+						failed_compile_traffic[i] = false;
 				}
 
 				if (!problem_with_compile)
