@@ -28,11 +28,13 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
+import javax.swing.text.MaskFormatter;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
@@ -46,6 +48,8 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import VerilogSimulator.Parse;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import java.awt.datatransfer.Clipboard;
@@ -74,13 +78,17 @@ public class VerilogEditor extends JFrame implements ActionListener
 {
 	static final int WIDTH = 800;
 	static final int HEIGHT = 600;
+	static final int MINWIDTH = 730;
+	static final int MINHEIGHT = 500;
 	MyTextPane codeText = null;
 	MyTextPane errorText = null;
 	MyUndo1 myUndoManager1 = null;
 	static String name;
 	static String path;
 	public File verilogFiles;
-	JFormattedTextField simulateInput;
+	JFormattedTextField simulateInput, generalSensorInput1, 
+						generalSensorInput2, generalSensorInput3,
+						generalSensorInput4, generalSensorInput5;
 	Parse Compiler;
 	/**
 	* @param args
@@ -117,7 +125,9 @@ public class VerilogEditor extends JFrame implements ActionListener
 		}
 		
 		this.setSize(WIDTH,HEIGHT);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setMinimumSize(new Dimension(MINWIDTH,MINHEIGHT));
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		
 		
 		//set the location the window will appear on the screen
 		Toolkit kit = Toolkit.getDefaultToolkit();
@@ -166,7 +176,13 @@ public class VerilogEditor extends JFrame implements ActionListener
 		
 		//for keywords highlight
 		codeText.getDocument().addDocumentListener(new SyntaxHighlighter(codeText));
-		
+		//something strange with the JTextPane's new line character.
+		//For more information see here: 
+		//http://docs.oracle.com/javase/7/docs/api/javax/swing/text/DefaultEditorKit.html
+		if(System.getProperty("os.name").startsWith("Mac"))
+			codeText.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty,"\r");
+		else
+			codeText.getDocument().putProperty(DefaultEditorKit.EndOfLineStringProperty,"\n");
 		//for undo and redo
 		myUndoManager1 = new MyUndo1();
 		codeText.getDocument().addUndoableEditListener(myUndoManager1);
@@ -192,11 +208,13 @@ public class VerilogEditor extends JFrame implements ActionListener
 				BufferedReader br = new BufferedReader(reader);
 				String line = "";
 				String temp = null;
+				if((temp = br.readLine()) != null)
+					line = temp;
 				while ((temp = br.readLine()) != null)
-				line =line + temp + "\n";
+					line = line + "\n" + temp;
 				Document docCode = codeText.getDocument();
 				docCode.insertString(0, line, null);
-				
+		
 				br.close();
 				reader.close();
 			} catch (IOException e)
@@ -264,6 +282,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		this.setJMenuBar(menubar);
 		JMenu fileMenu = new JMenu("File");
 		JMenu editMenu = new JMenu("Edit");
+		JMenu simulationMenu = new JMenu("Simulation");
 		
 		JMenuItem saveMenuItem = new JMenuItem("Save");
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
@@ -277,10 +296,6 @@ public class VerilogEditor extends JFrame implements ActionListener
 		uploadMenuItem.setAccelerator(KeyStroke.getKeyStroke('U', InputEvent.CTRL_MASK));
 		uploadMenuItem.addActionListener(this);
 		
-		JMenuItem simulateMenuItem = new JMenuItem("Simulate");
-		simulateMenuItem.setAccelerator(KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
-		simulateMenuItem.addActionListener(this);
-		
 		JMenuItem exitMenuItem = new JMenuItem("Exit");
 		
 		JMenuItem undoMenuItem = new JMenuItem("Undo");
@@ -291,15 +306,23 @@ public class VerilogEditor extends JFrame implements ActionListener
 		redoMenuItem.setAccelerator(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_MASK));
 		redoMenuItem.addActionListener(this);
 		
-		JMenuItem sarMenuItem = new JMenuItem("Search and replace");
+		JMenuItem sarMenuItem = new JMenuItem("Search and Replace");
 		sarMenuItem.setAccelerator(KeyStroke.getKeyStroke('F', InputEvent.CTRL_MASK));
 		sarMenuItem.addActionListener(this);
 		
+		JMenuItem simulateMenuItem = new JMenuItem("Simulate");
+		simulateMenuItem.setAccelerator(KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
+		simulateMenuItem.addActionListener(this);
+		
+		JMenuItem resetMenuItem = new JMenuItem("Reset Simulation");
+		resetMenuItem.setAccelerator(KeyStroke.getKeyStroke('R',InputEvent.CTRL_MASK));
+		resetMenuItem.addActionListener(this);
+		
 		menubar.add(fileMenu);
 		menubar.add(editMenu);
+		menubar.add(simulationMenu);
 		fileMenu.add(verifyMenuItem);
 		fileMenu.add(uploadMenuItem);
-		fileMenu.add(simulateMenuItem);
 		fileMenu.addSeparator();
 		fileMenu.add(saveMenuItem);
 		fileMenu.addSeparator();
@@ -307,9 +330,72 @@ public class VerilogEditor extends JFrame implements ActionListener
 		editMenu.add(undoMenuItem);
 		editMenu.add(redoMenuItem);
 		editMenu.add(sarMenuItem);
+		simulationMenu.add(simulateMenuItem);
+		simulationMenu.add(resetMenuItem);
 		
 		/* Initialize the Parser */
 		Compiler = new Parse(errorText);
+		
+		this.addWindowListener(new WindowAdapter()
+		{
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				//get the current text in the code area.
+				String fileContent = "";
+				try
+				{
+					InputStreamReader reader = new InputStreamReader(new FileInputStream(verilogFiles));
+					BufferedReader br = new BufferedReader(reader);
+					String temp = null;
+					if((temp = br.readLine()) != null)
+						fileContent = temp;
+					while ((temp = br.readLine()) != null){
+						if(System.getProperty("os.name").startsWith("Mac"))
+							fileContent = fileContent + "\r" + temp;
+						else
+							fileContent = fileContent + "\n" + temp;
+					}
+					br.close();
+					reader.close();
+				} catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				
+				
+				//this block of code is for debug
+				/*
+				System.out.println("code text: ");
+				for(int i = 0; i < codeText.getText().toCharArray().length; i++){
+					if(codeText.getText().toCharArray()[i] == 0xA)
+						System.out.print("N");
+					else if(codeText.getText().toCharArray()[i] == 0xD)
+						System.out.print("R");
+					else
+						System.out.print("a");
+					System.out.print((int)codeText.getText().toCharArray()[i] + "\t");
+				}
+				System.out.println();
+				System.out.println("file content: ");
+				for(int i = 0; i < fileContent.toCharArray().length; i++){
+					if(fileContent.toCharArray()[i] == 0xA)
+						System.out.print("N");
+					else if(fileContent.toCharArray()[i] == 0xD)
+						System.out.print("R");
+					else
+						System.out.print("a");
+					System.out.print((int)fileContent.toCharArray()[i] + "\t");
+				}
+				System.out.println();
+				*/
+				
+				if(codeText.getText().equals(fileContent))
+					System.exit(0);
+				else
+					closingPopFunction();
+			}
+		});
 	}
 	
 	//This block of code set how many space you get when you press the "tab"
@@ -433,15 +519,58 @@ public class VerilogEditor extends JFrame implements ActionListener
 		simulateButton.addActionListener(new ActionListener()
 		{
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e){
 				simulateButtonFunction();
 			}
 		});
 		toolBar.add(simulateButton);
-		toolBar.add(new JLabel("Simulation Input(hex): "));
-		simulateInput = new JFormattedTextField();
+		
+		JButton resetButton = makeToolBarButton("reset","Reset simulation","Reset simulation");
+		resetButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				resetButtonFunction();
+			}
+		});
+		toolBar.add(resetButton);
+		
+		toolBar.add(new JLabel("Internal Sensors: "));
+		MaskFormatter formatterInternal = null;
+		try {
+			formatterInternal = new MaskFormatter("########");
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		formatterInternal.setValidCharacters("10");
+		simulateInput = new JFormattedTextField(formatterInternal);
+		simulateInput.setColumns(8);
 		toolBar.add(simulateInput);
+		
+		toolBar.add(new JLabel("General Sensors: "));
+		MaskFormatter formatterGeneral = null;
+		try{
+			formatterGeneral = new MaskFormatter("#####");
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		formatterGeneral.setValidCharacters("10");
+		generalSensorInput1 = new JFormattedTextField(formatterGeneral);
+		generalSensorInput2 = new JFormattedTextField(formatterGeneral);
+		generalSensorInput3 = new JFormattedTextField(formatterGeneral);
+		generalSensorInput4 = new JFormattedTextField(formatterGeneral);
+		generalSensorInput5 = new JFormattedTextField(formatterGeneral);
+		generalSensorInput1.setColumns(5);
+		generalSensorInput2.setColumns(5);
+		generalSensorInput3.setColumns(5);
+		generalSensorInput4.setColumns(5);
+		generalSensorInput5.setColumns(5);
+		toolBar.add(generalSensorInput1);
+		toolBar.add(generalSensorInput2);
+		toolBar.add(generalSensorInput3);
+		toolBar.add(generalSensorInput4);
+		toolBar.add(generalSensorInput5);
 	}
 	
 	@Override
@@ -478,13 +607,16 @@ public class VerilogEditor extends JFrame implements ActionListener
 		{
 			redoButtonFunction();
 		}
-		else if(str.equals("Search and replace"))
+		else if(str.equals("Search and Replace"))
 		{
 			salButtonFunction();
 		}
 		else if(str.equals("Simulate"))
 		{
 			simulateButtonFunction();
+		}
+		else if(str.equals("Reset Simulation")){
+			resetButtonFunction();
 		}
 	}
 	
@@ -709,6 +841,27 @@ public class VerilogEditor extends JFrame implements ActionListener
 			errorText.setText("Simulation cycle not sucessful\nMissing Simulation vector or it vector isn't 10 characters (Hexidecimal digits) long.");
 		}
 	}
+	
+	public void resetButtonFunction(){
+		//put the reset simualtion code at here
+	}
+	
+	public void closingPopFunction(){
+		String[] str = {"Content changed.", "Do you want to save this file?"};
+		int selection = JOptionPane.showConfirmDialog(this, str, 
+													"Save this file?", JOptionPane.YES_NO_CANCEL_OPTION);
+		switch (selection){
+		case JOptionPane.YES_OPTION:{
+			saveButtonFunction();
+			System.exit(0);
+			break;
+		}
+		case JOptionPane.NO_OPTION:{
+			System.exit(0);
+			break;
+		}
+		}
+	}
 }
 
 
@@ -755,9 +908,9 @@ class SyntaxHighlighter implements DocumentListener
 		//prepare the keywords
 		String[] keywordsSet = new String[]
 		{"always","assign","begin",
-			"case","else","endcase","end","for","function","if",
-			"input","integer","module","negedge","output","parameter",
-			"posedge","real","reg","task","signed","wire","while","endmodule"};
+		"case","else","endcase","end","for","function","if",
+		"input","integer","module","negedge","output","parameter",
+		"posedge","real","reg","task","signed","wire","while","endmodule"};
 		keywords = new HashSet<String>();
 
 		for(int i = 0; i < keywordsSet.length; i++)
@@ -817,7 +970,7 @@ class SyntaxHighlighter implements DocumentListener
 	public int indexOfWordStart(Document doc, int pos) throws BadLocationException
 	{
 		//find the first non-character before "pos"
-		for (; pos < 0 && isWordCharacter(doc, pos - 1); --pos);
+		for (; pos > 0 && isWordCharacter(doc, pos - 1); --pos);
 		
 		return pos;
 	}
@@ -843,7 +996,7 @@ class SyntaxHighlighter implements DocumentListener
 	@Override
 	public void changedUpdate(DocumentEvent e)
 	{
-		
+	
 	}
 	
 	@Override
@@ -1054,15 +1207,13 @@ class searchAndReplaceDialog extends JDialog
 	private JButton next = new JButton("Next");
 	private JButton replaceAll = new JButton("Replace All");
 	private JButton replaceButton = new JButton("Replace");
-	private JCheckBox caseSensitive = new JCheckBox("&lt;html&gt;case<br>sensitive");
+	private JCheckBox caseSensitive = new JCheckBox("<html>case<br>sensitive");
 	private Highlighter hilit;
 	private Highlighter.HighlightPainter painter;
 	
 	private JTextField targetField = new JTextField(40);
 	private JTextField replaceField = new JTextField(40);
 	
-	private String targetText = null;
-	private String replaceText = null;
 	private JPanel contentPane = new JPanel();
 	private GridBagLayout gridBagLayout = new GridBagLayout();
 	private Insets insetsButton = new Insets(9,7,5,7);
@@ -1255,16 +1406,16 @@ class searchAndReplaceDialog extends JDialog
 		hilit.removeAllHighlights();
 		int i = -1;
 		String textAreaText = textArea.getText();
-		textAreaText = textAreaText.replaceAll("\n", "");
 		if(!caseSensitive.isSelected())
 		{
 			i = textAreaText.toLowerCase().indexOf(target.toLowerCase(), findPosition);
+			System.out.println(i);
 		}
 		else
 		{
 			i = textAreaText.indexOf(target, findPosition);
 		}
-		if(i <= 0)
+		if(i >= 0)
 		{
 			textArea.setSelectionStart(i);
 			textArea.setSelectionEnd(i + target.length());
@@ -1293,7 +1444,6 @@ class searchAndReplaceDialog extends JDialog
 	{
 		int i = -1;
 		String textAreaText = textArea.getText();
-		textAreaText = textAreaText.replaceAll("\n", "");
 		if(!caseSensitive.isSelected())
 		{
 			i = textAreaText.toLowerCase().indexOf(fromStr.toLowerCase(), findPosition);
@@ -1302,7 +1452,7 @@ class searchAndReplaceDialog extends JDialog
 		{
 			i = textAreaText.indexOf(fromStr, findPosition);
 		}
-		if(i <= 0)
+		if(i >= 0)
 		{
 			textArea.setSelectionStart(i);
 			textArea.setSelectionEnd(i + fromStr.length());
@@ -1316,3 +1466,4 @@ class searchAndReplaceDialog extends JDialog
 		}
 	}
 }
+
