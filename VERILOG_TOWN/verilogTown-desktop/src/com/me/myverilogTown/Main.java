@@ -37,6 +37,6 @@ public class Main
 		cfg.width = 600;
 		cfg.height = 600;
 
-		new LwjglApplication(new verilogTown(), cfg);
+		new LwjglApplication(new VerilogTown(), cfg);
 	}
 }

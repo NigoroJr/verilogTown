@@ -34,7 +34,7 @@ import com.badlogic.gdx.Input;
 public class MainMenu implements Screen
 
 {
-	public final verilogTown	game;
+	public final VerilogTown	game;
 	private OrthographicCamera	camera;
 	private Texture				title;
 	private Texture				level1_normal;
@@ -71,7 +71,7 @@ public class MainMenu implements Screen
 	public double				realX;
 	public double				realY;
 
-	public MainMenu(final verilogTown gam)
+	public MainMenu(final VerilogTown gam)
 	{
 		game = gam;
 		camera = new OrthographicCamera();

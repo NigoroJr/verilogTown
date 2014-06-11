@@ -45,7 +45,7 @@ import com.badlogic.gdx.InputAdapter;
 
 public class LevelScreen implements Screen
 {
-	public final verilogTown	game;
+	public final VerilogTown	game;
 
 	private Car					cars[];
 	private int					num_cars;
@@ -109,7 +109,7 @@ public class LevelScreen implements Screen
 	private boolean				currentButtonPressed	= false;
 	private LevelXMLParser parser;
 
-	public LevelScreen(final verilogTown gam)
+	public LevelScreen(final VerilogTown gam)
 	{
 		this.isSimulationPaused = true;
 		this.reset_as_front_of_loop = false;

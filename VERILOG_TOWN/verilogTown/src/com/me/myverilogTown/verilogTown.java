@@ -29,7 +29,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 
-public class verilogTown extends Game
+public class VerilogTown extends Game
 {
 	public SpriteBatch	batch;
 	public BitmapFont	font;
