@@ -75,6 +75,7 @@ public class LevelScreen implements Screen
 	private Texture				letterI;
 	private Texture				letterM;
 	private Texture				letterE;
+	private Texture 			help_menu;
 
 	private int					LEVEL_WIDTH;
 	private int					LEVEL_HEIGHT;
@@ -94,6 +95,12 @@ public class LevelScreen implements Screen
 	private boolean				level_done;
 	private boolean				simulation_started;
 	private boolean				reset_as_front_of_loop;
+	
+	private boolean 			help_menu_pop;
+	private boolean 			lastHPressed;
+	private boolean 			currentHPressed;
+	private double 				helpTime;
+	private int 				helpYPosition;
 
 	private float				zoom_initial;						/* what the  initial  zoom  ratio is  so we can  stop at  it */
 
@@ -108,7 +115,7 @@ public class LevelScreen implements Screen
 
 	private boolean				lastButtonPressed		= false;
 	private boolean				currentButtonPressed	= false;
-	private LevelXMLParser parser;
+	private LevelXMLParser 		parser;
 
 	private boolean 			problem_with_compile;
 	private boolean[] 			failed_compile_traffic;
@@ -208,6 +215,8 @@ public class LevelScreen implements Screen
 		letterM.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		letterE = new Texture("data/Letter-E.png");
 		letterE.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		help_menu = new Texture("data/help_menu.png");
+		help_menu.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
 		inputProcessor = new InputHandler(camera, LEVEL_WIDTH, LEVEL_HEIGHT, SCORE_BAR_HEIGHT);
 
@@ -232,6 +241,8 @@ public class LevelScreen implements Screen
 		Time = 0f;
 		Frame_Time_25 = 1 / 25; // 25 FPS
 		Next_Frame_Time = 0f;
+		
+		helpYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
 	}
 
 	@Override
@@ -279,6 +290,7 @@ public class LevelScreen implements Screen
 		}
 		
 		/* check for button presses */
+		lastHPressed = currentHPressed;
 		handle_inputs();
 
 		if(problem_with_compile){
@@ -438,6 +450,29 @@ public class LevelScreen implements Screen
 
 			lastTime = Time;
 		}
+		double offset = 0;
+		if(help_menu_pop){
+			thebatch.begin();
+			helpTime += Gdx.graphics.getDeltaTime();
+			helpYPosition -= (int)(300 * Math.pow(helpTime + 0.4, 4));
+			if(helpYPosition <= 0)
+				helpYPosition = 0;
+			else if(helpYPosition > LEVEL_HEIGHT + SCORE_BAR_HEIGHT)
+				helpYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
+			thebatch.draw(help_menu, (int)(offset * LEVEL_WIDTH), helpYPosition,
+					(int)((1-2*offset) * LEVEL_WIDTH), LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+			thebatch.end();
+		}
+		else if(!help_menu_pop && helpYPosition < LEVEL_HEIGHT + SCORE_BAR_HEIGHT){
+			thebatch.begin();
+			helpTime += Gdx.graphics.getDeltaTime();
+			helpYPosition += (int)(300 * Math.pow(helpTime + 0.4, 4));
+			if(helpYPosition > LEVEL_HEIGHT + SCORE_BAR_HEIGHT || helpYPosition < 0)
+				helpYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
+			thebatch.draw(help_menu, (int)(offset * LEVEL_WIDTH), helpYPosition,
+					(int)((1-2*offset) * LEVEL_WIDTH), LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+			thebatch.end();
+		}
 	}
 
 	public void setupPaths()
@@ -566,9 +601,15 @@ public class LevelScreen implements Screen
 		}
 
 		/* Help button */
-		if (Gdx.input.isKeyPressed(Keys.H))
+		if ((currentHPressed = Gdx.input.isKeyPressed(Keys.H)) && !lastHPressed)
 		{
-			System.out.println("Help Button");
+			if(!simulation_started || isSimulationPaused){
+				if(help_menu_pop)
+					help_menu_pop = false;
+				else
+					help_menu_pop = true;
+				helpTime = 0;
+			}
 		}
 
 		/* Reset Level */
