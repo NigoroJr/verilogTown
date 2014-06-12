@@ -110,7 +110,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		Locale.setDefault(Locale.ENGLISH);
 		
 		if(System.getProperty("os.name").startsWith("Mac"))
-			newLine = "\r";
+			newLine = "\n";
 		else
 			newLine = "\n";
 		
