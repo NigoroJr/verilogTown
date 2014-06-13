@@ -37,6 +37,7 @@ public class MainMenu implements Screen
 	public final VerilogTown	game;
 	private OrthographicCamera	camera;
 	private Texture				title;
+	private Texture				select_level;
 	private Texture				level1_normal;
 	private Texture				level1_mouse_on;
 	private Texture				level1_pressed;
@@ -70,6 +71,8 @@ public class MainMenu implements Screen
 
 	public double				realX;
 	public double				realY;
+	
+	private double 				time;
 
 	public MainMenu(final VerilogTown gam)
 	{
@@ -77,7 +80,9 @@ public class MainMenu implements Screen
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, MAINMENU_WIDTH, MAINMENU_HEIGHT);
 
-		title = new Texture(Gdx.files.internal("ASSET_RESOURCES/title2.png"));
+		title = new Texture(Gdx.files.internal("ASSET_RESOURCES/welcom_to_verilogtown.png"));
+		
+		select_level = new Texture("ASSET_RESOURCES/select_a_level.png");
 
 		level1_normal = new Texture("ASSET_RESOURCES/level1_normal.png");
 		level1_mouse_on = new Texture("ASSET_RESOURCES/level1_mouse_on.png");
@@ -94,13 +99,17 @@ public class MainMenu implements Screen
 		credits_normal = new Texture("ASSET_RESOURCES/credits_normal.png");
 		credits_mouse_on = new Texture("ASSET_RESOURCES/credits_mouse_on.png");
 		credits_pressed = new Texture("ASSET_RESOURCES/credits_pressed.png");
+		
+		time = 0;
 	}
 
 	@Override
 	public void render(float delta)
 	{
-		Gdx.gl.glClearColor(0f, 0f, 0.2f, 1);
+		Gdx.gl.glClearColor(0.78f, 0.9f, 0.78f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		time += Gdx.graphics.getDeltaTime();
 
 		pixOfWindowX = MAINMENU_WIDTH * camera.zoom;
 		pixOfWindowY = MAINMENU_HEIGHT * camera.zoom;
@@ -126,12 +135,15 @@ public class MainMenu implements Screen
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 
-		// the stage MUST BE DRAWN outside of the screen's batch, otherwise
-		// rendering errors occur with textures.
-
 		game.batch.begin();
 
-		game.batch.draw(title, 325, 900);
+		game.batch.draw(title, 200, 950, 800, 200);
+		
+		if((int)(time * 1.3) % 2 == 0)
+			game.batch.draw(select_level, 370, 850, 540, 120);
+		
+		
+		
 		if (realX >= 514 && realX <= 763 && realY >= 805 && realY <= 863)
 		{
 			if (isPressed)
