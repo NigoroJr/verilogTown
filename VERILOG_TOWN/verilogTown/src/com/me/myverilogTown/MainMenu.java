@@ -128,7 +128,7 @@ public class MainMenu implements Screen
 			if (isPressed)
 				level1.drawTexture(TextureButton.CLICK);
 			else if (wasPressed)
-				game.setScreen(new LevelScreen(game));
+				game.setScreen(new LevelScreen(game, 1));
 			else
 				level1.drawTexture(TextureButton.HOVER);
 		}
@@ -141,7 +141,7 @@ public class MainMenu implements Screen
 			if (isPressed)
 				level2.drawTexture(TextureButton.CLICK);
 			else if (wasPressed)
-				game.setScreen(new LevelScreen(game));
+				game.setScreen(new LevelScreen(game, 2));
 			else
 				level2.drawTexture(TextureButton.HOVER);
 		}
@@ -154,7 +154,7 @@ public class MainMenu implements Screen
 			if (isPressed)
 				tutorial.drawTexture(TextureButton.CLICK);
 			else if (wasPressed)
-				game.setScreen(new LevelScreen(game));
+				game.setScreen(new LevelScreen(game, 0));
 			else
 				tutorial.drawTexture(TextureButton.HOVER);
 		}
@@ -167,7 +167,8 @@ public class MainMenu implements Screen
 			if (isPressed)
 				credits.drawTexture(TextureButton.CLICK);
 			else if (wasPressed)
-				game.setScreen(new LevelScreen(game));
+				// TODO: Show credits
+				;
 			else
 				credits.drawTexture(TextureButton.HOVER);
 		}

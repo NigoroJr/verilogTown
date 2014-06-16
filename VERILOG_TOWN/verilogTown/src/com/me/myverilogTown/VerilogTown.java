@@ -24,6 +24,10 @@ THE SOFTWARE.
 
 package com.me.myverilogTown;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -31,8 +35,13 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class VerilogTown extends Game
 {
-	public SpriteBatch	batch;
-	public BitmapFont	font;
+	/** Environment variable set when developing. Non-zero value indicates
+	 * development mode. In development mode, the directory structure is
+	 * different. */
+	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
+
+	public SpriteBatch			batch;
+	public BitmapFont			font;
 
 	@Override
 	public void create()
@@ -58,5 +67,42 @@ public class VerilogTown extends Game
 	{
 		batch.dispose();
 		font.dispose();
+	}
+
+	/** Returns the root path of this program.
+	 * 
+	 * @return The root path of this program. */
+	public static String getRootPath()
+	{
+		String path = "";
+		try
+		{
+			path = VerilogTown.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			// Path can be a filename when executing a jar file. (filename/../)
+			// doesn't work.
+			path = new File(path).getParent() + "/../";
+			// Development environment has different directory structure than
+			// that when releasing
+			if (isDevelopment())
+				path += "../";
+
+			return new File(path).getCanonicalPath();
+		}
+		catch (URISyntaxException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static boolean isDevelopment()
+	{
+		String env = System.getenv(VERILOG_TOWN_DEVELOPMENT);
+		return env != null && !env.equals("0");
 	}
 }
