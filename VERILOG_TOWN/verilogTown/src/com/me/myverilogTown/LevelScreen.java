@@ -77,6 +77,8 @@ public class LevelScreen implements Screen
 	private Texture				letterE;
 	private Texture 			help_menu;
 	private Texture				level_finish;
+	private Texture[]			numbers_chiller;
+	private Texture 			colon_chiller;
 
 	private int					LEVEL_WIDTH;
 	private int					LEVEL_HEIGHT;
@@ -125,6 +127,8 @@ public class LevelScreen implements Screen
 
 	private boolean 			problem_with_compile;
 	private boolean[] 			failed_compile_traffic;
+	
+	private int 				level_number;
 
 	public LevelScreen(final VerilogTown gam)
 	{
@@ -148,6 +152,7 @@ public class LevelScreen implements Screen
 
 		/* XML read map goes here */
 		clevel.readMap(parser);
+		level_number = parser.getLevelNumber();
 
 		/* setup the sprites. First is for the cars and Second is for the UI */
 		thebatch = new SpriteBatch();
@@ -197,11 +202,15 @@ public class LevelScreen implements Screen
 		top_score_bar = new Texture("data/score_bar.jpg");
 		top_score_bar.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		numbers = new Texture[10];
+		numbers_chiller = new Texture[10];
 		for (int i = 0; i < 10; i++)
 		{
 			String temp = "data/red_num_" + i + ".png";
 			numbers[i] = new Texture(temp);
 			numbers[i].setFilter(TextureFilter.Linear, TextureFilter.Linear);
+			temp = "data/chiller_num_" + i + ".png";
+			numbers_chiller[i] = new Texture(temp);
+			numbers_chiller[i].setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		}
 		check_mark = new Texture("data/checkmark.png");
 		check_mark.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -212,6 +221,8 @@ public class LevelScreen implements Screen
 		colon2 = new Texture("data/dot.png");
 		colon2.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		crash = new Texture("data/skeleton.png");
+		colon_chiller = new Texture("data/chiller_colon.png");
+		colon_chiller.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		crash.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		letterT = new Texture("data/Letter-T.png");
 		letterT.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -394,6 +405,22 @@ public class LevelScreen implements Screen
 			else if(finishYPosition <= 0)
 				finishYPosition = 0;
 			thebatch.draw(level_finish,0,finishYPosition,1280,1380);
+			
+			thebatch.draw(numbers_chiller[level_number % 10], 578, finishYPosition + 1042, 80, 80);
+			
+			thebatch.draw(numbers_chiller[success_cars / 100], 780, finishYPosition + 815, 80, 80);
+			thebatch.draw(numbers_chiller[(success_cars % 100) / 10], 880, finishYPosition + 815, 80, 80);
+			thebatch.draw(numbers_chiller[success_cars % 10], 980, finishYPosition + 815, 80, 80);
+			
+			thebatch.draw(numbers_chiller[crash_cars / 100], 780, finishYPosition + 600, 80, 80);
+			thebatch.draw(numbers_chiller[(crash_cars % 100) / 10], 880, finishYPosition + 600, 80, 80);
+			thebatch.draw(numbers_chiller[crash_cars % 10], 980, finishYPosition + 600, 80, 80);
+			
+			thebatch.draw(numbers_chiller[((int)playTime / 60) / 10], 780, finishYPosition + 375, 80, 80);
+			thebatch.draw(numbers_chiller[((int)playTime / 60) % 10], 840, finishYPosition + 375, 80, 80);
+			thebatch.draw(colon_chiller, 890, finishYPosition + 375, 80, 80);
+			thebatch.draw(numbers_chiller[((int)playTime % 60) / 10], 940, finishYPosition + 375, 80, 80);
+			thebatch.draw(numbers_chiller[((int)playTime % 60) % 10], 1000, finishYPosition + 375, 80, 80);
 			thebatch.end();
 		}
 		
