@@ -76,6 +76,7 @@ public class LevelScreen implements Screen
 	private Texture				letterM;
 	private Texture				letterE;
 	private Texture 			help_menu;
+	private Texture				level_finish;
 
 	private int					LEVEL_WIDTH;
 	private int					LEVEL_HEIGHT;
@@ -101,6 +102,11 @@ public class LevelScreen implements Screen
 	private boolean 			currentHPressed;
 	private double 				helpTime;
 	private int 				helpYPosition;
+	
+	private double 				finish_time;
+	private int 				finishYPosition;
+	
+	private boolean 			disableZoom;
 
 	private float				zoom_initial;						/* what the  initial  zoom  ratio is  so we can  stop at  it */
 
@@ -217,8 +223,10 @@ public class LevelScreen implements Screen
 		letterE.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		help_menu = new Texture("data/help_menu.png");
 		help_menu.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		level_finish = new Texture("data/level_finish.png");
+		level_finish.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-		inputProcessor = new InputHandler(camera, LEVEL_WIDTH, LEVEL_HEIGHT, SCORE_BAR_HEIGHT);
+		inputProcessor = new InputHandler(camera, LEVEL_WIDTH, LEVEL_HEIGHT, SCORE_BAR_HEIGHT, disableZoom);
 
 		/* Get parsed cars */
 		cars = parser.getCars();
@@ -243,6 +251,7 @@ public class LevelScreen implements Screen
 		Next_Frame_Time = 0f;
 		
 		helpYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
+		finishYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
 	}
 
 	@Override
@@ -313,15 +322,13 @@ public class LevelScreen implements Screen
 			this.crash_cars = levelLogic.crash_cars;
 			this.playTime += Gdx.graphics.getDeltaTime();
 		}
-		else if (this.level_done == true)
-		{
-			/* ELSE - level is done. Probably cleanup here */
-		}
 		
 		//TODO this if block should be removed because after the level is done the last frame will stay there
+		
+		
 		if (this.level_done == true && simulation_started)
 		{
-			/* LEVEL COMPLETE */
+			// LEVEL COMPLETE
 			thebatch.begin();
 			thebatch.draw(level_map, 0, 0, 1280, 1280);
 
@@ -339,7 +346,8 @@ public class LevelScreen implements Screen
 
 			thebatch.end();
 		}
-		else if(this.level_done == false && simulation_started)
+		
+		if(this.level_done == false && simulation_started)
 		{
 			/* Normal animation of simulation */
 			thebatch.begin();
@@ -375,6 +383,20 @@ public class LevelScreen implements Screen
 		/* Draw the UI ontop of the level map */
 		draw_score_bar();
 
+		if (this.level_done == true)
+		{
+			/* ELSE - level is done. Probably cleanup here */
+			thebatch.begin();
+			finish_time += Gdx.graphics.getDeltaTime();
+			finishYPosition -= (int)(300 * Math.pow(finish_time + 0.4, 4));
+			if(finishYPosition >= LEVEL_HEIGHT + SCORE_BAR_HEIGHT)
+				finishYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
+			else if(finishYPosition <= 0)
+				finishYPosition = 0;
+			thebatch.draw(level_finish,0,finishYPosition,1280,1380);
+			thebatch.end();
+		}
+		
 		// determine the type of tile that the mouse is click
 		double pixOfWindowX = LEVEL_WIDTH * camera.zoom;
 		double pixOfWindowY = (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) * camera.zoom;
@@ -450,7 +472,6 @@ public class LevelScreen implements Screen
 
 			lastTime = Time;
 		}
-		double offset = 0;
 		if(help_menu_pop){
 			thebatch.begin();
 			helpTime += Gdx.graphics.getDeltaTime();
@@ -459,8 +480,8 @@ public class LevelScreen implements Screen
 				helpYPosition = 0;
 			else if(helpYPosition > LEVEL_HEIGHT + SCORE_BAR_HEIGHT)
 				helpYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
-			thebatch.draw(help_menu, (int)(offset * LEVEL_WIDTH), helpYPosition,
-					(int)((1-2*offset) * LEVEL_WIDTH), LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+			thebatch.draw(help_menu, 0, helpYPosition,
+					LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
 			thebatch.end();
 		}
 		else if(!help_menu_pop && helpYPosition < LEVEL_HEIGHT + SCORE_BAR_HEIGHT){
@@ -469,10 +490,16 @@ public class LevelScreen implements Screen
 			helpYPosition += (int)(300 * Math.pow(helpTime + 0.4, 4));
 			if(helpYPosition > LEVEL_HEIGHT + SCORE_BAR_HEIGHT || helpYPosition < 0)
 				helpYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
-			thebatch.draw(help_menu, (int)(offset * LEVEL_WIDTH), helpYPosition,
-					(int)((1-2*offset) * LEVEL_WIDTH), LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+			thebatch.draw(help_menu, 0, helpYPosition,
+					LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
 			thebatch.end();
 		}
+		
+		if(help_menu_pop || this.level_done)
+			disableZoom = true;
+		else
+			disableZoom = false;
+		inputProcessor.set_disable_zoom(disableZoom);
 	}
 
 	public void setupPaths()
@@ -545,7 +572,7 @@ public class LevelScreen implements Screen
 		/* Polling solution at present */
 
 		/* Sim on and off */
-		if ((Gdx.input.isKeyPressed(Keys.S) && isSimulationPaused) || (Gdx.input.isKeyPressed(Keys.X) && !isSimulationPaused))
+		if ((Gdx.input.isKeyPressed(Keys.S) && isSimulationPaused && !help_menu_pop) || (Gdx.input.isKeyPressed(Keys.X) && !isSimulationPaused))
 		{
 			if (!simulation_started)
 			{
@@ -619,7 +646,7 @@ public class LevelScreen implements Screen
 		}
 
 		/* Zoom out */
-		if (Gdx.input.isKeyPressed(Keys.A))
+		if (Gdx.input.isKeyPressed(Keys.A) && !disableZoom)
 		{
 			if (zoom_initial != camera.zoom)
 			{
@@ -630,7 +657,7 @@ public class LevelScreen implements Screen
 		}
 
 		/* Zoom in */
-		if (Gdx.input.isKeyPressed(Keys.Q))
+		if (Gdx.input.isKeyPressed(Keys.Q) && !disableZoom)
 		{
 			if (camera.zoom >= 0.1)
 				camera.zoom -= 0.02;
@@ -650,28 +677,28 @@ public class LevelScreen implements Screen
 		}
 
 		/* Panning functions */
-		if (Gdx.input.isKeyPressed(Keys.LEFT))
+		if (Gdx.input.isKeyPressed(Keys.LEFT) && !disableZoom)
 		{
 			camera.translate(-3, 0, 0);
 			zoom_limit_to_border();
 			// System.out.println("camera position x: " + camera.position.x
 			// +"camera position y: " + camera.position.y);
 		}
-		if (Gdx.input.isKeyPressed(Keys.RIGHT))
+		if (Gdx.input.isKeyPressed(Keys.RIGHT) && !disableZoom)
 		{
 			camera.translate(3, 0, 0);
 			zoom_limit_to_border();
 			// System.out.println("camera position x: " + camera.position.x
 			// +"camera position y: " + camera.position.y);
 		}
-		if (Gdx.input.isKeyPressed(Keys.DOWN))
+		if (Gdx.input.isKeyPressed(Keys.DOWN) && !disableZoom)
 		{
 			camera.translate(0, -3, 0);
 			zoom_limit_to_border();
 			// System.out.println("camera position x: " + camera.position.x
 			// +"camera position y: " + camera.position.y);
 		}
-		if (Gdx.input.isKeyPressed(Keys.UP))
+		if (Gdx.input.isKeyPressed(Keys.UP) && !disableZoom)
 		{
 			camera.translate(0, 3, 0);
 			zoom_limit_to_border();
@@ -774,6 +801,7 @@ class InputHandler extends InputAdapter
 	private int					LEVEL_WIDTH;
 	private int					LEVEL_HEIGHT;
 	private int					SCORE_BAR_HEIGHT;
+	private boolean 			DISABLEZOOM;
 
 	float						pixOfWindowX;
 	float						pixOfWindowY;
@@ -796,18 +824,24 @@ class InputHandler extends InputAdapter
 			OrthographicCamera camera,
 			int LEVEL_WIDTH,
 			int LEVEL_HEIGHT,
-			int SCORE_BAR_HEIGHT)
+			int SCORE_BAR_HEIGHT,
+			boolean DISABLEZOOM)
 	{
 		this.camera = camera;
 		this.LEVEL_WIDTH = LEVEL_WIDTH;
 		this.LEVEL_HEIGHT = LEVEL_HEIGHT;
 		this.SCORE_BAR_HEIGHT = SCORE_BAR_HEIGHT;
+		this.DISABLEZOOM = DISABLEZOOM;
 	}
 
+	public void set_disable_zoom(boolean disableZoom){
+		this.DISABLEZOOM = disableZoom;
+	}
+	
 	@Override
 	public boolean scrolled(int amount)
 	{
-		if (amount == -1)
+		if (amount == -1 && !DISABLEZOOM)
 		{
 			System.out.println("amount == " + amount);
 			System.out.println("zoom == " + camera.zoom);
@@ -817,7 +851,7 @@ class InputHandler extends InputAdapter
 				camera.zoom = 0.2f;
 			zoom_limit_to_border();
 		}
-		else if (amount == 1)
+		else if (amount == 1 && !DISABLEZOOM)
 		{
 			System.out.println("amount == " + amount);
 			System.out.println("zoom == " + camera.zoom);
@@ -841,7 +875,7 @@ class InputHandler extends InputAdapter
 
 		get_real_xy();
 
-		if (lastRealX != 0 && lastRealY != 0)
+		if (lastRealX != 0 && lastRealY != 0 && !DISABLEZOOM)
 			camera.translate((lastRealX - currentRealX), (lastRealY - currentRealY), 0);
 		zoom_limit_to_border();
 
