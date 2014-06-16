@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="20" height="20" tilewidth="64" tileheight="64">
- <tileset firstgid="1" source="base_gta_tileset.tsx"/>
- <layer name="Tile Layer 1" width="20" height="20">
-  <data encoding="base64" compression="zlib">
-   eJxjZGBg4AViWSCWgbJJwSB9fEAsB8UsQCwMxKxYsAgeOWQ16OYh8+WIlMOlZiSahyteiYlzdDX44pcYjJ4GiPETtcJvsJhHTj6jRnwQk/9I8S856ZGQWpjfuKhknjADZpmCy05iyzp8bmAiMdy5SfQTMWFAT/MAUVEffQ==
-  </data>
- </layer>
-</map>
