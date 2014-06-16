@@ -38,19 +38,6 @@ public class MainMenu implements Screen
 	private OrthographicCamera	camera;
 	private Texture				title;
 	private Texture				select_level;
-	private Texture				level1_normal;
-	private Texture				level1_mouse_on;
-	private Texture				level1_pressed;
-	private Texture				level2_normal;
-	private Texture				level2_mouse_on;
-	private Texture				level2_pressed;
-	private Texture				tutorial_normal;
-	private Texture				tutorial_mouse_on;
-	private Texture				tutorial_pressed;
-	private Texture				credits_normal;
-	private Texture				credits_mouse_on;
-	private Texture				credits_pressed;
-
 	private static final int	MAINMENU_WIDTH	= 1280;
 	private static final int	MAINMENU_HEIGHT	= 1280;
 
@@ -71,8 +58,12 @@ public class MainMenu implements Screen
 
 	public double				realX;
 	public double				realY;
-	
-	private double 				time;
+
+	private double				time;
+	private TextureButton		level1;
+	private TextureButton		level2;
+	private TextureButton		tutorial;
+	private TextureButton		credits;
 
 	public MainMenu(final VerilogTown gam)
 	{
@@ -81,25 +72,14 @@ public class MainMenu implements Screen
 		camera.setToOrtho(false, MAINMENU_WIDTH, MAINMENU_HEIGHT);
 
 		title = new Texture(Gdx.files.internal("ASSET_RESOURCES/welcom_to_verilogtown.png"));
-		
+
 		select_level = new Texture("ASSET_RESOURCES/select_a_level.png");
 
-		level1_normal = new Texture("ASSET_RESOURCES/level1_normal.png");
-		level1_mouse_on = new Texture("ASSET_RESOURCES/level1_mouse_on.png");
-		level1_pressed = new Texture("ASSET_RESOURCES/level1_pressed.png");
+		level1 = new TextureButton(game.batch, 512, 805, 250, 60, "ASSET_RESOURCES", "level1", "_normal.png", "_mouse_on.png", "_pressed.png");
+		level2 = new TextureButton(game.batch, 512, 705, 250, 60, "ASSET_RESOURCES", "level2", "_normal.png", "_mouse_on.png", "_pressed.png");
+		tutorial = new TextureButton(game.batch, 512, 605, 250, 60, "ASSET_RESOURCES", "tutorial", "_normal.png", "_mouse_on.png", "_pressed.png");
+		credits = new TextureButton(game.batch, 512, 505, 250, 60, "ASSET_RESOURCES", "credits", "_normal.png", "_mouse_on.png", "_pressed.png");
 
-		level2_normal = new Texture("ASSET_RESOURCES/level2_normal.png");
-		level2_mouse_on = new Texture("ASSET_RESOURCES/level2_mouse_on.png");
-		level2_pressed = new Texture("ASSET_RESOURCES/level2_pressed.png");
-
-		tutorial_normal = new Texture("ASSET_RESOURCES/tutorial_normal.png");
-		tutorial_mouse_on = new Texture("ASSET_RESOURCES/tutorial_mouse_on.png");
-		tutorial_pressed = new Texture("ASSET_RESOURCES/tutorial_pressed.png");
-
-		credits_normal = new Texture("ASSET_RESOURCES/credits_normal.png");
-		credits_mouse_on = new Texture("ASSET_RESOURCES/credits_mouse_on.png");
-		credits_pressed = new Texture("ASSET_RESOURCES/credits_pressed.png");
-		
 		time = 0;
 	}
 
@@ -108,7 +88,7 @@ public class MainMenu implements Screen
 	{
 		Gdx.gl.glClearColor(0.78f, 0.9f, 0.78f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		
+
 		time += Gdx.graphics.getDeltaTime();
 
 		pixOfWindowX = MAINMENU_WIDTH * camera.zoom;
@@ -138,92 +118,61 @@ public class MainMenu implements Screen
 		game.batch.begin();
 
 		game.batch.draw(title, 200, 950, 800, 200);
-		
-		if((int)(time * 1.3) % 2 == 0)
+
+		if ((int) (time * 1.3) % 2 == 0)
 			game.batch.draw(select_level, 370, 850, 540, 120);
-		
-		
-		
-		if (realX >= 514 && realX <= 763 && realY >= 805 && realY <= 863)
-		{
-			if (isPressed)
-			{
-				game.batch.draw(level1_pressed, 512, 700);
-			}
-			// If clicked
-			else if (!isPressed && wasPressed)
-			{
-				game.setScreen(new LevelScreen((game)));
-			}
-			else
-			{
-				game.batch.draw(level1_mouse_on, 512, 700);
-			}
-		}
-		else
-			game.batch.draw(level1_normal, 512, 700);
 
-		if (realX >= 514 && realX <= 763 && realY >= 705 && realY <= 763)
+		// Level 1 button
+		if (level1.isOnButton(realX, realY))
 		{
 			if (isPressed)
-			{
-				game.batch.draw(level2_pressed, 512, 600);
-			}
-			// If clicked
-			else if (!isPressed && wasPressed)
-			{
-				game.setScreen(new LevelScreen((game)));
-			}
+				level1.drawTexture(TextureButton.CLICK);
+			else if (wasPressed)
+				game.setScreen(new LevelScreen(game));
 			else
-			{
-				game.batch.draw(level2_mouse_on, 512, 600);
-			}
+				level1.drawTexture(TextureButton.HOVER);
 		}
 		else
-		{
-			game.batch.draw(level2_normal, 512, 600);
-		}
+			level1.drawTexture(TextureButton.NORMAL);
 
-		if (realX >= 514 && realX <= 763 && realY >= 605 && realY <= 663)
+		// Level 2 button
+		if (level2.isOnButton(realX, realY))
 		{
 			if (isPressed)
-			{
-				game.batch.draw(tutorial_pressed, 512, 500);
-			}
-			// If clicked
-			else if (!isPressed && wasPressed)
-			{
-				// show the tutorial screen here
-			}
+				level2.drawTexture(TextureButton.CLICK);
+			else if (wasPressed)
+				game.setScreen(new LevelScreen(game));
 			else
-			{
-				game.batch.draw(tutorial_mouse_on, 512, 500);
-			}
+				level2.drawTexture(TextureButton.HOVER);
 		}
 		else
-		{
-			game.batch.draw(tutorial_normal, 512, 500);
-		}
+			level2.drawTexture(TextureButton.NORMAL);
 
-		if (realX >= 514 && realX <= 763 && realY >= 505 && realY <= 563)
+		// Tutorial button
+		if (tutorial.isOnButton(realX, realY))
 		{
 			if (isPressed)
-			{
-				game.batch.draw(credits_pressed, 512, 400);
-			}
-			else if (!isPressed && wasPressed)
-			{
-				// show the credits screen here
-			}
+				tutorial.drawTexture(TextureButton.CLICK);
+			else if (wasPressed)
+				game.setScreen(new LevelScreen(game));
 			else
-			{
-				game.batch.draw(credits_mouse_on, 512, 400);
-			}
+				tutorial.drawTexture(TextureButton.HOVER);
 		}
 		else
+			tutorial.drawTexture(TextureButton.NORMAL);
+
+		// Credits button
+		if (credits.isOnButton(realX, realY))
 		{
-			game.batch.draw(credits_normal, 512, 400);
+			if (isPressed)
+				credits.drawTexture(TextureButton.CLICK);
+			else if (wasPressed)
+				game.setScreen(new LevelScreen(game));
+			else
+				credits.drawTexture(TextureButton.HOVER);
 		}
+		else
+			credits.drawTexture(TextureButton.NORMAL);
 
 		game.batch.end();
 	}
