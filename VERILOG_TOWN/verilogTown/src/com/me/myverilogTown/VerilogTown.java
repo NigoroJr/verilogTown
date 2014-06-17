@@ -93,7 +93,7 @@ public class VerilogTown extends Game
 				path += "../";
 			}
 			try {
-				System.out.println(new File(path).getCanonicalPath().replaceAll("\\\\\\b", "/"));
+				return (new File(path).getCanonicalPath().replaceAll("\\\\\\b", "/"));
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
