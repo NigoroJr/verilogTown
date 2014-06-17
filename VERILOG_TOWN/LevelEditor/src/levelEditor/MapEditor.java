@@ -234,8 +234,9 @@ public class MapEditor extends JDialog
 		level.setAttribute("lv", Integer.toString(levelNumber));
 
 		Element map = doc.createElement("map");
-		map.setAttribute("size_x", Integer.toString(sizeX));
-		map.setAttribute("size_y", Integer.toString(sizeY));
+		// Add the invisible border grids
+		map.setAttribute("size_x", Integer.toString(sizeX + 2));
+		map.setAttribute("size_y", Integer.toString(sizeY + 2));
 
 		// Add start/end points
 		boolean noIntersectionOnEdge = addStartEnd(doc, map);
