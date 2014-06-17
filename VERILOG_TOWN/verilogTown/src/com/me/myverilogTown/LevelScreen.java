@@ -47,7 +47,7 @@ import com.badlogic.gdx.InputAdapter;
 public class LevelScreen implements Screen
 {
 	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
-	
+
 	public final VerilogTown	game;
 
 	private Car					cars[];
@@ -93,13 +93,10 @@ public class LevelScreen implements Screen
 	private Random				random_number;
 	private Rectangle			glViewport;
 
-	private float				Time;								/* Game
-																	 * clock of
-																	 * passed
-																	 * time */
-	private float				Frame_Time_25;						/* amount of
-																	 * time for
-																	 * 25FPS */
+	/* Game clock of passed time */
+	private float				Time;
+	/* amount of time for 25F PS */
+	private float				Frame_Time_25;
 	private float				Next_Frame_Time;
 
 	private VerilogTownMap		clevel;
@@ -118,13 +115,8 @@ public class LevelScreen implements Screen
 
 	private boolean				disableZoom;
 
-	private float				zoom_initial;						/* what the
-																	 * initial
-																	 * zoom
-																	 * ratio is
-																	 * so we can
-																	 * stop at
-																	 * it */
+	/* what the initial zoom ratio is so we can stop at it */
+	private float				zoom_initial;
 
 	private double				lastTime;
 	private double				playTime;
@@ -132,12 +124,12 @@ public class LevelScreen implements Screen
 	private InputHandler		inputProcessor;
 
 	private Parse[]				Compiler;
-	private String				pathOfVerilogFile		= "";
-	private String				pathOfEditorJar		= "";
-	private String 				rootPath 				= "";
+	private String				pathOfVerilogFile			= "";
+	private String				pathOfEditorJar				= "";
+	private String				rootPath					= "";
 
-	private boolean				lastButtonPressed		= false;
-	private boolean				currentButtonPressed	= false;
+	private boolean				lastButtonPressed			= false;
+	private boolean				currentButtonPressed		= false;
 	private LevelXMLParser		parser;
 
 	private boolean				problem_with_compile;
@@ -426,7 +418,8 @@ public class LevelScreen implements Screen
 			finishYPosition -= (int) (300 * Math.pow(finish_time + 0.4, 4));
 			if (finishYPosition >= LEVEL_HEIGHT + SCORE_BAR_HEIGHT)
 				finishYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
-			else if (finishYPosition < 0){
+			else if (finishYPosition < 0)
+			{
 				finishYPosition = 0;
 			}
 			thebatch.draw(level_finish, 0, finishYPosition, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
@@ -446,8 +439,9 @@ public class LevelScreen implements Screen
 			thebatch.draw(colon_chiller, 890, finishYPosition + 375, 80, 80);
 			thebatch.draw(numbers_chiller[((int) playTime % 60) / 10], 940, finishYPosition + 375, 80, 80);
 			thebatch.draw(numbers_chiller[((int) playTime % 60) % 10], 1000, finishYPosition + 375, 80, 80);
-			
-			if(finishYPosition == 0 && finish_time >= 0.7){
+
+			if (finishYPosition == 0 && finish_time >= 0.7)
+			{
 				this.dispose();
 				game.setScreen(new ScoreScreen(game, level_number, success_cars, crash_cars, playTime));
 			}
