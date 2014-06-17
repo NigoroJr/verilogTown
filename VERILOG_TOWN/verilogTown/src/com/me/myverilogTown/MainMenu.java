@@ -64,6 +64,23 @@ public class MainMenu implements Screen
 	private TextureButton		level2;
 	private TextureButton		tutorial;
 	private TextureButton		credits;
+	
+	private Texture				level1_normal;
+	private Texture				level1_hover;
+	private Texture				level1_pressed;
+	
+	private Texture				level2_normal;				
+	private Texture				level2_hover;
+	private Texture				level2_pressed;
+	
+	private Texture				tutorial_normal;				
+	private Texture				tutorial_hover;
+	private Texture				tutorial_pressed;
+	
+	private Texture				credits_normal;
+	private Texture				credits_hover;
+	private Texture				credits_pressed;
+	
 
 	public MainMenu(final VerilogTown gam)
 	{
@@ -74,11 +91,27 @@ public class MainMenu implements Screen
 		title = new Texture(Gdx.files.internal("ASSET_RESOURCES/welcom_to_verilogtown.png"));
 
 		select_level = new Texture("ASSET_RESOURCES/select_a_level.png");
+		
+		level1_normal = new Texture("ASSET_RESOURCES/level1_normal.png");
+		level1_hover = new Texture("ASSET_RESOURCES/level1_mouse_on.png");
+		level1_pressed = new Texture("ASSET_RESOURCES/level1_pressed.png");
 
-		level1 = new TextureButton(game.batch, 512, 805, 250, 60, "ASSET_RESOURCES", "level1", "_normal.png", "_mouse_on.png", "_pressed.png");
-		level2 = new TextureButton(game.batch, 512, 705, 250, 60, "ASSET_RESOURCES", "level2", "_normal.png", "_mouse_on.png", "_pressed.png");
-		tutorial = new TextureButton(game.batch, 512, 605, 250, 60, "ASSET_RESOURCES", "tutorial", "_normal.png", "_mouse_on.png", "_pressed.png");
-		credits = new TextureButton(game.batch, 512, 505, 250, 60, "ASSET_RESOURCES", "credits", "_normal.png", "_mouse_on.png", "_pressed.png");
+		level2_normal = new Texture("ASSET_RESOURCES/level2_normal.png");
+		level2_hover = new Texture("ASSET_RESOURCES/level2_mouse_on.png");
+		level2_pressed = new Texture("ASSET_RESOURCES/level2_pressed.png");
+		
+		tutorial_normal = new Texture("ASSET_RESOURCES/tutorial_normal.png");
+		tutorial_hover = new Texture("ASSET_RESOURCES/tutorial_mouse_on.png");
+		tutorial_pressed = new Texture("ASSET_RESOURCES/tutorial_pressed.png");
+		
+		credits_normal = new Texture("ASSET_RESOURCES/credits_normal.png");
+		credits_hover = new Texture("ASSET_RESOURCES/credits_mouse_on.png");
+		credits_pressed = new Texture("ASSET_RESOURCES/credits_pressed.png");
+		
+		level1 = new TextureButton(game.batch, 512, 805, 250, 60, level1_normal, level1_hover, level1_pressed);
+		level2 = new TextureButton(game.batch, 512, 705, 250, 60, level2_normal, level2_hover, level2_pressed);
+		tutorial = new TextureButton(game.batch, 512, 605, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
+		credits = new TextureButton(game.batch, 512, 505, 250, 60, credits_normal, credits_hover, credits_pressed);
 
 		time = 0;
 	}
@@ -126,9 +159,11 @@ public class MainMenu implements Screen
 		if (level1.isOnButton(realX, realY))
 		{
 			if (isPressed)
-				level1.drawTexture(TextureButton.CLICK);
-			else if (wasPressed)
+				level1.drawTexture(TextureButton.PRESSED);
+			else if (wasPressed){
+				this.dispose();
 				game.setScreen(new LevelScreen(game, 1));
+			}
 			else
 				level1.drawTexture(TextureButton.HOVER);
 		}
@@ -139,9 +174,11 @@ public class MainMenu implements Screen
 		if (level2.isOnButton(realX, realY))
 		{
 			if (isPressed)
-				level2.drawTexture(TextureButton.CLICK);
-			else if (wasPressed)
+				level2.drawTexture(TextureButton.PRESSED);
+			else if (wasPressed){
+				this.dispose();
 				game.setScreen(new LevelScreen(game, 2));
+			}
 			else
 				level2.drawTexture(TextureButton.HOVER);
 		}
@@ -152,9 +189,11 @@ public class MainMenu implements Screen
 		if (tutorial.isOnButton(realX, realY))
 		{
 			if (isPressed)
-				tutorial.drawTexture(TextureButton.CLICK);
-			else if (wasPressed)
+				tutorial.drawTexture(TextureButton.PRESSED);
+			else if (wasPressed){
+				this.dispose();
 				game.setScreen(new LevelScreen(game, 0));
+			}
 			else
 				tutorial.drawTexture(TextureButton.HOVER);
 		}
@@ -165,10 +204,11 @@ public class MainMenu implements Screen
 		if (credits.isOnButton(realX, realY))
 		{
 			if (isPressed)
-				credits.drawTexture(TextureButton.CLICK);
-			else if (wasPressed)
+				credits.drawTexture(TextureButton.PRESSED);
+			else if (wasPressed){
+				this.dispose();
 				// TODO: Show credits
-				;
+			}
 			else
 				credits.drawTexture(TextureButton.HOVER);
 		}
