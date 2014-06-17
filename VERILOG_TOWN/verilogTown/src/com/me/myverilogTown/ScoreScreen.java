@@ -146,6 +146,11 @@ public class ScoreScreen implements Screen
 			if (isPressed)
 				next_level.drawTexture(TextureButton.PRESSED);
 			else if (wasPressed){
+				this.dispose();
+				if(level_number + 1 < 4)
+					game.setScreen(new LevelScreen(game, level_number + 1));
+				else 
+					game.setScreen(new MainMenu(game));
 				//go to the next level
 			}
 			else 
