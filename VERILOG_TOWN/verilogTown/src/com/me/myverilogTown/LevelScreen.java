@@ -46,6 +46,8 @@ import com.badlogic.gdx.InputAdapter;
 
 public class LevelScreen implements Screen
 {
+	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
+	
 	public final VerilogTown	game;
 
 	private Car					cars[];
@@ -131,7 +133,8 @@ public class LevelScreen implements Screen
 
 	private Parse[]				Compiler;
 	private String				pathOfVerilogFile		= "";
-	private String				pathOfVerilogDir		= "";
+	private String				pathOfEditorJar		= "";
+	private String 				rootPath 				= "";
 
 	private boolean				lastButtonPressed		= false;
 	private boolean				currentButtonPressed	= false;
@@ -154,7 +157,8 @@ public class LevelScreen implements Screen
 		this.random_number = new Random(3); // should this be rand seed?
 
 		String xmlPath = String.format("%s/Levels/Lv%d/map/lv%02d.xml", VerilogTown.getRootPath(), level_number, level_number);
-		parser = new LevelXMLParser(xmlPath);
+		//parser = new LevelXMLParser(xmlPath);
+		parser = new LevelXMLParser();
 		/* init current level map data structure */
 		int visibleGridX = parser.getGridArray().length - 2;
 		int visibleGridY = parser.getGridArray()[0].length - 3;
@@ -173,8 +177,9 @@ public class LevelScreen implements Screen
 
 		String pngPath = String.format("%s/Levels/Lv%d/map/lv%02d.png", VerilogTown.getRootPath(), level_number, level_number);
 		/* initialize the map - should be provided by XML read */
-		level_map = new Texture(pngPath);
-
+		//level_map = new Texture(pngPath);
+		level_map = new Texture("data/first_map.png");
+		
 		/* create the camera for the SpriteBatch */
 		camera = new OrthographicCamera();
 		uiCamera = new OrthographicCamera();
@@ -421,8 +426,9 @@ public class LevelScreen implements Screen
 			finishYPosition -= (int) (300 * Math.pow(finish_time + 0.4, 4));
 			if (finishYPosition >= LEVEL_HEIGHT + SCORE_BAR_HEIGHT)
 				finishYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
-			else if (finishYPosition <= 0)
+			else if (finishYPosition < 0){
 				finishYPosition = 0;
+			}
 			thebatch.draw(level_finish, 0, finishYPosition, 1280, 1380);
 
 			thebatch.draw(numbers_chiller[level_number % 10], 578, finishYPosition + 1042, 80, 80);
@@ -440,6 +446,11 @@ public class LevelScreen implements Screen
 			thebatch.draw(colon_chiller, 890, finishYPosition + 375, 80, 80);
 			thebatch.draw(numbers_chiller[((int) playTime % 60) / 10], 940, finishYPosition + 375, 80, 80);
 			thebatch.draw(numbers_chiller[((int) playTime % 60) % 10], 1000, finishYPosition + 375, 80, 80);
+			
+			if(finishYPosition == 0 && finish_time >= 0.7){
+				this.dispose();
+				game.setScreen(new ScoreScreen(game, level_number, success_cars, crash_cars, playTime));
+			}
 			thebatch.end();
 		}
 
@@ -494,7 +505,7 @@ public class LevelScreen implements Screen
 			String jar_path;
 			String verilogFileName = "Traffic_signal_set_" + counter;
 
-			jar_path = this.pathOfVerilogDir + "VerilogEditor.jar";
+			jar_path = this.pathOfEditorJar + "VerilogEditor.jar";
 			String OSName = System.getProperty("os.name");
 			if (OSName.startsWith("Windows"))
 				jar_path = jar_path.substring(1);
@@ -504,7 +515,9 @@ public class LevelScreen implements Screen
 			list.add(jar_path);
 			// list.add("D:/Program Files/eclipse-java/program/verilogTownStuff/myverilogTown/VerilogEditor.jar");
 			list.add(verilogFileName);
-			list.add(pathOfVerilogDir);
+			list.add(pathOfEditorJar);
+			list.add(rootPath);
+			list.add(Integer.toString(level_number));
 			try
 			{
 				ProcessBuilder proc = new ProcessBuilder(list);
@@ -550,17 +563,26 @@ public class LevelScreen implements Screen
 
 	public void setupPaths()
 	{
+		
 		try
 		{
-			pathOfVerilogDir = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			pathOfEditorJar = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 		}
 		catch (URISyntaxException e2)
 		{
 			e2.printStackTrace();
 		}
-		pathOfVerilogDir += "../../";
-
-		pathOfVerilogFile = pathOfVerilogDir + "VerilogFiles/";
+		if(isDevelopment()){
+			rootPath = pathOfEditorJar.substring(0, pathOfEditorJar.substring(0,pathOfEditorJar.lastIndexOf("/")).lastIndexOf("/") + 1);
+			rootPath = rootPath.substring(0, rootPath.substring(0,rootPath.lastIndexOf("/")).lastIndexOf("/") + 1);
+			rootPath = rootPath.substring(0, rootPath.substring(0,rootPath.lastIndexOf("/")).lastIndexOf("/") + 1);
+			pathOfEditorJar += "../../";
+		}
+		else{
+			pathOfEditorJar += "../";
+			rootPath = pathOfEditorJar + "../";
+		}
+		pathOfVerilogFile = rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/";
 	}
 
 	public void draw_score_bar()
@@ -808,6 +830,12 @@ public class LevelScreen implements Screen
 
 		/* reset position */
 		camera.position.set(camX, camY, camera.position.z);
+	}
+	
+	public static boolean isDevelopment()
+	{
+		String env = System.getenv(VERILOG_TOWN_DEVELOPMENT);
+		return env != null && !env.equals("0");
 	}
 
 	@Override
