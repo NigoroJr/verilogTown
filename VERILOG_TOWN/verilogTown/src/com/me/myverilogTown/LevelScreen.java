@@ -155,13 +155,13 @@ public class LevelScreen implements Screen
 		this.level_done = false;
 		this.simulation_started = false;
 		this.random_number = new Random(3); // should this be rand seed?
-
+		
 		String xmlPath = String.format("%s/Levels/Lv%d/map/lv%02d.xml", VerilogTown.getRootPath(), level_number, level_number);
-		//parser = new LevelXMLParser(xmlPath);
-		parser = new LevelXMLParser();
+		parser = new LevelXMLParser(xmlPath);
+		//parser = new LevelXMLParser();
 		/* init current level map data structure */
 		int visibleGridX = parser.getGridArray().length - 2;
-		int visibleGridY = parser.getGridArray()[0].length - 3;
+		int visibleGridY = parser.getGridArray()[0].length - 2;
 
 		this.clevel = new VerilogTownMap(visibleGridX, visibleGridY); // firts_map
 
@@ -177,8 +177,8 @@ public class LevelScreen implements Screen
 
 		String pngPath = String.format("%s/Levels/Lv%d/map/lv%02d.png", VerilogTown.getRootPath(), level_number, level_number);
 		/* initialize the map - should be provided by XML read */
-		//level_map = new Texture(pngPath);
-		level_map = new Texture("data/first_map.png");
+		level_map = new Texture(pngPath);
+		//level_map = new Texture("data/first_map.png");
 		
 		/* create the camera for the SpriteBatch */
 		camera = new OrthographicCamera();
@@ -327,7 +327,7 @@ public class LevelScreen implements Screen
 		if (!simulation_started)
 		{
 			thebatch.begin();
-			thebatch.draw(level_map, 0, 0, 1280, 1280);
+			thebatch.draw(level_map, 0, 0, LEVEL_WIDTH, LEVEL_HEIGHT);
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
 			thebatch.end();
 		}
@@ -365,7 +365,7 @@ public class LevelScreen implements Screen
 		{
 			// LEVEL COMPLETE
 			thebatch.begin();
-			thebatch.draw(level_map, 0, 0, 1280, 1280);
+			thebatch.draw(level_map, 0, 0, LEVEL_WIDTH, LEVEL_HEIGHT);
 
 			for (int i = 0; i < num_cars; i++)
 			{
@@ -386,7 +386,7 @@ public class LevelScreen implements Screen
 		{
 			/* Normal animation of simulation */
 			thebatch.begin();
-			thebatch.draw(level_map, 0, 0, 1280, 1280);
+			thebatch.draw(level_map, 0, 0, LEVEL_WIDTH, LEVEL_HEIGHT);
 
 			for (int i = 0; i < num_cars; i++)
 			{
@@ -429,7 +429,7 @@ public class LevelScreen implements Screen
 			else if (finishYPosition < 0){
 				finishYPosition = 0;
 			}
-			thebatch.draw(level_finish, 0, finishYPosition, 1280, 1380);
+			thebatch.draw(level_finish, 0, finishYPosition, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
 
 			thebatch.draw(numbers_chiller[level_number % 10], 578, finishYPosition + 1042, 80, 80);
 
