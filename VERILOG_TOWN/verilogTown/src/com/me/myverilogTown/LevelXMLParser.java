@@ -99,6 +99,7 @@ public class LevelXMLParser
 		int mapSizeX = Integer.parseInt(map.getAttributes().getNamedItem("size_x").getTextContent());
 		int mapSizeY = Integer.parseInt(map.getAttributes().getNamedItem("size_y").getTextContent());
 		grids = new GridNode[mapSizeX][mapSizeY];
+		initGrids(grids);
 
 		readMap(map.getChildNodes());
 
@@ -116,6 +117,21 @@ public class LevelXMLParser
 		}
 
 		readCars(cars.getChildNodes());
+	}
+
+	/** Initializes all grids to NON_ROAD grids. This is done because the level
+	 * editor leaves most of the grids on the edge null.
+	 * 
+	 * @param grids */
+	private void initGrids(GridNode[][] grids)
+	{
+		for (int y = 0; y < grids.length; y++)
+		{
+			for (int x = 0; x < grids[0].length; x++)
+			{
+				grids[y][x] = new GridNode(x, y, GridType.NON_ROAD);
+			}
+		}
 	}
 
 	/** Reads the "map" tag in the XML file.
