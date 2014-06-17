@@ -85,7 +85,9 @@ public class VerilogEditor extends JFrame implements ActionListener
 	MyTextPane errorText = null;
 	MyUndo1 myUndoManager1 = null;
 	static String name;
-	static String path;
+	static String pathOfEditorJar;
+	static String rootPath;
+	static String level_number;
 	public File verilogFiles;
 	JFormattedTextField simulateInput, generalSensorInput1, 
 						generalSensorInput2, generalSensorInput3,
@@ -100,7 +102,9 @@ public class VerilogEditor extends JFrame implements ActionListener
 	{
 		// TODO Auto-generated method stub
 		name = args[0];
-		path = args[1];
+		pathOfEditorJar = args[1];
+		rootPath = args[2];
+		level_number = args[3];
 		new VerilogEditor();
 	}
 	
@@ -114,7 +118,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 		else
 			newLine = "\n";
 		
-		File verilogDir = new File(path + "VerilogFiles");
+		//File verilogDir = new File(pathOfEditorJar + "VerilogFiles");
+		File verilogDir = new File(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/");
 		if  (!verilogDir.exists()  && !verilogDir.isDirectory())
 		
 		{
@@ -192,7 +197,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 		codeText.getDocument().addUndoableEditListener(myUndoManager1);
 		
 		//read in the already existed file or create a new file
-		verilogFiles = new File(path + "VerilogFiles/" + name + ".txt");
+		//verilogFiles = new File(pathOfEditorJar + "VerilogFiles/" + name + ".txt");
+		verilogFiles = new File(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
 		if(!verilogFiles.exists())
 		{
 			try
@@ -378,7 +384,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 				
 				
 				//this block of code is for debug
-				
+				/*
 				System.out.println("code text: ");
 				for(int i = 0; i < codeText.getText().toCharArray().length; i++){
 					if(codeText.getText().toCharArray()[i] == 0xA)
@@ -401,7 +407,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 					System.out.print((int)fileContent.toCharArray()[i] + "\t");
 				}
 				System.out.println();
-				
+				*/
 				
 				if(codeText.getText().equals(fileContent))
 					System.exit(0);
@@ -668,10 +674,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 			out.close();
 			
 			/* print out what we're compiling */
-			errorText.setText("Compiling "+path + "VerilogFiles/" + name + ".txt");
+			errorText.setText("Compiling "+pathOfEditorJar + "VerilogFiles/" + name + ".txt");
 
 			/* parse the base file */
-			Compiler.compileFileForEditor(path + "VerilogFiles/" + name + ".txt");
+			Compiler.compileFileForEditor(pathOfEditorJar + "VerilogFiles/" + name + ".txt");
 
 			if (Compiler.is_compiled_yet())
 			{
