@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <level lv="3">
-    <map size_x="20" size_y="20">
+    <map size_x="22" size_y="22">
         <grid x="5" y="21">
             <type>START_NEDGE2S</type>
         </grid>
