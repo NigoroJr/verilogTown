@@ -1221,9 +1221,11 @@
             <type>NON_ROAD</type>
         </grid>
     </map>
-    <car>
-        <start x="7" y="0"/>
-        <end x="14" y="0"/>
-        <delay>400</delay>
-    </car>
+    <cars>
+        <car>
+            <start x="7" y="0"/>
+            <end x="14" y="0"/>
+            <delay>400</delay>
+        </car>
+    </cars>
 </level>
