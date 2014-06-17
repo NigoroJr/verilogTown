@@ -12,14 +12,14 @@ public class TextureButton
 {
 	public static final int	NORMAL	= 0;
 	public static final int	HOVER	= 1;
-	public static final int	CLICK	= 2;
+	public static final int	PRESSED	= 2;
 
 	private SpriteBatch		batch;
 	/* Bottom-left corner of this button is (x, y) */
 	private int				x, y, width, height;
-	private String			location;
-	private String			text;
-	private String			suffixNormal, suffixHover, suffixClick;
+	private Texture			normal;
+	private Texture			hover;
+	private Texture			pressed;
 
 	/** Creates a new button as a texture. If the path to the file is:
 	 * <code>data/level1_normal.png</code>, <code>location</code> is set to
@@ -56,64 +56,21 @@ public class TextureButton
 			int y,
 			int width,
 			int height,
-			String location,
-			String text,
-			String suffixNormal,
-			String suffixHover,
-			String suffixClick)
+			Texture normal,
+			Texture hover,
+			Texture pressed)
 	{
 		this.batch = batch;
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		this.location = location;
-		this.text = text;
-		this.suffixNormal = suffixNormal;
-		this.suffixHover = suffixHover;
-		this.suffixClick = suffixClick;
+		this.normal = normal;
+		this.hover = hover;
+		this.pressed = pressed;
 	}
 
-	private String getInternalPath(int type)
-	{
-		String suf = "";
-		switch (type)
-		{
-			case NORMAL:
-				suf = suffixNormal;
-			break;
-			case HOVER:
-				suf = suffixHover;
-			break;
-			case CLICK:
-				suf = suffixClick;
-			break;
-		}
-		return String.format("%s/%s%s", location, text, suf);
-	}
 
-	/** Sets the suffix used in the filename.
-	 * 
-	 * @param type
-	 *            Specify whether the suffix is for NORMAL, HOVER, or CLICK.
-	 * @param suffix
-	 *            The suffix. This is the string concatenated right after
-	 *            <code>text</code>. */
-	public void setSuffix(int type, String suffix)
-	{
-		switch (type)
-		{
-			case NORMAL:
-				suffixNormal = suffix;
-			break;
-			case HOVER:
-				suffixHover = suffix;
-			break;
-			case CLICK:
-				suffixClick = suffix;
-			break;
-		}
-	}
 
 	/** Sets the texture to the appropriate texture according to the state of the
 	 * mouse. The state must be either NORMAL, HOVER, or CLICK.
@@ -122,8 +79,21 @@ public class TextureButton
 	 *            State of the mouse. Select from NORMAL, HOVER, or CLICK. */
 	public void drawTexture(int type)
 	{
-		String path = getInternalPath(type);
-		batch.draw(new Texture(path), x, y);
+		switch (type){
+		case NORMAL:{
+			batch.draw(normal, x, y, width, height);
+			break;
+		}
+		case HOVER :{
+			batch.draw(hover, x, y, width, height);
+			break;
+		}
+		case PRESSED:{
+			batch.draw(pressed, x, y, width, height);
+			break;
+		}
+		}
+		
 	}
 
 	/** Returns whether the given x and y coordinates of the mouse is above this
