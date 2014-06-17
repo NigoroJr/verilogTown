@@ -74,38 +74,33 @@ public class VerilogTown extends Game
 	 * @return The root path of this program. */
 	public static String getRootPath()
 	{
-		String path = "";
+		String path = null;
 		try
 		{
 			path = VerilogTown.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 			// Path can be a filename when executing a jar file. (filename/../)
 			// doesn't work.
 			path = new File(path).getParent() + "/../";
-			//System.out.println(path);
-			//path = path.substring(0, path.lastIndexOf("/") + 1);
-			//System.out.println(path);
-			//path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
 			// Development environment has different directory structure than
 			// that when releasing
-			if (isDevelopment()){
-				//path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
-				//path = path.substring(0, path.substring(0, path.lastIndexOf("/")).lastIndexOf("/") + 1);
+			if (isDevelopment())
 				path += "../";
-			}
-			try {
-				return (new File(path).getCanonicalPath().replaceAll("\\\\\\b", "/"));
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			/* getCanonicalPath() returns a path containing "\", which doesn't
+			 * work (even on Windows) when passing the path as a command line
+			 * argument. Thus, regular expression <code>\\\b</code> is used to
+			 * substitute '\' to '/'. */
+			path = new File(path).getCanonicalPath().replaceAll("\\\\\\b", "/");
 		}
 		catch (URISyntaxException e)
 		{
 			e.printStackTrace();
 		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 
-		return null;
+		return path;
 	}
 
 	public static boolean isDevelopment()

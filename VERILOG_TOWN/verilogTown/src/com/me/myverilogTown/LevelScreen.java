@@ -554,26 +554,10 @@ public class LevelScreen implements Screen
 
 	public void setupPaths()
 	{
-		
-		try
-		{
-			pathOfEditorJar = LevelScreen.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-		}
-		catch (URISyntaxException e2)
-		{
-			e2.printStackTrace();
-		}
-		if(isDevelopment()){
-			rootPath = pathOfEditorJar.substring(0, pathOfEditorJar.substring(0,pathOfEditorJar.lastIndexOf("/")).lastIndexOf("/") + 1);
-			rootPath = rootPath.substring(0, rootPath.substring(0,rootPath.lastIndexOf("/")).lastIndexOf("/") + 1);
-			rootPath = rootPath.substring(0, rootPath.substring(0,rootPath.lastIndexOf("/")).lastIndexOf("/") + 1);
-			pathOfEditorJar += "../../";
-		}
-		else{
-			pathOfEditorJar += "../";
-			rootPath = pathOfEditorJar + "../";
-		}
-		pathOfVerilogFile = rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/";
+		rootPath = VerilogTown.getRootPath();
+		pathOfEditorJar = rootPath + "/" + (VerilogTown.isDevelopment() ? "VERILOG_TOWN" : "jars") + "/";
+
+		pathOfVerilogFile = String.format("%s/Levels/Lv%d/VerilogFiles/", rootPath, level_number);
 	}
 
 	public void draw_score_bar()
