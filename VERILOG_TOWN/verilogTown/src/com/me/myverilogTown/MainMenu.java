@@ -62,6 +62,7 @@ public class MainMenu implements Screen
 	private double				time;
 	private TextureButton		level1;
 	private TextureButton		level2;
+	private TextureButton  		level3;
 	private TextureButton		tutorial;
 	private TextureButton		credits;
 	
@@ -72,6 +73,10 @@ public class MainMenu implements Screen
 	private Texture				level2_normal;				
 	private Texture				level2_hover;
 	private Texture				level2_pressed;
+	
+	private Texture 			level3_normal;
+	private Texture				level3_hover;
+	private Texture				level3_pressed;
 	
 	private Texture				tutorial_normal;				
 	private Texture				tutorial_hover;
@@ -100,6 +105,10 @@ public class MainMenu implements Screen
 		level2_hover = new Texture("ASSET_RESOURCES/level2_mouse_on.png");
 		level2_pressed = new Texture("ASSET_RESOURCES/level2_pressed.png");
 		
+		level3_normal = new Texture("ASSET_RESOURCES/level3_normal.png");
+		level3_hover = new Texture("ASSET_RESOURCES/level3_mouse_on.png");
+		level3_pressed = new Texture("ASSET_RESOURCES/level3_pressed.png");
+		
 		tutorial_normal = new Texture("ASSET_RESOURCES/tutorial_normal.png");
 		tutorial_hover = new Texture("ASSET_RESOURCES/tutorial_mouse_on.png");
 		tutorial_pressed = new Texture("ASSET_RESOURCES/tutorial_pressed.png");
@@ -110,8 +119,9 @@ public class MainMenu implements Screen
 		
 		level1 = new TextureButton(game.batch, 512, 805, 250, 60, level1_normal, level1_hover, level1_pressed);
 		level2 = new TextureButton(game.batch, 512, 705, 250, 60, level2_normal, level2_hover, level2_pressed);
-		tutorial = new TextureButton(game.batch, 512, 605, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
-		credits = new TextureButton(game.batch, 512, 505, 250, 60, credits_normal, credits_hover, credits_pressed);
+		level3 = new TextureButton(game.batch, 512, 605, 250, 60, level3_normal, level3_hover, level3_pressed);
+		tutorial = new TextureButton(game.batch, 512, 505, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
+		credits = new TextureButton(game.batch, 512, 405, 250, 60, credits_normal, credits_hover, credits_pressed);
 
 		time = 0;
 	}
@@ -184,6 +194,20 @@ public class MainMenu implements Screen
 		}
 		else
 			level2.drawTexture(TextureButton.NORMAL);
+		
+		if (level3.isOnButton(realX, realY))
+		{
+			if (isPressed)
+				level3.drawTexture(TextureButton.PRESSED);
+			else if (wasPressed){
+				this.dispose();
+				game.setScreen(new LevelScreen(game, 3));
+			}
+			else
+				level3.drawTexture(TextureButton.HOVER);
+		}
+		else
+			level3.drawTexture(TextureButton.NORMAL);
 
 		// Tutorial button
 		if (tutorial.isOnButton(realX, realY))
