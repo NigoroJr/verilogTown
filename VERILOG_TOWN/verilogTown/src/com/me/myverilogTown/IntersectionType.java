@@ -26,5 +26,23 @@ package com.me.myverilogTown;
 
 public enum IntersectionType
 {
+	/** The three characters proceeding THREE_WAY represents where car is headed
+	 * when entering the intersection.
+	 * 
+	 * <pre>
+	 * <code>
+	 *    | v |   |
+	 *    +---+---+---
+	 *    |   |   | <
+	 *    +---+---+---
+	 *    |   |   |
+	 *    +---+---+---
+	 *    |   | ^ |
+	 * </code>
+	 * </pre>
+	 * 
+	 * In this case, the type of this intersection is THREE_WAY_NSW, since cars
+	 * entering this intersection are headed north, south, and west as shown
+	 * with the arrows. */
 	FOUR_WAY, THREE_WAY_NSE, THREE_WAY_SEW, THREE_WAY_NSW, THREE_WAY_NEW
 }

@@ -428,7 +428,7 @@
             <type>STRAIGHT_EW</type>
         </grid>
         <grid x="9" y="14">
-            <intersection>THREE_WAY_SEW</intersection>
+            <intersection>THREE_WAY_NEW</intersection>
             <type>THREE_WAY_SEW</type>
         </grid>
         <grid x="10" y="14">

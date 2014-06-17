@@ -34,10 +34,16 @@ public class MapGridGroup extends JPanel implements MouseListener
 
 	/* Intersections */
 	public static final String	FOUR_WAY			= "FOUR_WAY";
-	public static final String	THREE_WAY_NSE		= "THREE_WAY_NSE";
-	public static final String	THREE_WAY_SEW		= "THREE_WAY_SEW";
-	public static final String	THREE_WAY_NSW		= "THREE_WAY_NSW";
-	public static final String	THREE_WAY_NEW		= "THREE_WAY_NEW";
+	/* The naming convention of three-way intersection is different from the
+	 * main game program. The reason of this is because it is easier to process
+	 * intersections by specifying them by where the intersection is open to.
+	 * Thus, the String value accounts for this different so that when exporting
+	 * to an XML file it uses the appropriate intersection name used in the
+	 * game. */
+	public static final String	THREE_WAY_NSE		= "THREE_WAY_NSW";
+	public static final String	THREE_WAY_SEW		= "THREE_WAY_NEW";
+	public static final String	THREE_WAY_NSW		= "THREE_WAY_NSE";
+	public static final String	THREE_WAY_NEW		= "THREE_WAY_SEW";
 
 	public static final String	NON_ROAD			= "NON_ROAD";
 
