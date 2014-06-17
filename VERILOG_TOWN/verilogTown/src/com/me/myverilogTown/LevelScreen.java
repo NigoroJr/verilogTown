@@ -150,7 +150,6 @@ public class LevelScreen implements Screen
 		
 		String xmlPath = String.format("%s/Levels/Lv%d/map/lv%02d.xml", VerilogTown.getRootPath(), level_number, level_number);
 		parser = new LevelXMLParser(xmlPath);
-		//parser = new LevelXMLParser();
 		/* init current level map data structure */
 		int visibleGridX = parser.getGridArray().length - 2;
 		int visibleGridY = parser.getGridArray()[0].length - 2;
@@ -167,11 +166,9 @@ public class LevelScreen implements Screen
 		thebatch = new SpriteBatch();
 		uibatch = new SpriteBatch();
 
+		/* Set map picture */
 		String pngPath = String.format("%s/Levels/Lv%d/map/lv%02d.png", VerilogTown.getRootPath(), level_number, level_number);
-		/* initialize the map - should be provided by XML read */
 		level_map = new Texture(pngPath);
-		//level_map = new Texture("data/first_map.png");
-		
 		/* create the camera for the SpriteBatch */
 		camera = new OrthographicCamera();
 		uiCamera = new OrthographicCamera();
@@ -824,12 +821,6 @@ public class LevelScreen implements Screen
 
 		/* reset position */
 		camera.position.set(camX, camY, camera.position.z);
-	}
-	
-	public static boolean isDevelopment()
-	{
-		String env = System.getenv(VERILOG_TOWN_DEVELOPMENT);
-		return env != null && !env.equals("0");
 	}
 
 	@Override
