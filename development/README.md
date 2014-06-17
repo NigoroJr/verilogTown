@@ -39,3 +39,9 @@ have GWT Designer installed.
 ## Error regarding GWT
 Refer to
 [http://stackoverflow.com/questions/16699301/unresolved-gwt-error-in-libgdx-html-project](http://stackoverflow.com/questions/16699301/unresolved-gwt-error-in-libgdx-html-project)
+
+## Configurations
+Due to different directory structures between development and deployment,
+environment variable `VERILOG_TOWN_DEVELOPMENT` must be set to a non-zero
+value when developing with Eclipse. When this environment variable is 0 or
+unset, the program will be executed in deployment mode.
