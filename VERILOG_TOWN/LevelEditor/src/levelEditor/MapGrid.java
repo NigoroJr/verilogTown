@@ -43,10 +43,10 @@ public class MapGrid extends JPanel
 	public static final String	INTER_TURN_E2SE		= "INTER_TURN_E2SE";
 
 	/* Straight roads in intersections */
-	public static final String	INTER_TURN_S2ES_STR	= "INTER_TURN_S2ES_STR";
-	public static final String	INTER_TURN_W2SW_STR	= "INTER_TURN_W2SW_STR";
-	public static final String	INTER_TURN_N2WN_STR	= "INTER_TURN_N2WN_STR";
-	public static final String	INTER_TURN_E2NE_STR	= "INTER_TURN_E2NE_STR";
+	public static final String	INTER_TURN_S2ES_STR	= "INTER_TURN_E2SE_STR";
+	public static final String	INTER_TURN_W2SW_STR	= "INTER_TURN_S2WS_STR";
+	public static final String	INTER_TURN_N2WN_STR	= "INTER_TURN_W2NW_STR";
+	public static final String	INTER_TURN_E2NE_STR	= "INTER_TURN_N2EN_STR";
 
 	public static final String	NON_ROAD			= "NON_ROAD";
 
