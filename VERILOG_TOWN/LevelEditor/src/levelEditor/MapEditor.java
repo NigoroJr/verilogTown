@@ -318,7 +318,8 @@ public class MapEditor extends JDialog
 		for (int i = 0; i < sizeX / 2; i++)
 		{
 			String type = gridGroups[0][i].getType();
-			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
 			Matcher m = p.matcher(type);
 			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
 				return false;
@@ -357,7 +358,8 @@ public class MapEditor extends JDialog
 		for (int i = 0; i < sizeX / 2; i++)
 		{
 			String type = gridGroups[sizeY / 2 - 1][i].getType();
-			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
 			Matcher m = p.matcher(type);
 			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
 				return false;
@@ -396,7 +398,8 @@ public class MapEditor extends JDialog
 		for (int i = 0; i < sizeY / 2; i++)
 		{
 			String type = gridGroups[i][sizeX / 2 - 1].getType();
-			Pattern p = Pattern.compile("THREE_WAY_(?![^E]{3})");
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^W]{3})");
 			Matcher m = p.matcher(type);
 			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
 				return false;
@@ -435,7 +438,8 @@ public class MapEditor extends JDialog
 		for (int i = 0; i < sizeY / 2; i++)
 		{
 			String type = gridGroups[i][0].getType();
-			Pattern p = Pattern.compile("THREE_WAY_(?![^W]{3})");
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^E]{3})");
 			Matcher m = p.matcher(type);
 			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
 				return false;
