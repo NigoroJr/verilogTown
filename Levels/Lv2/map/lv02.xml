@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<level lv="3">
+<level lv="2">
     <map size_x="22" size_y="22">
         <grid x="5" y="21">
             <type>START_NEDGE2S</type>
@@ -7,10 +7,10 @@
         <grid x="6" y="21">
             <type>END_N2NEDGE</type>
         </grid>
-        <grid x="13" y="21">
+        <grid x="15" y="21">
             <type>START_NEDGE2S</type>
         </grid>
-        <grid x="14" y="21">
+        <grid x="16" y="21">
             <type>END_N2NEDGE</type>
         </grid>
         <grid x="6" y="0">
@@ -25,10 +25,10 @@
         <grid x="9" y="0">
             <type>END_S2SEDGE</type>
         </grid>
-        <grid x="14" y="0">
+        <grid x="16" y="0">
             <type>START_SEDGE2N</type>
         </grid>
-        <grid x="13" y="0">
+        <grid x="15" y="0">
             <type>END_S2SEDGE</type>
         </grid>
         <grid x="21" y="16">
@@ -37,10 +37,10 @@
         <grid x="21" y="15">
             <type>END_E2EEDGE</type>
         </grid>
-        <grid x="21" y="10">
+        <grid x="21" y="8">
             <type>START_EEDGE2W</type>
         </grid>
-        <grid x="21" y="9">
+        <grid x="21" y="7">
             <type>END_E2EEDGE</type>
         </grid>
         <grid x="0" y="15">
@@ -74,16 +74,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="20">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="20">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="19">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="19">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="20">
             <type>NON_ROAD</type>
@@ -122,28 +122,28 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="20">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="20">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="19">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="19">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="20">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="20">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="19">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="19">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="20">
             <type>NON_ROAD</type>
@@ -194,16 +194,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="18">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="18">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="17">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="17">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="18">
             <type>NON_ROAD</type>
@@ -242,28 +242,28 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="18">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="18">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="17">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="17">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="18">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="18">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="17">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="17">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="18">
             <type>NON_ROAD</type>
@@ -290,126 +290,124 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="1" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="2" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="1" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="2" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="3" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="4" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="3" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="4" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="5" y="16">
-            <intersection>FOUR_WAY</intersection>
-            <type>FOUR_WAY</type>
+            <intersection>FOUR_WAY</intersection><type>INTER_TURN_S2WS</type>
         </grid>
         <grid x="6" y="16">
-            <type>FOUR_WAY</type>
+            <type>INTER_TURN_W2NW</type>
         </grid>
         <grid x="5" y="15">
-            <type>FOUR_WAY</type>
+            <type>INTER_TURN_E2SE</type>
         </grid>
         <grid x="6" y="15">
-            <type>FOUR_WAY</type>
+            <type>INTER_TURN_N2EN</type>
         </grid>
         <grid x="7" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="8" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="7" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="8" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="9" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="10" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="9" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="10" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="11" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="12" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="11" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="12" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="13" y="16">
-            <intersection>FOUR_WAY</intersection>
-            <type>FOUR_WAY</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="14" y="16">
-            <type>FOUR_WAY</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="13" y="15">
-            <type>FOUR_WAY</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="14" y="15">
-            <type>FOUR_WAY</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="15" y="16">
-            <type>STRAIGHT_EW</type>
+            <intersection>FOUR_WAY</intersection><type>INTER_TURN_S2WS</type>
         </grid>
         <grid x="16" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>INTER_TURN_W2NW</type>
         </grid>
         <grid x="15" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>INTER_TURN_E2SE</type>
         </grid>
         <grid x="16" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>INTER_TURN_N2EN</type>
         </grid>
         <grid x="17" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="18" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="17" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="18" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="19" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="20" y="16">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="19" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="20" y="15">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="1" y="14">
             <type>NON_ROAD</type>
@@ -436,16 +434,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="14">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="14">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="13">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="13">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="14">
             <type>NON_ROAD</type>
@@ -484,28 +482,28 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="14">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="14">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="13">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="13">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="14">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="14">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="13">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="13">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="14">
             <type>NON_ROAD</type>
@@ -556,16 +554,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="12">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="12">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="11">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="11">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="12">
             <type>NON_ROAD</type>
@@ -604,28 +602,28 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="12">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="12">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="11">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="11">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="12">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="12">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="11">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="11">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="12">
             <type>NON_ROAD</type>
@@ -676,16 +674,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="10">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="10">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="9">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="9">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="10">
             <type>NON_ROAD</type>
@@ -700,77 +698,76 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="9" y="10">
-            <type>CORNER_SE</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="10" y="10">
-            <type>CORNER_SE</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="9" y="9">
-            <type>CORNER_SE</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="10" y="9">
-            <type>CORNER_SE</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="11" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="12" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="11" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="12" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="10">
-            <intersection>FOUR_WAY</intersection>
-            <type>FOUR_WAY</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="10">
-            <type>FOUR_WAY</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="9">
-            <type>FOUR_WAY</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="9">
-            <type>FOUR_WAY</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="18" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="17" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="18" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="19" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="20" y="10">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="19" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="20" y="9">
-            <type>STRAIGHT_EW</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="1" y="8">
             <type>NON_ROAD</type>
@@ -797,16 +794,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="8">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="8">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="7">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="7">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="8">
             <type>NON_ROAD</type>
@@ -821,76 +818,76 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="9" y="8">
-            <type>STRAIGHT_NS</type>
+            <type>CORNER_ROAD_W2S</type>
         </grid>
         <grid x="10" y="8">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="9" y="7">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="10" y="7">
-            <type>STRAIGHT_NS</type>
+            <type>CORNER_ROAD_N2E</type>
         </grid>
         <grid x="11" y="8">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="12" y="8">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="11" y="7">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="12" y="7">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="13" y="8">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="14" y="8">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="13" y="7">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="14" y="7">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="15" y="8">
-            <type>NON_ROAD</type>
+            <intersection>FOUR_WAY</intersection><type>INTER_TURN_S2WS</type>
         </grid>
         <grid x="16" y="8">
-            <type>NON_ROAD</type>
+            <type>INTER_TURN_W2NW</type>
         </grid>
         <grid x="15" y="7">
-            <type>NON_ROAD</type>
+            <type>INTER_TURN_E2SE</type>
         </grid>
         <grid x="16" y="7">
-            <type>NON_ROAD</type>
+            <type>INTER_TURN_N2EN</type>
         </grid>
         <grid x="17" y="8">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="18" y="8">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="17" y="7">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="18" y="7">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="19" y="8">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="20" y="8">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_W2W</type>
         </grid>
         <grid x="19" y="7">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="20" y="7">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="1" y="6">
             <type>NON_ROAD</type>
@@ -917,16 +914,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="6">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="6">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="5">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="5">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="6">
             <type>NON_ROAD</type>
@@ -941,16 +938,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="9" y="6">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="10" y="6">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="9" y="5">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="10" y="5">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="11" y="6">
             <type>NON_ROAD</type>
@@ -965,28 +962,28 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="6">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="6">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="5">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="5">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="6">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="6">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="5">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="5">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="6">
             <type>NON_ROAD</type>
@@ -1037,16 +1034,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="4">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="4">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="3">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="3">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="4">
             <type>NON_ROAD</type>
@@ -1061,16 +1058,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="9" y="4">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="10" y="4">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="9" y="3">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="10" y="3">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="11" y="4">
             <type>NON_ROAD</type>
@@ -1085,28 +1082,28 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="4">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="4">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="3">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="3">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="4">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="4">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="3">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="3">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="4">
             <type>NON_ROAD</type>
@@ -1157,16 +1154,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="5" y="2">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="2">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="5" y="1">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="6" y="1">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="7" y="2">
             <type>NON_ROAD</type>
@@ -1181,16 +1178,16 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="9" y="2">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="10" y="2">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="9" y="1">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="10" y="1">
-            <type>STRAIGHT_NS</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="11" y="2">
             <type>NON_ROAD</type>
@@ -1205,28 +1202,28 @@
             <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="2">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="2">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="13" y="1">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="14" y="1">
-            <type>STRAIGHT_NS</type>
+            <type>NON_ROAD</type>
         </grid>
         <grid x="15" y="2">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="2">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="15" y="1">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_S2S</type>
         </grid>
         <grid x="16" y="1">
-            <type>NON_ROAD</type>
+            <type>STRAIGHT_ROAD_N2N</type>
         </grid>
         <grid x="17" y="2">
             <type>NON_ROAD</type>
@@ -1253,11 +1250,4 @@
             <type>NON_ROAD</type>
         </grid>
     </map>
-    <cars>
-        <car>
-            <start x="7" y="0"/>
-            <end x="14" y="0"/>
-            <delay>400</delay>
-        </car>
-    </cars>
 </level>
