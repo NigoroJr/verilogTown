@@ -1238,4 +1238,56 @@
             <type>NON_ROAD</type>
         </grid>
     </map>
+    <cars>
+        <car>
+            <start x="5" y="21" />
+            <end x="5" y="0" />
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="6" y="0" />
+            <end x="14" y="21" />
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="21" y="12" />
+            <end x="14" y="21" />
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="14" y="0" />
+            <end x="0" y="12" />
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="0" y="11" />
+            <end x="21" y="11" />
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="5" y="21" />
+            <end x="13" y="0" />
+            <delay>250</delay>
+        </car>
+        <car>
+            <start x="6" y="0" />
+            <end x="14" y="21" />
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="0" y="11" />
+            <end x="6" y="21" />
+            <delay>300</delay>
+        </car>
+        <car>
+            <start x="0" y="11" />
+            <end x="6" y="21" />
+            <delay>350</delay>
+        </car>
+        <car>
+            <start x="13" y="21" />
+            <end x="5" y="0" />
+            <delay>300</delay>
+        </car>
+    </cars>
 </level>
