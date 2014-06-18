@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<level lv="2">
+<level lv="0">
     <map size_x="22" size_y="22">
         <grid x="8" y="0">
             <type>START_SEDGE2N</type>
@@ -176,7 +176,8 @@
             <type>STRAIGHT_ROAD_E2E</type>
         </grid>
         <grid x="7" y="18">
-            <intersection>THREE_WAY_NEW</intersection><type>INTER_TURN_W2SW_STR</type>
+            <intersection>THREE_WAY_NEW</intersection>
+            <type>INTER_TURN_S2WS</type>
         </grid>
         <grid x="8" y="18">
             <type>STRAIGHT_ROAD_W2W</type>
@@ -1222,72 +1223,64 @@
     </map>
     <cars>
         <car>
-<<<<<<< Updated upstream
             <start x="8" y="0" />
-            <end x="21" y="17"/>
+            <end x="21" y="17" />
             <delay>100</delay>
         </car>
+        <car>
+            <start x="8" y="0" />
+            <end x="0" y="18" />
+            <delay>150</delay>
+        </car>
+        <car>
+            <start x="8" y="0" />
+            <end x="21" y="17" />
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="8" y="0" />
+            <end x="0" y="18" />
+            <delay>250</delay>
+        </car>
+        <car>
+            <start x="21" y="18" />
+            <end x="7" y="0" />
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="21" y="18" />
+            <end x="0" y="18" />
+            <delay>150</delay>
+        </car>
+        <car>
+            <start x="21" y="18" />
+            <end x="7" y="0" />
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="21" y="18" />
+            <end x="0" y="18" />
+            <delay>250</delay>
+        </car>
+        <car>
+            <start x="0" y="17" />
+            <end x="7" y="0" />
+            <delay>100</delay>
+        </car>
+        <car>
+            <start x="0" y="17" />
+            <end x="21" y="17" />
+            <delay>150</delay>
+        </car>
+        <car>
+            <start x="0" y="17" />
+            <end x="7" y="0" />
+            <delay>200</delay>
+        </car>
+        <car>
+            <start x="0" y="17" />
+            <end x="21" y="17" />
+            <delay>250</delay>
+        </car>  
     </cars>
-=======
-        <start x="10" y="0" />
-        <end x="21" y="13" />
-        <delay>0</delay>
-    </car>
-    <car>
-        <start x="10" y="0" />
-        <end x="0" y="14" />
-        <delay>25</delay>
-    </car>
-    <car>
-        <start x="10" y="0" />
-        <end x="21" y="13" />
-        <delay>50</delay>
-    </car>
-    <car>
-        <start x="10" y="0" />
-        <end x="0" y="14" />
-        <delay>75</delay>
-    </car>
-    <car>
-        <start x="21" y="14" />
-        <end x="9" y="0" />
-        <delay>0</delay>
-    </car>
-    <car>
-        <start x="21" y="14" />
-        <end x="0" y="14" />
-        <delay>25</delay>
-    </car>
-    <car>
-        <start x="21" y="14" />
-        <end x="9" y="0" />
-        <delay>50</delay>
-    </car>
-    <car>
-        <start x="21" y="14" />
-        <end x="0" y="14" />
-        <delay>75</delay>
-    </car>
-    <car>
-        <start x="0" y="13" />
-        <end x="9" y="0" />
-        <delay>0</delay>
-    </car>
-    <car>
-        <start x="0" y="13" />
-        <end x="21" y="13" />
-        <delay>25</delay>
-    </car>
-    <car>
-        <start x="0" y="13" />
-        <end x="9" y="0" />
-        <delay>50</delay>
-    </car>
-    <car>
-        <start x="0" y="13" />
-        <end x="21" y="13" />
-        <delay>75</delay>
-    </car>  
-  </cars>
->>>>>>> Stashed changes
 </level>
