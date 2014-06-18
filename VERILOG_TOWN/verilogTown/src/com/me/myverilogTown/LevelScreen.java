@@ -497,9 +497,8 @@ public class LevelScreen implements Screen
 			String verilogFileName = "Traffic_signal_set_" + counter;
 
 			jar_path = this.pathOfEditorJar + "VerilogEditor.jar";
+			
 			String OSName = System.getProperty("os.name");
-			if (OSName.startsWith("Windows"))
-				jar_path = jar_path.substring(1);
 			List<String> list = new ArrayList<String>();
 			list.add("java");
 			list.add("-jar");
@@ -554,10 +553,14 @@ public class LevelScreen implements Screen
 
 	public void setupPaths()
 	{
-		rootPath = VerilogTown.getRootPath();
-		pathOfEditorJar = rootPath + "/" + (VerilogTown.isDevelopment() ? "VERILOG_TOWN" : "jars") + "/";
-
-		pathOfVerilogFile = String.format("%s/Levels/Lv%d/VerilogFiles/", rootPath, level_number);
+		
+		if(VerilogTown.isDevelopment())
+			pathOfEditorJar = VerilogTown.getRootPath() + "/VERILOG_TOWN/";
+		else
+			pathOfEditorJar = VerilogTown.getRootPath() + "/jars/";
+		
+		rootPath = VerilogTown.getRootPath() + "/";
+		pathOfVerilogFile = rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/";
 	}
 
 	public void draw_score_bar()
