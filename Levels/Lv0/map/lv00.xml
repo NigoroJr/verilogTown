@@ -1222,9 +1222,72 @@
     </map>
     <cars>
         <car>
+<<<<<<< Updated upstream
             <start x="8" y="0" />
             <end x="21" y="17"/>
             <delay>100</delay>
         </car>
     </cars>
+=======
+        <start x="10" y="0" />
+        <end x="21" y="13" />
+        <delay>0</delay>
+    </car>
+    <car>
+        <start x="10" y="0" />
+        <end x="0" y="14" />
+        <delay>25</delay>
+    </car>
+    <car>
+        <start x="10" y="0" />
+        <end x="21" y="13" />
+        <delay>50</delay>
+    </car>
+    <car>
+        <start x="10" y="0" />
+        <end x="0" y="14" />
+        <delay>75</delay>
+    </car>
+    <car>
+        <start x="21" y="14" />
+        <end x="9" y="0" />
+        <delay>0</delay>
+    </car>
+    <car>
+        <start x="21" y="14" />
+        <end x="0" y="14" />
+        <delay>25</delay>
+    </car>
+    <car>
+        <start x="21" y="14" />
+        <end x="9" y="0" />
+        <delay>50</delay>
+    </car>
+    <car>
+        <start x="21" y="14" />
+        <end x="0" y="14" />
+        <delay>75</delay>
+    </car>
+    <car>
+        <start x="0" y="13" />
+        <end x="9" y="0" />
+        <delay>0</delay>
+    </car>
+    <car>
+        <start x="0" y="13" />
+        <end x="21" y="13" />
+        <delay>25</delay>
+    </car>
+    <car>
+        <start x="0" y="13" />
+        <end x="9" y="0" />
+        <delay>50</delay>
+    </car>
+    <car>
+        <start x="0" y="13" />
+        <end x="21" y="13" />
+        <delay>75</delay>
+    </car>  
+  </cars>
+>>>>>>> Stashed changes
 </level>
