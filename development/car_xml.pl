@@ -68,11 +68,11 @@ while (1) {
     %car = %{$cars[$id]} if defined $id and defined $cars[$id];
 
     if ($attr =~ /s(tart)?/) {
-        my ($x, $y) = split /\s*,\s*/, $val;
+        my ($x, $y) = split /\s*[, ]\s*/, $val;
         $car{start} = [$x, $y];
     }
     elsif ($attr =~ /e(nd)?/) {
-        my ($x, $y) = split /\s*,\s*/, $val;
+        my ($x, $y) = split /\s*[, ]\s*/, $val;
         $car{end} = [$x, $y];
     }
     elsif ($attr =~ /d(elay)?/) {
