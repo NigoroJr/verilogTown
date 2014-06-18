@@ -568,8 +568,8 @@ public class MapGridGroup extends JPanel implements MouseListener
 
 			Element type = doc.createElement("type");
 			// "_STR" is used to identify which image to use for intersections
-			String gridType = this.type.replaceFirst("_STR", "");
-			type.appendChild(doc.createTextNode(gridType));
+			// String gridType = this.type.replaceFirst("_STR", "");
+			type.appendChild(doc.createTextNode(grids[i].getType()));
 
 			// Add <intersection> if it's the top-left of an intersection
 			if (grids[i] == topLeft && (this.type.startsWith("THREE_WAY") || this.type.equals(FOUR_WAY)))
