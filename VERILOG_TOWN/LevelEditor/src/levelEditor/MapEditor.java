@@ -10,7 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -270,12 +272,17 @@ public class MapEditor extends JDialog
 			e.printStackTrace();
 		}
 		DOMSource source = new DOMSource(doc);
-		StreamResult stream = new StreamResult(System.out);
 		try
 		{
+			PrintWriter pw = new PrintWriter(new File("foo.xml"));
+			StreamResult stream = new StreamResult(pw);
 			transformer.transform(source, stream);
 		}
 		catch (TransformerException e)
+		{
+			e.printStackTrace();
+		}
+		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
 		}
