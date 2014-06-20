@@ -112,7 +112,11 @@ public class MainMenu implements Screen
 		tutorial_normal = new Texture("ASSET_RESOURCES/tutorial_normal.png");
 		tutorial_hover = new Texture("ASSET_RESOURCES/tutorial_mouse_on.png");
 		tutorial_pressed = new Texture("ASSET_RESOURCES/tutorial_pressed.png");
-		
+		/*
+		tutorial_normal = new Texture("ASSET_RESOURCES/lv00_thumbnail_normal.png");
+		tutorial_hover = new Texture("ASSET_RESOURCES/lv00_thumbnail_mouse_on.png");
+		tutorial_pressed = new Texture("ASSET_RESOURCES/lv00_thumbnail_pressed.png");
+		*/
 		credits_normal = new Texture("ASSET_RESOURCES/credits_normal.png");
 		credits_hover = new Texture("ASSET_RESOURCES/credits_mouse_on.png");
 		credits_pressed = new Texture("ASSET_RESOURCES/credits_pressed.png");
@@ -122,7 +126,7 @@ public class MainMenu implements Screen
 		level3 = new TextureButton(game.batch, 512, 605, 250, 60, level3_normal, level3_hover, level3_pressed);
 		tutorial = new TextureButton(game.batch, 512, 505, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
 		credits = new TextureButton(game.batch, 512, 405, 250, 60, credits_normal, credits_hover, credits_pressed);
-
+		
 		time = 0;
 	}
 
