@@ -177,17 +177,43 @@ sub correct_grids {
 }
 
 sub help {  # {{{
-    print "Empty line to quit\n";
     print <<EOF
 
 Usage: $0 <XML file>
 
-    If the XML file doesn't exist, it will be created after the car
-    information has been input.
+    The XML file needs to have the <map> information. XML file will be updated
+    with the car information.
 
 Commands:
-    // TODO
+    [Car ID] <Start ID> <End ID> <Delay>
 
+        Car ID is optional. Start and end ID can be seen with
+
+            l se
+
+        When the car ID is specified, car with that ID will get updated to the
+        given value. When updating the car, you must specify all three values.
+
+    ( l | ls | list )
+
+        Lists the cars that are currently registered.
+
+    l se
+
+        Lists all the starting and ending points of the map.
+
+    ( r | rm | remove ) <Car ID>
+
+        Removes the car specified by the ID from the list.
+
+    ( h | help )
+
+        Displays this help message.
+
+    ( q | quit )
+
+        Updates the XML file with the car information and quits the program.
+        Entering an empty line will also quit the program.
 EOF
     ;
 }   # }}}
