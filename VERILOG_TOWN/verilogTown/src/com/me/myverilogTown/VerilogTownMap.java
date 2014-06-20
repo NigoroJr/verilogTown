@@ -36,6 +36,7 @@ public class VerilogTownMap
 	private int				grid_x;
 	private int				grid_y;
 	public GridNode			grid[][];
+	public int				forced_cars;
 	private int				markPathCount;		// used as a count for a mark
 												// path idetifier
 	public TrafficControl	traffic_signals[];
@@ -46,6 +47,7 @@ public class VerilogTownMap
 		this.grid_x = size_x + 2;
 		this.grid_y = size_y + 2;
 		this.markPathCount = 0;
+
 
 		this.grid = new GridNode[size_x + 2][size_y + 2];
 
@@ -232,6 +234,9 @@ public class VerilogTownMap
 		/* Error in that it can't find a path */
 		/* update cars end point */
 		the_car.set_end_point_and_fail_on_getting_car_accross(possible_end);
+		if(!the_car.get_forced_turned())
+			forced_cars++;
+		the_car.set_forced_turned(true);
 		Gdx.app.log("verilogTownMap-findPath", "Car couldn't find path so forcing to new end");
 
 		while (!queue.isEmpty())

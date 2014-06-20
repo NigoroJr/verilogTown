@@ -19,7 +19,10 @@ public class ScoreScreen implements Screen
 	private Texture					colon_chiller;
 	private int						level_number;
 	private int						success_cars;
-	private int						crash_cars;
+	private int						failed_cars;
+	private int 					deviated_cars;
+	private int						three_way_int;
+	private int						four_way_int;
 	private double					playTime;
 	
 	private boolean					isPressed		= false;
@@ -51,14 +54,17 @@ public class ScoreScreen implements Screen
 	private Texture					next_level_hover;
 	private Texture					next_level_pressed;
 	
-	public ScoreScreen (VerilogTown game, int level_number, int car_success, int car_crash, double time){
+	public ScoreScreen (VerilogTown game, int level_number, int car_success, int car_failed,
+						double time, int three_way_int, int four_way_int){
 		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, SCORE_SCREEN_WIDTH, SCORE_SCREEN_HEIGHT);
 		
 		this.level_number = level_number;
 		this.success_cars = car_success;
-		this.crash_cars = car_crash;
+		this.failed_cars = car_failed;
+		this.three_way_int = three_way_int;
+		this.four_way_int = four_way_int;
 		this.playTime = time;
 		numbers_chiller = new Texture[10];
 		background = new Texture("data/level_finish.png");
@@ -115,21 +121,23 @@ public class ScoreScreen implements Screen
 		
 		game.batch.draw(background, 0, 0, SCORE_SCREEN_WIDTH, SCORE_SCREEN_HEIGHT);
 		
-		game.batch.draw(numbers_chiller[level_number % 10], 578, 1042, 80, 80);
-
-		game.batch.draw(numbers_chiller[success_cars / 100], 780, 815, 80, 80);
-		game.batch.draw(numbers_chiller[(success_cars % 100) / 10], 880, 815, 80, 80);
-		game.batch.draw(numbers_chiller[success_cars % 10], 980, 815, 80, 80);
-
-		game.batch.draw(numbers_chiller[crash_cars / 100], 780, 600, 80, 80);
-		game.batch.draw(numbers_chiller[(crash_cars % 100) / 10], 880, 600, 80, 80);
-		game.batch.draw(numbers_chiller[crash_cars % 10], 980, 600, 80, 80);
-
-		game.batch.draw(numbers_chiller[((int) playTime / 60) / 10], 780, 375, 80, 80);
-		game.batch.draw(numbers_chiller[((int) playTime / 60) % 10], 840, 375, 80, 80);
-		game.batch.draw(colon_chiller, 890, 375, 80, 80);
-		game.batch.draw(numbers_chiller[((int) playTime % 60) / 10], 940, 375, 80, 80);
-		game.batch.draw(numbers_chiller[((int) playTime % 60) % 10], 1000, 375, 80, 80);
+		game.batch.draw(numbers_chiller[level_number % 10], 578, 1088, 80, 80);
+		
+		game.batch.draw(numbers_chiller[success_cars / 100], 725, 660, 75, 75);
+		game.batch.draw(numbers_chiller[(success_cars % 100) / 10], 800, 660, 75, 75);
+		game.batch.draw(numbers_chiller[success_cars % 10], 875, 660, 75, 75);
+		
+		game.batch.draw(numbers_chiller[failed_cars / 100], 725, 420, 75, 75);
+		game.batch.draw(numbers_chiller[(failed_cars % 100) / 10], 800, 420, 75, 75);
+		game.batch.draw(numbers_chiller[failed_cars % 10], 875, 420, 75, 75);
+		
+		game.batch.draw(numbers_chiller[((int) playTime / 60) / 10], 725, 895, 75, 75);
+		game.batch.draw(numbers_chiller[((int) playTime / 60) % 10], 790, 895, 75, 75);
+		game.batch.draw(colon_chiller, 840, 895, 75, 75);
+		game.batch.draw(numbers_chiller[((int) playTime % 60) / 10], 895, 895, 75, 75);
+		game.batch.draw(numbers_chiller[((int) playTime % 60) % 10], 960, 895, 75, 75);
+		
+		
 		
 		if(main_menu.isOnButton(realX, realY)){
 			if (isPressed)

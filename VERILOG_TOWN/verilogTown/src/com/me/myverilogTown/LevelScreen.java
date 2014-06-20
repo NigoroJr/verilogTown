@@ -82,6 +82,7 @@ public class LevelScreen implements Screen
 	private Texture				level_finish;
 	private Texture[]			numbers_chiller;
 	private Texture				colon_chiller;
+	private Texture				press_h;
 
 	private int					LEVEL_WIDTH;
 	private int					LEVEL_HEIGHT;
@@ -90,6 +91,8 @@ public class LevelScreen implements Screen
 	private Boolean				isSimulationPaused;
 	private int					success_cars;
 	private int					crash_cars;
+	private int					forced_cars;
+	private int 				failed_cars;
 	private Random				random_number;
 	private Rectangle			glViewport;
 
@@ -136,6 +139,9 @@ public class LevelScreen implements Screen
 	private boolean[]			failed_compile_traffic;
 
 	private int					level_number;
+	
+	private int					three_way_int = 0;
+	private int 				four_way_int = 0;
 
 	public LevelScreen(final VerilogTown gam, int level_number)
 	{
@@ -150,6 +156,13 @@ public class LevelScreen implements Screen
 		
 		String xmlPath = String.format("%s/Levels/Lv%d/map/lv%02d.xml", VerilogTown.getRootPath(), level_number, level_number);
 		parser = new LevelXMLParser(xmlPath);
+		
+		for (TrafficControl tc : parser.getTrafficControls()){
+			if (tc.getIntersectionType() == IntersectionType.FOUR_WAY)
+				four_way_int++;
+			else
+				three_way_int++;
+		}
 		/* init current level map data structure */
 		int visibleGridX = parser.getGridArray().length - 2;
 		int visibleGridY = parser.getGridArray()[0].length - 2;
@@ -161,7 +174,6 @@ public class LevelScreen implements Screen
 		this.level_number = level_number;
 		/* Read XML */
 		clevel.readMap(parser);
-
 		/* setup the sprites. First is for the cars and Second is for the UI */
 		thebatch = new SpriteBatch();
 		uibatch = new SpriteBatch();
@@ -244,6 +256,8 @@ public class LevelScreen implements Screen
 		help_menu.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		level_finish = new Texture("data/level_finish.png");
 		level_finish.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		press_h = new Texture("data/press_h_for_help.png");
+		press_h.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
 		inputProcessor = new InputHandler(camera, LEVEL_WIDTH, LEVEL_HEIGHT, SCORE_BAR_HEIGHT, disableZoom);
 
@@ -342,8 +356,10 @@ public class LevelScreen implements Screen
 			/* IF - tick happends and simulating then simulate a time frame */
 			/* Gdx.app.log("Time Since last simulation:", "="+ Time); */
 			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number, Compiler);
-			this.success_cars = levelLogic.success_cars;
 			this.crash_cars = levelLogic.crash_cars;
+			this.forced_cars = clevel.forced_cars;
+			this.failed_cars = clevel.forced_cars + levelLogic.crash_cars;
+			this.success_cars = levelLogic.success_cars - clevel.forced_cars;
 			this.playTime += Gdx.graphics.getDeltaTime();
 		}
 
@@ -421,26 +437,27 @@ public class LevelScreen implements Screen
 			}
 			thebatch.draw(level_finish, 0, finishYPosition, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
 
-			thebatch.draw(numbers_chiller[level_number % 10], 578, finishYPosition + 1042, 80, 80);
+			thebatch.draw(numbers_chiller[level_number % 10], 578, finishYPosition + 1088, 80, 80);
 
-			thebatch.draw(numbers_chiller[success_cars / 100], 780, finishYPosition + 815, 80, 80);
-			thebatch.draw(numbers_chiller[(success_cars % 100) / 10], 880, finishYPosition + 815, 80, 80);
-			thebatch.draw(numbers_chiller[success_cars % 10], 980, finishYPosition + 815, 80, 80);
+			thebatch.draw(numbers_chiller[success_cars / 100], 725, finishYPosition + 660, 75, 75);
+			thebatch.draw(numbers_chiller[(success_cars % 100) / 10], 800, finishYPosition + 660, 75, 75);
+			thebatch.draw(numbers_chiller[success_cars % 10], 875, finishYPosition + 660, 75, 75);
+			
+			thebatch.draw(numbers_chiller[failed_cars / 100], 725, finishYPosition + 420, 75, 75);
+			thebatch.draw(numbers_chiller[(failed_cars % 100) / 10], 800, finishYPosition + 420, 75, 75);
+			thebatch.draw(numbers_chiller[failed_cars % 10], 875, finishYPosition + 420, 75, 75);
 
-			thebatch.draw(numbers_chiller[crash_cars / 100], 780, finishYPosition + 600, 80, 80);
-			thebatch.draw(numbers_chiller[(crash_cars % 100) / 10], 880, finishYPosition + 600, 80, 80);
-			thebatch.draw(numbers_chiller[crash_cars % 10], 980, finishYPosition + 600, 80, 80);
-
-			thebatch.draw(numbers_chiller[((int) playTime / 60) / 10], 780, finishYPosition + 375, 80, 80);
-			thebatch.draw(numbers_chiller[((int) playTime / 60) % 10], 840, finishYPosition + 375, 80, 80);
-			thebatch.draw(colon_chiller, 890, finishYPosition + 375, 80, 80);
-			thebatch.draw(numbers_chiller[((int) playTime % 60) / 10], 940, finishYPosition + 375, 80, 80);
-			thebatch.draw(numbers_chiller[((int) playTime % 60) % 10], 1000, finishYPosition + 375, 80, 80);
+			thebatch.draw(numbers_chiller[((int) playTime / 60) / 10], 725, finishYPosition + 895, 75, 75);
+			thebatch.draw(numbers_chiller[((int) playTime / 60) % 10], 790, finishYPosition + 895, 75, 75);
+			thebatch.draw(colon_chiller, 840, finishYPosition + 895, 75, 75);
+			thebatch.draw(numbers_chiller[((int) playTime % 60) / 10], 895, finishYPosition + 895, 75, 75);
+			thebatch.draw(numbers_chiller[((int) playTime % 60) % 10], 960, finishYPosition + 895, 75, 75);
 
 			if (finishYPosition == 0 && finish_time >= 0.7)
 			{
 				this.dispose();
-				game.setScreen(new ScoreScreen(game, level_number, success_cars, crash_cars, playTime));
+				game.setScreen(new ScoreScreen(game, level_number, success_cars, failed_cars, playTime, 
+								 three_way_int, four_way_int));
 			}
 			thebatch.end();
 		}
@@ -568,7 +585,8 @@ public class LevelScreen implements Screen
 		uibatch.begin();
 
 		uibatch.draw(top_score_bar, 0, LEVEL_HEIGHT, LEVEL_WIDTH, 100);
-
+		if(success_cars < 0)
+			success_cars = 0;
 		uibatch.draw(check_mark, 70, LEVEL_HEIGHT + 18);
 		uibatch.draw(border, 140, LEVEL_HEIGHT + 18);
 		int successedCars3 = success_cars / 100;
@@ -582,13 +600,13 @@ public class LevelScreen implements Screen
 
 		uibatch.draw(crash, 380, LEVEL_HEIGHT + 18);
 		uibatch.draw(border, 450, LEVEL_HEIGHT + 18);
-		int crashedCars3 = crash_cars / 100;
+		int crashedCars3 = failed_cars / 100;
 		uibatch.draw(numbers[crashedCars3], 450, LEVEL_HEIGHT + 18);
 		uibatch.draw(border, 520, LEVEL_HEIGHT + 18);
-		int crashedCars2 = (crash_cars - crashedCars3 * 100) / 10;
+		int crashedCars2 = (failed_cars - crashedCars3 * 100) / 10;
 		uibatch.draw(numbers[crashedCars2], 520, LEVEL_HEIGHT + 18);
 		uibatch.draw(border, 590, LEVEL_HEIGHT + 18);
-		int crashedCars1 = crash_cars % 10;
+		int crashedCars1 = failed_cars % 10;
 		uibatch.draw(numbers[crashedCars1], 590, LEVEL_HEIGHT + 18);
 
 		uibatch.draw(letterT, 700, LEVEL_HEIGHT + 18);
@@ -609,6 +627,8 @@ public class LevelScreen implements Screen
 		uibatch.draw(numbers[playTimeSecond / 10], 1114, LEVEL_HEIGHT + 18);
 		uibatch.draw(border, 1184, LEVEL_HEIGHT + 18);
 		uibatch.draw(numbers[playTimeSecond % 10], 1184, LEVEL_HEIGHT + 18);
+		
+		uibatch.draw(press_h, 900, 10, 400, 100);
 
 		uibatch.end();
 	}

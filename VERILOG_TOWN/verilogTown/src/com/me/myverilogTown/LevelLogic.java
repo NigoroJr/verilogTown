@@ -29,11 +29,11 @@ import VerilogSimulator.Parse;
 
 public class LevelLogic
 {
-	private int		time_step;
-	private int		count_cars_done;
-	private int		num_general_sensors;
-	public int		success_cars	= 0;
-	public int		crash_cars		= 0;
+	private int				time_step;
+	private int				count_cars_done;
+	private int				num_general_sensors;
+	public int				success_cars	= 0;
+	public int				crash_cars		= 0;
 	private Queue<Integer>	car_processing_q;
 	private Queue<Integer>	car_crashing_q;
 
@@ -188,7 +188,7 @@ public class LevelLogic
 				}
 			}
 		}
-
+		
 		if (count_cars_done >= num_cars)
 		{
 			/* IF all cars done then record this */

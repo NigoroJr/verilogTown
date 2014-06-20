@@ -75,6 +75,8 @@ public class Car
 	private float				animating_turn_x;
 	private float				animating_turn_y;
 	private float				turn_rotation;
+	
+	private boolean				is_forced_turned;
 
 	/** Sets the start and end grid and the start time of this car. TODO:
 	 * starting_time is frames? TODO: setSpeed method
@@ -884,4 +886,13 @@ public class Car
 	{
 		return this.direction;
 	}
+	
+	public void set_forced_turned(boolean is_forced_turned){
+		this.is_forced_turned = is_forced_turned;
+	}
+	
+	public boolean get_forced_turned(){
+		return this.is_forced_turned;
+	}
+		
 }
