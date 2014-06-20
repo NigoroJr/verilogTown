@@ -224,7 +224,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 					line = line + newLine + temp;
 				Document docCode = codeText.getDocument();
 				docCode.insertString(0, line, null);
-		
+				myUndoManager1.discardAllEdits();
 				br.close();
 				reader.close();
 			} catch (IOException e)
@@ -302,12 +302,14 @@ public class VerilogEditor extends JFrame implements ActionListener
 		JMenuItem verifyMenuItem = new JMenuItem("Verify");
 		verifyMenuItem.setAccelerator(KeyStroke.getKeyStroke('R', InputEvent.CTRL_MASK));
 		verifyMenuItem.addActionListener(this);
-		
+		/*
 		JMenuItem uploadMenuItem = new JMenuItem("Upload");
 		uploadMenuItem.setAccelerator(KeyStroke.getKeyStroke('U', InputEvent.CTRL_MASK));
 		uploadMenuItem.addActionListener(this);
-		
+		*/
 		JMenuItem exitMenuItem = new JMenuItem("Exit");
+		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke('E', InputEvent.CTRL_MASK));
+		exitMenuItem.addActionListener(this);
 		
 		JMenuItem undoMenuItem = new JMenuItem("Undo");
 		undoMenuItem.setAccelerator(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_MASK));
@@ -342,7 +344,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		menubar.add(simulationMenu);
 		menubar.add(headerMenu);
 		fileMenu.add(verifyMenuItem);
-		fileMenu.add(uploadMenuItem);
+		//fileMenu.add(uploadMenuItem);
 		fileMenu.addSeparator();
 		fileMenu.add(saveMenuItem);
 		fileMenu.addSeparator();
@@ -493,6 +495,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 			}
 		});
 		toolBar.add(verifyButton);
+		/*
 		JButton uploadButton = makeToolBarButton("upload","Upload","Upload");
 		uploadButton.addActionListener(new ActionListener()
 		{
@@ -503,6 +506,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 			}
 		});
 		toolBar.add(uploadButton);
+		*/
 		JButton undoButton = makeToolBarButton("undo","Undo","Undo");
 		undoButton.addActionListener(new ActionListener()
 		{
@@ -569,7 +573,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		toolBar.add(new JLabel("General Sensors: "));
 		MaskFormatter formatterGeneral = null;
 		try{
-			formatterGeneral = new MaskFormatter("#####");
+			formatterGeneral = new MaskFormatter("######");
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -674,10 +678,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 			out.close();
 			
 			/* print out what we're compiling */
-			errorText.setText("Compiling "+pathOfEditorJar + "VerilogFiles/" + name + ".txt");
+			errorText.setText("Compiling "+rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
 
 			/* parse the base file */
-			Compiler.compileFileForEditor(pathOfEditorJar + "VerilogFiles/" + name + ".txt");
+			Compiler.compileFileForEditor(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
 
 			if (Compiler.is_compiled_yet())
 			{
@@ -709,7 +713,28 @@ public class VerilogEditor extends JFrame implements ActionListener
 	//exit
 	public void exitButtonFunction()
 	{
+		String fileContent = "";
+		try
+		{
+			InputStreamReader reader = new InputStreamReader(new FileInputStream(verilogFiles));
+			BufferedReader br = new BufferedReader(reader);
+			String temp = null;
+			if((temp = br.readLine()) != null)
+				fileContent = temp;
+			while ((temp = br.readLine()) != null){
+					fileContent = fileContent + newLine + temp;
+			}
+			br.close();
+			reader.close();
+		} catch (IOException e1)
+		{
+			e1.printStackTrace();
+		}
 		
+		if(codeText.getText().equals(fileContent))
+			System.exit(0);
+		else
+			closingPopFunction();
 	}
 	
 	//undo
@@ -717,7 +742,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 	{
 		try
 		{
-			myUndoManager1.undo();
+			if(myUndoManager1.canUndo())
+				myUndoManager1.undo();
 		} catch (CannotUndoException e)
 		{
 			Toolkit.getDefaultToolkit().beep();
@@ -729,7 +755,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 	{
 		try
 		{
-			myUndoManager1.redo();
+			if(myUndoManager1.canRedo())
+				myUndoManager1.redo();
 		} catch (CannotUndoException e)
 		{
 			Toolkit.getDefaultToolkit().beep();
@@ -746,115 +773,21 @@ public class VerilogEditor extends JFrame implements ActionListener
 	{
 		//add the simulate code here
 		String simulateStr = simulateInput.getText();
-		String simulateBin = "";
+		String generalSensorStr = generalSensorInput1.getText() + generalSensorInput2.getText() + generalSensorInput3.getText()
+								+ generalSensorInput4.getText() + generalSensorInput5.getText();
 
-		if (simulateStr != null && simulateStr.length() >= 10)
+		if (simulateStr.length() == 8 && generalSensorStr.length() == 30)
 		{
-			for(int i = 0; i < 10; i++)
-			{
-				char temp;
-				temp = simulateStr.charAt(i);
-				switch (temp)
-				{
-					case '0':
-					{
-						simulateBin += "0000";
-						break;
-					}
-					case '1':
-					{
-						simulateBin += "0001";
-						break;
-					}
-					case '2':
-					{
-						simulateBin += "0010";
-						break;
-					}
-					case '3':
-					{
-						simulateBin += "0011";
-						break;
-					}
-					case '4':
-					{
-						simulateBin += "0100";
-						break;
-					}
-					case '5':
-					{
-						simulateBin += "0101";
-						break;
-					}
-					case '6':
-					{
-						simulateBin += "0110";
-						break;
-					}
-					case '7':
-					{
-						simulateBin += "0111";
-						break;
-					}
-					case '8':
-					{
-						simulateBin += "1000";
-						break;
-					}
-					case '9':
-					{
-						simulateBin += "1001";
-						break;
-					}
-					case 'A':
-					case 'a':
-					{
-						simulateBin += "1010";
-						break;
-					}
-					case 'B':
-					case 'b':
-					{
-						simulateBin += "1011";
-						break;
-					}
-					case 'C':
-					case 'c':
-					{
-						simulateBin += "1100";
-						break;
-					}
-					case 'D':
-					case 'd':
-					{
-						simulateBin += "1101";
-						break;
-					}
-					case 'E':
-					case 'e':
-					{
-						simulateBin += "1110";
-						break;
-					}
-					case 'F':
-					case 'f':
-					{
-						simulateBin += "1111";
-						break;
-					}
-				}
-			}
-
 			if (Compiler.is_compiled_yet())
 			{
 				ArrayList<Integer> output_vector_list;
 
 				/* first sim is for the clock cycle */
-				output_vector_list = Compiler.sim_cycle("1", simulateBin.substring(1, 9), simulateBin.substring(9, 40));
+				output_vector_list = Compiler.sim_cycle("1", simulateStr, generalSensorStr);
 				/* first sim is for the combinational propagation */
-				output_vector_list = Compiler.sim_cycle("1", simulateBin.substring(1, 9), simulateBin.substring(9, 40));
+				output_vector_list = Compiler.sim_cycle("1", simulateStr, generalSensorStr);
 			
-				errorText.setText("Simulation Cycle\nReset is: " + simulateBin.substring(0,1) + "\nClock Cycle:"+output_vector_list.get(5)+ " Sensors Light: " + simulateBin.substring(1, 9)+" General Sensors: " + simulateBin.substring(9, 40)+"\nOut0 Val:"+output_vector_list.get(0) + "\nOut1 Val:"+output_vector_list.get(1) +"\nOut:2 Val:"+output_vector_list.get(2) +"\nOut3 Val:"+output_vector_list.get(3)+"\nDebugVector:"+Integer.toBinaryString(output_vector_list.get(4)));
+				errorText.setText("Simulation Cycle\n" + "Clock Cycle:"+output_vector_list.get(5)+ " Sensors Light: " + simulateStr+" General Sensors: " + generalSensorStr + "\nOut0 Val:"+output_vector_list.get(0) + "\nOut1 Val:"+output_vector_list.get(1) +"\nOut:2 Val:"+output_vector_list.get(2) +"\nOut3 Val:"+output_vector_list.get(3)+"\nDebugVector:"+Integer.toBinaryString(output_vector_list.get(4)));
 			}
 			else
 			{
@@ -869,6 +802,30 @@ public class VerilogEditor extends JFrame implements ActionListener
 	
 	public void resetButtonFunction(){
 		//put the reset simualtion code at here
+		StyledDocument doc = codeText.getStyledDocument();
+		try
+		{
+			FileWriter out = new FileWriter(verilogFiles);
+			out.write(codeText.getText());
+			out.close();
+			
+			/* print out what we're compiling */
+			errorText.setText("Compiling "+rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
+
+			/* parse the base file */
+			Compiler.compileFileForEditor(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
+
+			if (Compiler.is_compiled_yet())
+			{
+				/* Reset the system - takes a double simulation */
+				Compiler.sim_cycle("0", "00000000", "000000000000000000000000000000");
+				Compiler.sim_cycle("1", "00000000", "000000000000000000000000000000");
+			}
+		}
+		catch (Exception e1)
+		{
+			System.out.println(e1);
+		}
 	}
 	
 	public void comboHeaderButtonFunction(){
