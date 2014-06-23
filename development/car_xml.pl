@@ -3,157 +3,217 @@
 use strict;
 use warnings;
 
-# This Perl script is a temporary tool that will be used to add cars to the
-# XML file. Be careful when reading this: it is **extremely** dirty code; I
-# know I will hate myself for writing this if I had to read this a month from
-# now...
+use 5.010;
+
+use XML::Simple;
+
+# Constants
+my $LIST_CARS = "list cars";
+my $LIST_START_END = "list start end";
+my $ADD = "add";
+my $REMOVE = "remove";
+my $QUIT = "quit";
+my $HELP = "help";
+
+my $level_xml = shift;
+# Exit program if no file specified
+exit 1 if not defined $level_xml and help();
+
+my $level_ref = XMLin($level_xml);
+populate_cars();
 
 my @cars;
-my $prev_id;
+my @starts;
+my @ends;
 
-print "Empty line to quit\n";
+parse_start_end();
+
 while (1) {
-    print "[list|remove] (id)\n";
-    print "(id) [start|end|delay] [value]: ";
-    chomp(my $input = <STDIN>);
+    my ($action, $id, $start, $end, $delay) = get_input();
 
-    # Exit if empty
-    last if $input =~ /^$/;
-
-    # list or remove
-    if ($input =~ /^\s*l(ist|s)?/) {
-        my $id = (split " ", $input)[1];
-        if (defined $id) {
-            show_car($id);
-        }
-        else {
-            show_car($_) for 0..$#cars;
-        }
-        next;
-    }
-    elsif ($input =~ /^\s*r(emove|m)?/) {
-        my $id = (split " ", $input)[1];
-        if (defined $id) {
-            $cars[$id] = undef;
-            print "Removed car ID $id\n";
-        }
-        else {
-            pop @cars;
-            print "Removed last car\n";
-        }
-        next;
-    }
-
-    my %car;
-    my ($id, $attr, $val);
-    # Has ID
-    if ($input =~ /^\s*\d/) {
-        ($id, $attr, $val) = split " ", $input, 3;
-    }
-    else {
-        # Use previous id if not specified
-        if (defined $prev_id and not (
-                defined $cars[$prev_id]{start} and
-                defined $cars[$prev_id]{end} and
-                defined $cars[$prev_id]{delay})) {
-            $id = $prev_id;
-        }
-        else {
-            $id = undef;
-        }
-        ($attr, $val) = split " ", $input, 2;
-    }
-
-    # Pull data if it exists
-    %car = %{$cars[$id]} if defined $id and defined $cars[$id];
-
-    if ($attr =~ /s(tart)?/) {
-        my ($x, $y) = split /\s*[, ]\s*/, $val;
-        $car{start} = [$x, $y];
-    }
-    elsif ($attr =~ /e(nd)?/) {
-        my ($x, $y) = split /\s*[, ]\s*/, $val;
-        $car{end} = [$x, $y];
-    }
-    elsif ($attr =~ /d(elay)?/) {
-        $car{delay} = $val;
-    }
-    else {
-        print <<EOF
-
-Usage:
-    [l|list] (ID)
-        List the cars currently in stack.
-
-    [r|rm|remove] (ID)
-        Remove a car from stack. Removes the car with the largest ID if no ID is specified.
-
-    (ID) [s|start] [x coord],[y coord]
-        Adds the x and y coordinate as the starting point. Adds to the last of stack if no ID is specified.
-
-    (ID) [e|end] [x coord],[y coord]
-        Adds the x and y coordinate as the ending point. Adds to the last of stack if no ID is specified.
-
-    (ID) [d|delay] [delay]
-        Adds the delay. Adds to the last of stack if no ID is specified.
-
-
-    When at least one of the three fields is not defined for the current car, the ID can be omitted.
-    For example,
-
-        s 0, 5
-        e 2, 4
-        e 3, 6
-        d 300
-        s 2, 8
-
-    will set the starting point as (0, 5), ending point as (2, 4) but update to (3, 6), and sets the delay to 300.
-    The last input sets the starting point (2, 8) for a new car, since all three fields has been filled for the previous car.
-
-EOF
-        ;
-        next;
-    }
-
-    # Update data if exists, push if not
-    if (defined $id) {
-        $cars[$id] = \%car;
-        print "Updated car ID $id\n";
-        $prev_id = $id;
-    }
-    else {
-        push @cars, \%car;
-        print "Added car to stack\n";
-        $prev_id = $#cars;
+    given ($action) {
+        last when $action eq $QUIT;
+        add_car($id, $start, $end, $delay) when $action eq $ADD;
+        remove_car($id) when $action eq $REMOVE;
+        list_cars() when $action eq $LIST_CARS;
+        list_start_end() when $action eq $LIST_START_END;
+        default { help(); };
     }
 }
 
 # Print in XML format
-open my $output_fh, ">", "output.xml" or die $!;
-print $output_fh "<cars>\n";
-for my $car (@cars) {
-    next unless defined $car;
+print_to_XML($level_xml);
 
-    print $output_fh "    <car>\n";
-    print $output_fh "        <start x=\"$$car{start}[0]\" y=\"$$car{start}[1]\" />\n" if defined @$car{start};
-    print $output_fh "        <end x=\"$$car{end}[0]\" y=\"$$car{end}[1]\" />\n" if defined @$car{end};
-    print $output_fh "        <delay>$$car{delay}</delay>\n" if defined $$car{delay};
-    print $output_fh "    </car>\n";
+sub populate_cars {
+    my @orig_cars = @{$level_ref->{cars}->{car}};
+
+    foreach my $orig_car (@orig_cars) {
+        my %car = (
+            'start' => [$$orig_car{start}],
+            'end'   => [$$orig_car{end}],
+            'delay' => [$$orig_car{delay}],
+        );
+        push @cars, \%car;
+    }
 }
-print $output_fh "</cars>\n";
-close $output_fh;
 
-# Print out car info
-sub show_car {
+sub get_input {
+    print "Enter data or command: ";
+    chomp(my $input = <STDIN>);
+
+    given ($input) {
+        return $QUIT when /^$|q(uit)?/;
+        return ($REMOVE, $1) when /r(?:emove|m)?\s*(\d+)/i;
+        return $LIST_START_END when /l(ist|s)?\s*se/i;
+        return $LIST_CARS when /l(ist|s)?(?!\s*se)/i;
+
+        when (/
+            (?<id>\d+)?     # Optional
+            \s*
+            (?<start>\d+)
+            \s+
+            (?<end>\d+)
+            \s+
+            (?<delay>\d+)
+            /x) {
+            my $id = (defined $+{id} ? $+{id} : -1);
+            return ($ADD, $id, $+{start}, $+{end}, $+{delay});
+        }
+
+        default { return $HELP; };
+    }
+}
+
+sub add_car {
+    my ($car_id, $start_id, $end_id, $delay) = @_;
+    my %car = (
+        'start' => [$starts[$start_id]],
+        'end'   => [$ends[$end_id]],
+        'delay' => [$delay],
+    );
+
+    # ID -1 means no car is to be updated
+    if ($car_id == -1) {
+        push @cars, \%car;
+        print "Added a car to stack\n";
+    }
+    # Update specified car if ID is given
+    else {
+        $cars[$car_id] = \%car;
+        print "Update Car $car_id\n";
+    }
+}
+
+sub remove_car {
     my $id = shift;
 
-    return unless defined $cars[$id];
-
-    my %car = %{$cars[$id]};
-
-    printf "%2d\n", $id;
-    printf "\tStart: %2d, %2d\n", @{$car{start}} if defined $car{start};
-    printf "\tEnd:   %2d, %2d\n", @{$car{end}} if defined $car{end};
-    printf "\tDelay: %4d\n", $car{delay} if defined $car{delay};
-    print "\n";
+    $cars[$id] = undef if defined $id;
 }
+
+sub list_cars {
+    print "No cars yet!\n" unless @cars;
+    print_car($_) for 0..$#cars;
+}
+
+sub list_start_end {
+    print "Starting points:\n";
+    print "\t$_: $starts[$_]->{x}, $starts[$_]->{y}\n" for 0..$#starts;
+    print "Ending points:\n";
+    print "\t$_: $ends[$_]->{x}, $ends[$_]->{y}\n" for 0..$#ends;
+}
+
+sub print_car {
+    my $id = shift;
+    my $car_hash_ref = $cars[$id];
+
+    return unless defined $car_hash_ref;
+
+    my %car = %$car_hash_ref;
+    print "Car $id\n";
+    print "\tStart: $car{start}[0]{x}, $car{start}[0]{y}\n";
+    print "\tEnd:   $car{end}[0]{x}, $car{end}[0]{y}\n";
+    print "\tDelay: $car{delay}[0]\n";
+}
+
+sub parse_start_end {   # {{{
+    my @grids = @{$level_ref->{map}->{grid}};
+
+    foreach my $grid (@grids) {
+        next unless $$grid{type} =~ /^(START|END)/;
+
+        push @starts, {
+            "x" => $$grid{x},
+            "y" => $$grid{y},
+        } if $$grid{type} =~ /^START/;
+        push @ends, {
+            "x" => $$grid{x},
+            "y" => $$grid{y},
+        } if $$grid{type} =~ /^END/;
+    }
+}   # }}}
+
+sub print_to_XML {
+    my $filename = shift;
+    correct_grids();
+
+    $$level_ref{cars}{car} = \@cars;
+    # print XMLout($level_ref, 'RootName' => 'level');
+    open my $xml_fh, ">", $filename or die $!;
+    print $xml_fh XMLout($level_ref, 'RootName' => 'level');
+
+    close $xml_fh;
+}
+
+# The XML::Simple module doesn't make the <type> an array reference
+sub correct_grids {
+    my @grids = @{$$level_ref{map}{grid}};
+
+    foreach my $grid (@grids) {
+        $$grid{type} = [$$grid{type}];
+        $$grid{intersection} = [$$grid{intersection}] if defined $$grid{intersection};
+    }
+
+    $$level_ref{map}{grid} = \@grids;
+}
+
+sub help {  # {{{
+    print <<EOF
+
+Usage: $0 <XML file>
+
+    The XML file needs to have the <map> information. XML file will be updated
+    with the car information.
+
+Commands:
+    [Car ID] <Start ID> <End ID> <Delay>
+
+        Car ID is optional. Start and end ID can be seen with
+
+            l se
+
+        When the car ID is specified, car with that ID will get updated to the
+        given value. When updating the car, you must specify all three values.
+
+    ( l | ls | list )
+
+        Lists the cars that are currently registered.
+
+    l se
+
+        Lists all the starting and ending points of the map.
+
+    ( r | rm | remove ) <Car ID>
+
+        Removes the car specified by the ID from the list.
+
+    ( h | help )
+
+        Displays this help message.
+
+    ( q | quit )
+
+        Updates the XML file with the car information and quits the program.
+        Entering an empty line will also quit the program.
+EOF
+    ;
+}   # }}}
