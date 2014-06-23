@@ -105,7 +105,6 @@ public class LevelScreen implements Screen
 	private VerilogTownMap		clevel;
 	private boolean				level_done;
 	private boolean				simulation_started;
-	private boolean				reset_as_front_of_loop;
 
 	private boolean				help_menu_pop;
 	private boolean				lastHPressed;
@@ -146,7 +145,6 @@ public class LevelScreen implements Screen
 	public LevelScreen(final VerilogTown gam, int level_number)
 	{
 		this.isSimulationPaused = true;
-		this.reset_as_front_of_loop = false;
 
 		/* initialize the level */
 		this.game = gam;
@@ -292,10 +290,6 @@ public class LevelScreen implements Screen
 	{
 		boolean fps_tick = false;
 
-		if (reset_as_front_of_loop)
-		{
-			this.softReset();
-		}
 		GL10 gl = Gdx.graphics.getGL10();
 
 		gl.glClearColor(0, 0, 0, 1);
@@ -709,7 +703,8 @@ public class LevelScreen implements Screen
 		/* Reset Level */
 		if (Gdx.input.isKeyPressed(Keys.R))
 		{
-			reset_as_front_of_loop = true;
+			this.dispose();
+			game.setScreen(new LevelScreen(game, level_number));
 		}
 
 		/* Zoom out */
@@ -803,8 +798,6 @@ public class LevelScreen implements Screen
 		Next_Frame_Time = 0f;
 
 		playTime = 0;
-
-		reset_as_front_of_loop = false;
 	}
 
 	private void zoom_limit_to_border()
