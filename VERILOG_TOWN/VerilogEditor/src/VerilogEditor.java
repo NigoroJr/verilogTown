@@ -566,6 +566,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 			e1.printStackTrace();
 		}
 		formatterInternal.setValidCharacters("10");
+		formatterInternal.setPlaceholderCharacter('0');
 		simulateInput = new JFormattedTextField(formatterInternal);
 		simulateInput.setColumns(8);
 		toolBar.add(simulateInput);
@@ -579,6 +580,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 			e1.printStackTrace();
 		}
 		formatterGeneral.setValidCharacters("10");
+		formatterGeneral.setPlaceholderCharacter('0');
 		generalSensorInput1 = new JFormattedTextField(formatterGeneral);
 		generalSensorInput2 = new JFormattedTextField(formatterGeneral);
 		generalSensorInput3 = new JFormattedTextField(formatterGeneral);
@@ -787,7 +789,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 				/* first sim is for the combinational propagation */
 				output_vector_list = Compiler.sim_cycle("1", simulateStr, generalSensorStr);
 			
-				errorText.setText("Simulation Cycle\n" + "Clock Cycle:"+output_vector_list.get(5)+ " Sensors Light: " + simulateStr+" General Sensors: " + generalSensorStr + "\nOut0 Val:"+output_vector_list.get(0) + "\nOut1 Val:"+output_vector_list.get(1) +"\nOut:2 Val:"+output_vector_list.get(2) +"\nOut3 Val:"+output_vector_list.get(3)+"\nDebugVector:"+Integer.toBinaryString(output_vector_list.get(4)));
+				errorText.setText("Simulation Cycle\n" + "Clock Cycle:"+output_vector_list.get(5)+ " Sensors Light: " + simulateStr+" General Sensors: " + generalSensorStr + "\nOut0 Val = "+output_vector_list.get(0) + "\nOut1 Val = "+output_vector_list.get(1) +"\nOut2 Val = "+output_vector_list.get(2) +"\nOut3 Val = "+output_vector_list.get(3)+"\nDebugVector = "+Integer.toBinaryString(output_vector_list.get(4)));
 			}
 			else
 			{
