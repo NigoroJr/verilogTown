@@ -38,7 +38,7 @@ always @(posedge clk or negedge rst)
 begin
 	if (rst == 1'b0)
 	begin
-		count <= 7'd0;
+		count <= 8'd0;
 		outN <= Go;
 		outS <= Stop;
 		outE <= Stop;
