@@ -92,7 +92,7 @@ public class LevelScreen implements Screen
 	private int					success_cars;
 	private int					crash_cars;
 	private int					forced_cars;
-	private int 				failed_cars;
+	private int					failed_cars;
 	private Random				random_number;
 	private Rectangle			glViewport;
 
@@ -138,9 +138,9 @@ public class LevelScreen implements Screen
 	private boolean[]			failed_compile_traffic;
 
 	private int					level_number;
-	
-	private int					three_way_int = 0;
-	private int 				four_way_int = 0;
+
+	private int					three_way_int				= 0;
+	private int					four_way_int				= 0;
 
 	public LevelScreen(final VerilogTown gam, int level_number)
 	{
@@ -151,11 +151,12 @@ public class LevelScreen implements Screen
 		this.level_done = false;
 		this.simulation_started = false;
 		this.random_number = new Random(3); // should this be rand seed?
-		
+
 		String xmlPath = String.format("%s/Levels/Lv%d/map/lv%02d.xml", VerilogTown.getRootPath(), level_number, level_number);
 		parser = new LevelXMLParser(xmlPath);
-		
-		for (TrafficControl tc : parser.getTrafficControls()){
+
+		for (TrafficControl tc : parser.getTrafficControls())
+		{
 			if (tc.getIntersectionType() == IntersectionType.FOUR_WAY)
 				four_way_int++;
 			else
@@ -436,7 +437,7 @@ public class LevelScreen implements Screen
 			thebatch.draw(numbers_chiller[success_cars / 100], 725, finishYPosition + 660, 75, 75);
 			thebatch.draw(numbers_chiller[(success_cars % 100) / 10], 800, finishYPosition + 660, 75, 75);
 			thebatch.draw(numbers_chiller[success_cars % 10], 875, finishYPosition + 660, 75, 75);
-			
+
 			thebatch.draw(numbers_chiller[failed_cars / 100], 725, finishYPosition + 420, 75, 75);
 			thebatch.draw(numbers_chiller[(failed_cars % 100) / 10], 800, finishYPosition + 420, 75, 75);
 			thebatch.draw(numbers_chiller[failed_cars % 10], 875, finishYPosition + 420, 75, 75);
@@ -450,8 +451,7 @@ public class LevelScreen implements Screen
 			if (finishYPosition == 0 && finish_time >= 0.7)
 			{
 				this.dispose();
-				game.setScreen(new ScoreScreen(game, level_number, success_cars, failed_cars, playTime, 
-								 three_way_int, four_way_int));
+				game.setScreen(new ScoreScreen(game, level_number, success_cars, failed_cars, playTime, three_way_int, four_way_int));
 			}
 			thebatch.end();
 		}
@@ -508,7 +508,7 @@ public class LevelScreen implements Screen
 			String verilogFileName = "Traffic_signal_set_" + counter;
 
 			jar_path = this.pathOfEditorJar + "VerilogEditor.jar";
-			
+
 			String OSName = System.getProperty("os.name");
 			List<String> list = new ArrayList<String>();
 			list.add("java");
@@ -564,12 +564,12 @@ public class LevelScreen implements Screen
 
 	public void setupPaths()
 	{
-		
-		if(VerilogTown.isDevelopment())
+
+		if (VerilogTown.isDevelopment())
 			pathOfEditorJar = VerilogTown.getRootPath() + "/VERILOG_TOWN/";
 		else
 			pathOfEditorJar = VerilogTown.getRootPath() + "/jars/";
-		
+
 		rootPath = VerilogTown.getRootPath() + "/";
 		pathOfVerilogFile = rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/";
 	}
@@ -579,7 +579,7 @@ public class LevelScreen implements Screen
 		uibatch.begin();
 
 		uibatch.draw(top_score_bar, 0, LEVEL_HEIGHT, LEVEL_WIDTH, 100);
-		if(success_cars < 0)
+		if (success_cars < 0)
 			success_cars = 0;
 		uibatch.draw(check_mark, 70, LEVEL_HEIGHT + 18);
 		uibatch.draw(border, 140, LEVEL_HEIGHT + 18);
@@ -621,7 +621,7 @@ public class LevelScreen implements Screen
 		uibatch.draw(numbers[playTimeSecond / 10], 1114, LEVEL_HEIGHT + 18);
 		uibatch.draw(border, 1184, LEVEL_HEIGHT + 18);
 		uibatch.draw(numbers[playTimeSecond % 10], 1184, LEVEL_HEIGHT + 18);
-		
+
 		uibatch.draw(press_h, 900, 10, 400, 100);
 
 		uibatch.end();
