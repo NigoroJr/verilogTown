@@ -1348,7 +1348,7 @@
         <car>
             <start x="16" y="0" />
             <end x="18" y="21" />
-            <delay>300</delay>
+            <delay>350</delay>
         </car>
         <car>
             <start x="21" y="10" />
@@ -1363,7 +1363,7 @@
         <car>
             <start x="16" y="0" />
             <end x="21" y="13" />
-            <delay>350</delay>
+            <delay>400</delay>
         </car>
         <car>
             <start x="6" y="0" />
