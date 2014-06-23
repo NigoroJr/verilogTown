@@ -121,10 +121,10 @@ public class MainMenu implements Screen
 		credits_hover = new Texture("ASSET_RESOURCES/credits_mouse_on.png");
 		credits_pressed = new Texture("ASSET_RESOURCES/credits_pressed.png");
 		
-		level1 = new TextureButton(game.batch, 512, 805, 250, 60, level1_normal, level1_hover, level1_pressed);
-		level2 = new TextureButton(game.batch, 512, 705, 250, 60, level2_normal, level2_hover, level2_pressed);
-		level3 = new TextureButton(game.batch, 512, 605, 250, 60, level3_normal, level3_hover, level3_pressed);
-		tutorial = new TextureButton(game.batch, 512, 505, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
+		level1 = new TextureButton(game.batch, 512, 705, 250, 60, level1_normal, level1_hover, level1_pressed);
+		level2 = new TextureButton(game.batch, 512, 605, 250, 60, level2_normal, level2_hover, level2_pressed);
+		level3 = new TextureButton(game.batch, 512, 505, 250, 60, level3_normal, level3_hover, level3_pressed);
+		tutorial = new TextureButton(game.batch, 512, 805, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
 		credits = new TextureButton(game.batch, 512, 405, 250, 60, credits_normal, credits_hover, credits_pressed);
 		
 		time = 0;
