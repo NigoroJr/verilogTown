@@ -204,6 +204,7 @@ public class MapEditor extends JDialog
 
 		buttons.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+		final JButton carEditor = new JButton("Edit Cars");
 		final JButton export = new JButton("Export");
 		final JButton cancel = new JButton("Cancel");
 
@@ -216,11 +217,27 @@ public class MapEditor extends JDialog
 					exportXML();
 				else if (e.getSource() == cancel)
 					dispose();
+				else if (e.getSource() == carEditor)
+				{
+					// Update starting and ending points
+					if (!populateStartsEnds()) {
+						JOptionPane.showMessageDialog(null, "Can't have intersections on the edge!", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+
+					int[][] startCoords = new int[0][];
+					int[][] endCoords = new int[0][];
+					startCoords = starts.toArray(startCoords);
+					endCoords = ends.toArray(endCoords);
+					new CarEditor(startCoords, endCoords);
+				}
 			}
 		};
 
+		carEditor.addActionListener(clickListener);
 		export.addActionListener(clickListener);
 		cancel.addActionListener(clickListener);
+		buttons.add(carEditor);
 		buttons.add(export);
 		buttons.add(cancel);
 
