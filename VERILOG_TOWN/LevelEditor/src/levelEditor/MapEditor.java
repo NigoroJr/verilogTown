@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +59,10 @@ public class MapEditor extends JDialog
 	private int					sizeX;
 	private int					sizeY;
 	private MapGridGroup[][]	gridGroups;
+	/** ArrayList of start and end coordinates. startsEnds[0] has the starting
+	 * coordinates and startsEnds[1] has the ending coordinates. */
+	private ArrayList<int[]>	starts;
+	private ArrayList<int[]>	ends;
 
 	/** Constructor for creating a new level.
 	 * 
@@ -73,6 +78,8 @@ public class MapEditor extends JDialog
 		this.sizeY = sizeY;
 		this.tracker = new StateTracker();
 		this.gridGroups = new MapGridGroup[sizeY / 2][sizeX / 2];
+		starts = new ArrayList<int[]>();
+		ends = new ArrayList<int[]>();
 
 		// Create directory (if it doesn't exist)
 		new File(String.format(LEVEL_FILE_LOCATION, levelNumber)).mkdirs();
@@ -220,6 +227,122 @@ public class MapEditor extends JDialog
 		return buttons;
 	}
 
+	/** Populates the startsEnds array with the starting and ending coordinates. */
+	private boolean populateStartsEnds()
+	{
+		starts.clear();
+		ends.clear();
+		return checkNorthStartsEnds() && checkSouthStartsEnds() && checkEastStartsEnds() && checkWestStartsEnds();
+	}
+
+	private boolean checkNorthStartsEnds()
+	{
+		// Look at north border
+		for (int i = 0; i < sizeX / 2; i++)
+		{
+			String type = gridGroups[0][i].getType();
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
+			Matcher m = p.matcher(type);
+			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+				return false;
+
+			if (type.equals(MapGridGroup.STRAIGHT_NS) || type.startsWith("CORNER_N"))
+			{
+				// gridGroups doesn't account for the borders, but the XML uses
+				// x = 0 as the left border, y = 0 as the bottom border.
+				int x = 2 * i + 1;
+				int y = sizeY + 1;
+				starts.add(new int[]
+				{ x, y });
+				ends.add(new int[]
+				{ x + 1, y });
+			}
+		}
+		return true;
+	}
+
+	private boolean checkSouthStartsEnds()
+	{
+		// Look at south border
+		for (int i = 0; i < sizeX / 2; i++)
+		{
+			String type = gridGroups[sizeY / 2 - 1][i].getType();
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
+			Matcher m = p.matcher(type);
+			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+				return false;
+
+			if (type.equals(MapGridGroup.STRAIGHT_NS) || type.startsWith("CORNER_S"))
+			{
+				// gridGroups doesn't account for the borders, but the XML uses
+				// x = 0 as the left border, y = 0 as the bottom border.
+				int x = 2 * i + 1;
+				int y = 0;
+				starts.add(new int[]
+				{ x + 1, y });
+				ends.add(new int[]
+				{ x, y });
+			}
+		}
+		return true;
+	}
+
+	private boolean checkEastStartsEnds()
+	{
+		// Look at east border
+		for (int i = 0; i < sizeY / 2; i++)
+		{
+			String type = gridGroups[i][sizeX / 2 - 1].getType();
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^W]{3})");
+			Matcher m = p.matcher(type);
+			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+				return false;
+
+			if (type.equals(MapGridGroup.STRAIGHT_EW) || type.matches("CORNER_.E"))
+			{
+				// gridGroups doesn't account for the borders, but the XML uses
+				// x = 0 as the left border, y = 0 as the bottom border.
+				int x = sizeX + 1;
+				int y = sizeY - (2 * i + 1);
+				starts.add(new int[]
+				{ x, y + 1 });
+				ends.add(new int[]
+				{ x, y });
+			}
+		}
+		return true;
+	}
+
+	private boolean checkWestStartsEnds()
+	{
+		// Look at west border
+		for (int i = 0; i < sizeY / 2; i++)
+		{
+			String type = gridGroups[i][0].getType();
+			// Naming convention difference. See MapGridGroup
+			Pattern p = Pattern.compile("THREE_WAY_(?![^E]{3})");
+			Matcher m = p.matcher(type);
+			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+				return false;
+
+			if (type.equals(MapGridGroup.STRAIGHT_EW) || type.matches("CORNER_.W"))
+			{
+				// gridGroups doesn't account for the borders, but the XML uses
+				// x = 0 as the left border, y = 0 as the bottom border.
+				int x = 0;
+				int y = sizeY - (2 * i + 1);
+				starts.add(new int[]
+				{ x, y });
+				ends.add(new int[]
+				{ x, y + 1 });
+			}
+		}
+		return true;
+	}
+
 	public void exportXML()
 	{
 		Document doc = null;
@@ -300,7 +423,8 @@ public class MapEditor extends JDialog
 	}
 
 	/** Adds the START and END grid types to the XML by looking at the grid types
-	 * of the outer grids.
+	 * of the outer grids. When there is an intersection on the edge, it does
+	 * not add the starts and ends.
 	 * 
 	 * @param doc
 	 *            The Document object to create the elements from.
@@ -309,167 +433,78 @@ public class MapEditor extends JDialog
 	 * @return True if there is no intersection on the edge, false if it does. */
 	private boolean addStartEnd(Document doc, Element map)
 	{
-		return addNorthStartEnd(doc, map) && addSouthStartEnd(doc, map) && addEastStartEnd(doc, map) && addWestStartEnd(doc, map);
-	}
+		if (!populateStartsEnds())
+			return false;
 
-	private boolean addNorthStartEnd(Document doc, Element map)
-	{
-		// Look at north border
-		for (int i = 0; i < sizeX / 2; i++)
+		if (starts.size() != ends.size())
+			return false;
+
+		for (int i = 0; i < starts.size(); i++)
 		{
-			String type = gridGroups[0][i].getType();
-			// Naming convention difference. See MapGridGroup
-			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
-			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
-				return false;
+			int x, y;
+			// Add starting point
+			x = starts.get(i)[0];
+			y = starts.get(i)[1];
+			Element start = doc.createElement("grid");
+			start.setAttribute("x", Integer.toString(x));
+			start.setAttribute("y", Integer.toString(y));
+			Element ts = doc.createElement("type");
+			ts.appendChild(doc.createTextNode(getStartEndType(x, y, true)));
+			start.appendChild(ts);
 
-			if (type.equals(MapGridGroup.STRAIGHT_NS) || type.startsWith("CORNER_N"))
-			{
-				Element start = doc.createElement("grid");
-				// gridGroups doesn't account for the borders, but the XML uses
-				// x = 0 as the left border, y = 0 as the bottom border.
-				int x = 2 * i + 1;
-				int y = sizeY + 1;
-				start.setAttribute("x", Integer.toString(x));
-				start.setAttribute("y", Integer.toString(y));
-				Element ts = doc.createElement("type");
-				ts.appendChild(doc.createTextNode(MapGrid.START_NEDGE2S));
-				start.appendChild(ts);
+			// Add ending point
+			x = ends.get(i)[0];
+			y = ends.get(i)[1];
+			Element end = doc.createElement("grid");
+			end.setAttribute("x", Integer.toString(x));
+			end.setAttribute("y", Integer.toString(y));
+			Element te = doc.createElement("type");
+			te.appendChild(doc.createTextNode(getStartEndType(x, y, false)));
+			end.appendChild(te);
 
-				Element end = doc.createElement("grid");
-				end.setAttribute("x", Integer.toString(x + 1));
-				end.setAttribute("y", Integer.toString(y));
-				Element te = doc.createElement("type");
-				te.appendChild(doc.createTextNode(MapGrid.END_N2NEDGE));
-				end.appendChild(te);
-
-				map.appendChild(start);
-				map.appendChild(end);
-			}
+			map.appendChild(start);
+			map.appendChild(end);
 		}
 
 		return true;
 	}
 
-	private boolean addSouthStartEnd(Document doc, Element map)
+	private String getStartEndType(int x, int y, boolean isStart)
 	{
-		// Look at south border
-		for (int i = 0; i < sizeX / 2; i++)
+		int maxX = sizeX + 1;
+		int maxY = sizeY + 1;
+
+		if (x == 0)
 		{
-			String type = gridGroups[sizeY / 2 - 1][i].getType();
-			// Naming convention difference. See MapGridGroup
-			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
-			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
-				return false;
-
-			if (type.equals(MapGridGroup.STRAIGHT_NS) || type.startsWith("CORNER_S"))
-			{
-				Element start = doc.createElement("grid");
-				// gridGroups doesn't account for the borders, but the XML uses
-				// x = 0 as the left border, y = 0 as the bottom border.
-				int x = 2 * i + 1;
-				int y = 0;
-				start.setAttribute("x", Integer.toString(x + 1));
-				start.setAttribute("y", Integer.toString(y));
-				Element ts = doc.createElement("type");
-				ts.appendChild(doc.createTextNode(MapGrid.START_SEDGE2N));
-				start.appendChild(ts);
-
-				Element end = doc.createElement("grid");
-				end.setAttribute("x", Integer.toString(x));
-				end.setAttribute("y", Integer.toString(y));
-				Element te = doc.createElement("type");
-				te.appendChild(doc.createTextNode(MapGrid.END_S2SEDGE));
-				end.appendChild(te);
-
-				map.appendChild(start);
-				map.appendChild(end);
-			}
+			if (isStart)
+				return MapGrid.START_WEDGE2E;
+			else
+				return MapGrid.END_W2WEDGE;
+		}
+		else if (y == 0)
+		{
+			if (isStart)
+				return MapGrid.START_SEDGE2N;
+			else
+				return MapGrid.END_S2SEDGE;
+		}
+		else if (x == maxX)
+		{
+			if (isStart)
+				return MapGrid.START_EEDGE2W;
+			else
+				return MapGrid.END_E2EEDGE;
+		}
+		else if (y == maxY)
+		{
+			if (isStart)
+				return MapGrid.START_NEDGE2S;
+			else
+				return MapGrid.END_N2NEDGE;
 		}
 
-		return true;
-	}
-
-	private boolean addEastStartEnd(Document doc, Element map)
-	{
-		// Look at east border
-		for (int i = 0; i < sizeY / 2; i++)
-		{
-			String type = gridGroups[i][sizeX / 2 - 1].getType();
-			// Naming convention difference. See MapGridGroup
-			Pattern p = Pattern.compile("THREE_WAY_(?![^W]{3})");
-			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
-				return false;
-
-			if (type.equals(MapGridGroup.STRAIGHT_EW) || type.matches("CORNER_.E"))
-			{
-				Element start = doc.createElement("grid");
-				// gridGroups doesn't account for the borders, but the XML uses
-				// x = 0 as the left border, y = 0 as the bottom border.
-				int x = sizeX + 1;
-				int y = sizeY - (2 * i + 1);
-				start.setAttribute("x", Integer.toString(x));
-				start.setAttribute("y", Integer.toString(y + 1));
-				Element ts = doc.createElement("type");
-				ts.appendChild(doc.createTextNode(MapGrid.START_EEDGE2W));
-				start.appendChild(ts);
-
-				Element end = doc.createElement("grid");
-				end.setAttribute("x", Integer.toString(x));
-				end.setAttribute("y", Integer.toString(y));
-				Element te = doc.createElement("type");
-				te.appendChild(doc.createTextNode(MapGrid.END_E2EEDGE));
-				end.appendChild(te);
-
-				map.appendChild(start);
-				map.appendChild(end);
-			}
-		}
-
-		return true;
-	}
-
-	private boolean addWestStartEnd(Document doc, Element map)
-	{
-		// Look at west border
-		for (int i = 0; i < sizeY / 2; i++)
-		{
-			String type = gridGroups[i][0].getType();
-			// Naming convention difference. See MapGridGroup
-			Pattern p = Pattern.compile("THREE_WAY_(?![^E]{3})");
-			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
-				return false;
-
-			if (type.equals(MapGridGroup.STRAIGHT_EW) || type.matches("CORNER_.W"))
-			{
-				Element start = doc.createElement("grid");
-				// gridGroups doesn't account for the borders, but the XML uses
-				// x = 0 as the left border, y = 0 as the bottom border.
-				int x = 0;
-				int y = sizeY - (2 * i + 1);
-				start.setAttribute("x", Integer.toString(x));
-				start.setAttribute("y", Integer.toString(y));
-				Element ts = doc.createElement("type");
-				ts.appendChild(doc.createTextNode(MapGrid.START_WEDGE2E));
-				start.appendChild(ts);
-
-				Element end = doc.createElement("grid");
-				end.setAttribute("x", Integer.toString(x));
-				end.setAttribute("y", Integer.toString(y + 1));
-				Element te = doc.createElement("type");
-				te.appendChild(doc.createTextNode(MapGrid.END_W2WEDGE));
-				end.appendChild(te);
-
-				map.appendChild(start);
-				map.appendChild(end);
-			}
-		}
-
-		return true;
+		// Shouldn't come here
+		return null;
 	}
 
 	public BufferedImage getBufferedImage()
