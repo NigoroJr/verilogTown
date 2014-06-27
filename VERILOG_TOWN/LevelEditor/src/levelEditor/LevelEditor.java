@@ -107,8 +107,6 @@ public class LevelEditor extends JFrame
 		ret.add(panelUpdate);
 		ret.add(fileChooserBuilder());
 
-		// TODO: add listeners
-
 		return ret;
 	}
 

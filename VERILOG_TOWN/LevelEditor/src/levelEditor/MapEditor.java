@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 
 /** Map editor for the level.
  * 
- * @author Naoki */
+ * @author Naoki Mizuno */
 
 public class MapEditor extends JDialog
 {
@@ -429,7 +429,7 @@ public class MapEditor extends JDialog
 		boolean noIntersectionOnEdge = addStartEnd(doc, map);
 		if (!noIntersectionOnEdge)
 		{
-			JOptionPane.showMessageDialog(null, "Can't have intersections on the edge! Lever is not saved.", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Can't have intersections on the edge! Level is not saved.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 

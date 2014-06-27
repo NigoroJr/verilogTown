@@ -56,6 +56,14 @@ class Car extends JPanel implements ActionListener
 	 * coordinates, and the delay.
 	 * 
 	 * @param id
+	 * @param carEditor
+	 *            The CarEditor object that this car belongs to.
+	 * @param id
+	 *            ID of this car.
+	 * @param allStarts
+	 *            List of all the starting coordinates.
+	 * @param allEnds
+	 *            List of all the ending coordinates.
 	 * @param start
 	 *            An array that contains exactly two elements. First is the X
 	 *            coordinate and the second is Y coordinate of the starting
