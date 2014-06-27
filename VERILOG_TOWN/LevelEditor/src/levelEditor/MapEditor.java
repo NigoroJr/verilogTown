@@ -44,10 +44,6 @@ public class MapEditor extends JDialog
 	/** Generated serial version ID. */
 	private static final long	serialVersionUID	= -115622713904200668L;
 
-	// Development only
-	public static final String	LEVEL_FILE_LOCATION	= "levels/lv%d/";
-	// public static final String LEVEL_FILE_LOCATION = "../../../levels/lv%d/";
-	public static final String	LEVEL_FILE_NAME		= "level.xml";
 	/** Size of edge rows/columns in pixels */
 	public static final int		EDGE_SIZE			= 15;
 	/** Width of the border in pixels */
@@ -64,6 +60,8 @@ public class MapEditor extends JDialog
 	private ArrayList<int[]>	starts;
 	private ArrayList<int[]>	ends;
 	private ArrayList<Car>		cars;
+
+	private String				mapDirectory;
 
 	/** Constructor for creating a new level.
 	 * 
@@ -83,9 +81,10 @@ public class MapEditor extends JDialog
 		ends = new ArrayList<int[]>();
 		cars = new ArrayList<Car>();
 
+		mapDirectory = String.format("%s/Levels/Lv%d/map/", LevelEditor.getRootPath(), levelNumber);
 		// Create directory (if it doesn't exist)
-		new File(String.format(LEVEL_FILE_LOCATION, levelNumber)).mkdirs();
-		xmlFile = new File(String.format(LEVEL_FILE_LOCATION + LEVEL_FILE_NAME, levelNumber));
+		new File(mapDirectory).mkdirs();
+		xmlFile = new File(String.format("%s/lv%02d.xml", mapDirectory, levelNumber));
 
 		add(mapBuilder());
 		add(buttonsBuilder(), BorderLayout.SOUTH);
@@ -453,7 +452,7 @@ public class MapEditor extends JDialog
 		DOMSource source = new DOMSource(doc);
 		try
 		{
-			PrintWriter pw = new PrintWriter(new File("foo.xml"));
+			PrintWriter pw = new PrintWriter(xmlFile);
 			StreamResult stream = new StreamResult(pw);
 			transformer.transform(source, stream);
 		}
@@ -467,7 +466,7 @@ public class MapEditor extends JDialog
 		}
 
 		// Export image
-		File imageFile = new File(String.format("level%02d.png", levelNumber));
+		File imageFile = new File(String.format("%s/lv%02d.png", mapDirectory, levelNumber));
 		try
 		{
 			ImageIO.write(getBufferedImage(), "PNG", imageFile);

@@ -44,4 +44,5 @@ Refer to
 Due to different directory structures between development and deployment,
 environment variable `VERILOG_TOWN_DEVELOPMENT` must be set to a non-zero
 value when developing with Eclipse. When this environment variable is 0 or
-unset, the program will be executed in deployment mode.
+unset, the program will be executed in deployment mode. Run configurations in
+the `verilogTown` and `LevelEditor` projects need to be changed.

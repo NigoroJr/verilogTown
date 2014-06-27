@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -33,6 +35,10 @@ public class LevelEditor extends JFrame
 	public static final String	BUTTON_OK			= "OK";
 	public static final String	BUTTON_CANCEL		= "Cancel";
 	public static final String	BUTTON_SELECT		= "Select";
+	/** Environment variable set when developing. Non-zero value indicates
+	 * development mode. In development mode, the directory structure is
+	 * different. */
+	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
 
 	private JRadioButton		create;
 	private JRadioButton		update;
@@ -261,6 +267,48 @@ public class LevelEditor extends JFrame
 				setVisible(true);
 			}
 		}
+	}
+
+	/** Returns the root path of this program. Exact copy of
+	 * VerilogTown.getRootPath(). It is assumed that this program is on the same
+	 * level as verilogTown and verilogEditor.
+	 * 
+	 * @return The root path of this program. */
+	public static String getRootPath()
+	{
+		String path = null;
+		try
+		{
+			path = LevelEditor.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+			// Path can be a filename when executing a jar file. (filename/../)
+			// doesn't work.
+			path = new File(path).getParent() + "/../";
+			// Development environment has different directory structure than
+			// that when releasing
+			if (isDevelopment())
+				path += "../";
+			/* getCanonicalPath() returns a path containing "\", which doesn't
+			 * work (even on Windows) when passing the path as a command line
+			 * argument. Thus, regular expression <code>\\\b</code> is used to
+			 * substitute '\' to '/'. */
+			path = new File(path).getCanonicalPath().replaceAll("\\\\\\b", "/");
+		}
+		catch (URISyntaxException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		return path;
+	}
+
+	public static boolean isDevelopment()
+	{
+		String env = System.getenv(VERILOG_TOWN_DEVELOPMENT);
+		return env != null && !env.equals("0");
 	}
 
 	public static void main(String[] args)
