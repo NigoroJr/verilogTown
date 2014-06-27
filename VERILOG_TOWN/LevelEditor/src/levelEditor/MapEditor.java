@@ -452,6 +452,10 @@ public class MapEditor extends JDialog
 		try
 		{
 			transformer = TransformerFactory.newInstance().newTransformer();
+			DOMSource source = new DOMSource(doc);
+			PrintWriter pw = new PrintWriter(xmlFile);
+			StreamResult stream = new StreamResult(pw);
+			transformer.transform(source, stream);
 		}
 		catch (TransformerConfigurationException e)
 		{
@@ -460,13 +464,6 @@ public class MapEditor extends JDialog
 		catch (TransformerFactoryConfigurationError e)
 		{
 			e.printStackTrace();
-		}
-		DOMSource source = new DOMSource(doc);
-		try
-		{
-			PrintWriter pw = new PrintWriter(xmlFile);
-			StreamResult stream = new StreamResult(pw);
-			transformer.transform(source, stream);
 		}
 		catch (TransformerException e)
 		{
