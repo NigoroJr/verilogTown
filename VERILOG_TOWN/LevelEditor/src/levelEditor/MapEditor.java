@@ -94,7 +94,7 @@ public class MapEditor extends JDialog
 
 		pack();
 		setLocationRelativeTo(null);
-		// setResizable(false);
+		setMinimumSize(getSize());
 		setTitle("Edit Level " + levelNumber);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setModalityType(ModalityType.DOCUMENT_MODAL);
