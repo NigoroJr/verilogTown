@@ -256,8 +256,10 @@ public class LevelEditor extends JFrame
 				// Account for the task bar, title bar, and buttons
 				int optimalGridHeight = (screenSize.height - 2 * MapEditor.EDGE_SIZE - 200) / mapSizeY;
 				int min = Math.min(optimalGridWidth, optimalGridHeight);
-				if (min < MapGrid.GRID_SIZE)
+				if (min < MapGrid.DEFAULT_GRID_SIZE)
 					MapGrid.GRID_SIZE = min;
+				else
+					MapGrid.GRID_SIZE = MapGrid.DEFAULT_GRID_SIZE;
 
 				setVisible(false);
 				new MapEditor(levelNumber, mapSizeX, mapSizeY);

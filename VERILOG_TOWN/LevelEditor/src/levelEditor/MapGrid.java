@@ -51,6 +51,9 @@ public class MapGrid extends JPanel
 	public static final String	NON_ROAD			= "NON_ROAD";
 
 	/** Size of each grid in pixels */
+	public static final int		DEFAULT_GRID_SIZE	= 30;
+	/* Can be changed when there is not enough screen height */
+	/** Size of each grid in pixels */
 	public static int			GRID_SIZE			= 30;
 
 	private String				type;
