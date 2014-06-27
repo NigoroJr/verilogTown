@@ -216,7 +216,7 @@ public class MapEditor extends JDialog
 			public void actionPerformed(ActionEvent e)
 			{
 				if (e.getSource() == export)
-					exportXML();
+					exportLevel();
 				else if (e.getSource() == cancel)
 					dispose();
 				else if (e.getSource() == editCars)
@@ -393,7 +393,19 @@ public class MapEditor extends JDialog
 		return true;
 	}
 
-	public void exportXML()
+	/** Generates the XML file and the PNG image file for the level. */
+	public void exportLevel()
+	{
+		exportXML(xmlFile);
+
+		File imageFile = new File(String.format("%s/lv%02d.png", mapDirectory, levelNumber));
+		exportMapImage(imageFile);
+	}
+
+	/** Exports the current state of the map to the given XML file.
+	 * 
+	 * @param xmlFile */
+	public void exportXML(File xmlFile)
 	{
 		Document doc = null;
 		try
@@ -461,17 +473,6 @@ public class MapEditor extends JDialog
 			e.printStackTrace();
 		}
 		catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-
-		// Export image
-		File imageFile = new File(String.format("%s/lv%02d.png", mapDirectory, levelNumber));
-		try
-		{
-			ImageIO.write(getBufferedImage(), "PNG", imageFile);
-		}
-		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -599,12 +600,16 @@ public class MapEditor extends JDialog
 		}
 	}
 
-	public BufferedImage getBufferedImage()
+	/** Exports the PNG image of the map.
+	 * 
+	 * @param imageFile
+	 *            File object to export the image to. */
+	public void exportMapImage(File imageFile)
 	{
 		int imageSize = gridGroups[0][0].getImageSize();
-		BufferedImage map = new BufferedImage(sizeX / 2 * imageSize, sizeY / 2 * imageSize, BufferedImage.TYPE_INT_RGB);
+		BufferedImage mapImage = new BufferedImage(sizeX / 2 * imageSize, sizeY / 2 * imageSize, BufferedImage.TYPE_INT_RGB);
 
-		Graphics2D g = map.createGraphics();
+		Graphics2D g = mapImage.createGraphics();
 		for (int i = 0; i < sizeX / 2; i++)
 		{
 			for (int j = 0; j < sizeY / 2; j++)
@@ -616,14 +621,13 @@ public class MapEditor extends JDialog
 			}
 		}
 
-		return map;
-	}
-
-	/* Only for development */
-	public static void main(String[] args)
-	{
-		// new MapEditor(2, 10, 12);
-		new MapEditor(2, 20, 20);
-		// new MapEditor(2, 6, 8);
+		try
+		{
+			ImageIO.write(mapImage, "PNG", imageFile);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }
