@@ -65,7 +65,7 @@ public class LevelEditor extends JFrame
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("XML Files", "xml");
 		chooser.setFileFilter(filter);
 
-		setTitle("Verilog Town Level Editor");
+		setTitle("verilogTown Level Editor");
 
 		add(radioButtonBuilder());
 		add(buttonBuilder(), BorderLayout.SOUTH);
