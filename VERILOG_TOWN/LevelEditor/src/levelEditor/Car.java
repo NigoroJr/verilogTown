@@ -32,7 +32,7 @@ class Car extends JPanel implements ActionListener
 	/** Creates a new Car object with the given ID and the list of starting and
 	 * ending coordinates.
 	 * 
-	 * @param ce
+	 * @param carEditor
 	 *            The CarEditor object that this car belongs to.
 	 * @param id
 	 *            ID of this car.
@@ -40,11 +40,11 @@ class Car extends JPanel implements ActionListener
 	 *            List of all the starting coordinates.
 	 * @param allEnds
 	 *            List of all the ending coordinates. */
-	public Car(CarEditor ce, int id, int[][] allStarts, int[][] allEnds)
+	public Car(CarEditor carEditor, int id, int[][] allStarts, int[][] allEnds)
 	{
 		super();
 
-		this.carEditor = ce;
+		this.carEditor = carEditor;
 		this.id = id;
 		this.allStarts = allStarts;
 		this.allEnds = allEnds;
@@ -66,7 +66,7 @@ class Car extends JPanel implements ActionListener
 	 * @param delay
 	 *            Delay for the car to start after the game has started. */
 	public Car(
-			CarEditor ce,
+			CarEditor carEditor,
 			int id,
 			int[][] allStarts,
 			int[][] allEnds,
@@ -74,7 +74,7 @@ class Car extends JPanel implements ActionListener
 			int[] end,
 			int delay)
 	{
-		this(ce, id, allStarts, allEnds);
+		this(carEditor, id, allStarts, allEnds);
 
 		// Set selected values
 		for (int i = 0; i < allStarts.length; i++)
