@@ -91,6 +91,7 @@ public class CarEditor extends JDialog
 		this.setMinimumSize(new Dimension(WINDOW_WIDTH, 600));
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setModalityType(ModalityType.DOCUMENT_MODAL);
 		this.setVisible(true);
 	}
 

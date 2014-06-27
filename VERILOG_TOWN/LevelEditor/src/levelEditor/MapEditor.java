@@ -92,8 +92,9 @@ public class MapEditor extends JDialog
 		setLocationRelativeTo(null);
 		// setResizable(false);
 		setTitle("Edit Level " + levelNumber);
-		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setModalityType(ModalityType.DOCUMENT_MODAL);
+		setVisible(true);
 	}
 
 	/** Constructor for updating an existing level file.
