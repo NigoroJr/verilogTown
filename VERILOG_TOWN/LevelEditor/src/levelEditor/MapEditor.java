@@ -49,6 +49,8 @@ public class MapEditor extends JDialog
 	/** Width of the border in pixels */
 	public static final int		BORDER				= 1;
 
+	private JPanel				mapPanel;
+
 	private StateTracker		tracker;
 	private File				xmlFile;
 	private int					levelNumber;
@@ -86,7 +88,8 @@ public class MapEditor extends JDialog
 		new File(mapDirectory).mkdirs();
 		xmlFile = new File(String.format("%s/lv%02d.xml", mapDirectory, levelNumber));
 
-		add(mapBuilder());
+		mapPanel = mapBuilder();
+		add(mapPanel);
 		add(buttonsBuilder(), BorderLayout.SOUTH);
 
 		pack();
@@ -206,6 +209,7 @@ public class MapEditor extends JDialog
 
 		buttons.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+		final JButton clearMap = new JButton("Clear Map");
 		final JButton editCars = new JButton("Edit Cars");
 		final JButton export = new JButton("Export");
 		final JButton cancel = new JButton("Cancel");
@@ -215,7 +219,9 @@ public class MapEditor extends JDialog
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				if (e.getSource() == export)
+				if (e.getSource() == clearMap)
+					clearMap();
+				else if (e.getSource() == export)
 					exportLevel();
 				else if (e.getSource() == cancel)
 					dispose();
@@ -267,14 +273,26 @@ public class MapEditor extends JDialog
 			}
 		};
 
+		clearMap.addActionListener(clickListener);
 		editCars.addActionListener(clickListener);
 		export.addActionListener(clickListener);
 		cancel.addActionListener(clickListener);
+		buttons.add(clearMap);
 		buttons.add(editCars);
 		buttons.add(export);
 		buttons.add(cancel);
 
 		return buttons;
+	}
+
+	/** Initializes the map to all NON_ROADs. */
+	private void clearMap()
+	{
+		remove(mapPanel);
+		mapPanel = mapBuilder();
+		add(mapPanel);
+		repaint();
+		revalidate();
 	}
 
 	/** Populates the startsEnds array with the starting and ending coordinates. */
