@@ -242,6 +242,14 @@ public class LevelEditor extends JFrame
 				mapSizeX = Integer.parseInt(textMapSizeX.getText());
 				mapSizeY = Integer.parseInt(textMapSizeY.getText());
 
+				// Don't allow odd or negative number size
+				if (mapSizeX % 2 != 0 || mapSizeY % 2 != 0 || mapSizeX <= 0 || mapSizeY <= 0)
+				{
+					String mes = "Both map sizes must be positive even numbers!";
+					JOptionPane.showMessageDialog(null, mes, "Invalid map size", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
 				// Set appropriate size of the grids in MapEditor
 				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 				int optimalGridWidth = (screenSize.width - 2 * MapEditor.EDGE_SIZE) / mapSizeX;
