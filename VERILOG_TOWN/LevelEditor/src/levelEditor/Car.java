@@ -29,6 +29,29 @@ class Car extends JPanel implements ActionListener
 	private JTextField			delayTextField;
 	private JButton				removeButton;
 
+	/** Creates a new Car object with the given ID and the list of starting and
+	 * ending coordinates.
+	 * 
+	 * @param ce
+	 *            The CarEditor object that this car belongs to.
+	 * @param id
+	 *            ID of this car.
+	 * @param allStarts
+	 *            List of all the starting coordinates.
+	 * @param allEnds
+	 *            List of all the ending coordinates. */
+	public Car(CarEditor ce, int id, int[][] allStarts, int[][] allEnds)
+	{
+		super();
+
+		this.carEditor = ce;
+		this.id = id;
+		this.allStarts = allStarts;
+		this.allEnds = allEnds;
+
+		panelBuilder();
+	}
+
 	/** Creates a new Car object that contains the car ID, starting and ending
 	 * coordinates, and the delay.
 	 * 
@@ -42,16 +65,25 @@ class Car extends JPanel implements ActionListener
 	 *            coordinate and the second is Y coordinate of the ending point.
 	 * @param delay
 	 *            Delay for the car to start after the game has started. */
-	public Car(CarEditor ce, int id, int[][] allStarts, int[][] allEnds)
+	public Car(
+			CarEditor ce,
+			int id,
+			int[][] allStarts,
+			int[][] allEnds,
+			int[] start,
+			int[] end,
+			int delay)
 	{
-		super();
+		this(ce, id, allStarts, allEnds);
 
-		this.carEditor = ce;
-		this.id = id;
-		this.allStarts = allStarts;
-		this.allEnds = allEnds;
-
-		panelBuilder();
+		// Set selected values
+		for (int i = 0; i < allStarts.length; i++)
+			if (allStarts[i][0] == start[0] && allStarts[i][1] == start[1])
+				startPoints.setSelectedIndex(i);
+		for (int i = 0; i < allEnds.length; i++)
+			if (allEnds[i][0] == end[0] && allEnds[i][1] == end[1])
+				endPoints.setSelectedIndex(i);
+		delayTextField.setText(Integer.toString(delay));
 	}
 
 	/** Adds the car ID, pull-down menu of the starting and ending points, and
@@ -122,6 +154,48 @@ class Car extends JPanel implements ActionListener
 	{
 		this.id = id;
 		this.carID.setText(Integer.toString(id));
+	}
+
+	/** Sets the CarEditor object that this car belongs to.
+	 * 
+	 * @param carEditor */
+	public void setCarEditor(CarEditor carEditor)
+	{
+		this.carEditor = carEditor;
+	}
+
+	public int getID()
+	{
+		return id;
+	}
+
+	/** Returns the coordinate of the starting point of this car.
+	 * 
+	 * @return Coordinates of the starting point. First element is the X
+	 *         coordinate, second element is the Y coordinate. */
+	public int[] getStart()
+	{
+		return allStarts[startPoints.getSelectedIndex()];
+	}
+
+	/** Returns the coordinate of the ending point of this car.
+	 * 
+	 * @return Coordinates of the ending point. First element is the X
+	 *         coordinate, second element is the Y coordinate. */
+	public int[] getEnd()
+	{
+		return allEnds[endPoints.getSelectedIndex()];
+	}
+
+	public int getDelay()
+	{
+		return Integer.parseInt(delayTextField.getText().trim());
+	}
+
+	@Override
+	public Car clone()
+	{
+		return new Car(carEditor, id, allStarts, allEnds, allStarts[startPoints.getSelectedIndex()], allEnds[endPoints.getSelectedIndex()], Integer.parseInt(delayTextField.getText()));
 	}
 
 	@Override

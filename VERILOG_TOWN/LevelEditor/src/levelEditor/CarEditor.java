@@ -17,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /** Car editor for the level.
  * 
  * @author Naoki Mizuno */
@@ -32,6 +35,9 @@ public class CarEditor extends JDialog
 	private int[][]				ends;
 
 	private ArrayList<Car>		cars;
+	/** Cars that were given to the constructor. Used to compare whether there
+	 * the cars were edited or not */
+	private ArrayList<Car>		givenCars;
 	/* Used in multiple methods to remove cars */
 	private JPanel				carListPanel;
 	private GridBagLayout		gbl;
@@ -39,13 +45,24 @@ public class CarEditor extends JDialog
 	private JButton				cancelButton;
 	private JButton				addCarButton;
 
-	public CarEditor(int[][] starts, int[][] ends)
+	public CarEditor(ArrayList<Car> cars, int[][] starts, int[][] ends)
 	{
+		this.cars = cars;
+		this.givenCars = new ArrayList<Car>();
 		this.starts = starts;
 		this.ends = ends;
 
+		for (int i = 0; i < cars.size(); i++)
+		{
+			// Update the CarEditor that each car belongs to
+			this.cars.get(i).setCarEditor(this);
+			// Deep copy given cars
+			Car copy = cars.get(i).clone();
+			copy.setCarEditor(this);
+			this.givenCars.add(copy);
+		}
+
 		gbl = new GridBagLayout();
-		cars = new ArrayList<Car>();
 		carListPanel = new JPanel();
 		carListPanel.setLayout(gbl);
 		saveButton = new JButton("Save");
@@ -150,10 +167,14 @@ public class CarEditor extends JDialog
 		{
 			if (e.getSource() == saveButton)
 			{
-				// TODO
+				dispose();
 			}
 			else if (e.getSource() == cancelButton)
 			{
+				// Reset to the initial list
+				cars.clear();
+				for (int i = 0; i < givenCars.size(); i++)
+					cars.add(givenCars.get(i));
 				dispose();
 			}
 			else if (e.getSource() == addCarButton)

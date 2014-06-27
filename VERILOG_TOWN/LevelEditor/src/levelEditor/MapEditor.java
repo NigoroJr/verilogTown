@@ -63,6 +63,7 @@ public class MapEditor extends JDialog
 	 * coordinates and startsEnds[1] has the ending coordinates. */
 	private ArrayList<int[]>	starts;
 	private ArrayList<int[]>	ends;
+	private ArrayList<Car>		cars;
 
 	/** Constructor for creating a new level.
 	 * 
@@ -80,6 +81,7 @@ public class MapEditor extends JDialog
 		this.gridGroups = new MapGridGroup[sizeY / 2][sizeX / 2];
 		starts = new ArrayList<int[]>();
 		ends = new ArrayList<int[]>();
+		cars = new ArrayList<Car>();
 
 		// Create directory (if it doesn't exist)
 		new File(String.format(LEVEL_FILE_LOCATION, levelNumber)).mkdirs();
@@ -205,7 +207,7 @@ public class MapEditor extends JDialog
 
 		buttons.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		final JButton carEditor = new JButton("Edit Cars");
+		final JButton editCars = new JButton("Edit Cars");
 		final JButton export = new JButton("Export");
 		final JButton cancel = new JButton("Cancel");
 
@@ -218,27 +220,58 @@ public class MapEditor extends JDialog
 					exportXML();
 				else if (e.getSource() == cancel)
 					dispose();
-				else if (e.getSource() == carEditor)
+				else if (e.getSource() == editCars)
 				{
+					/* Check whether the starting and ending points have been
+					 * modified. Check is done by comparing the starting
+					 * coordinates before and after the calling of
+					 * populateStartsEnds() method. If there is no change, the
+					 * coordinates are the same after re-populating the
+					 * ArrayList. Only the starting coordinates are checked
+					 * because starting and ending coordinates act as a set and
+					 * if one has been changed, it is guaranteed that the other
+					 * has also changed. */
+					boolean startsHaveChanged = false;
+					int[][] prevStarts = new int[starts.size()][];
+					prevStarts = starts.toArray(prevStarts);
+
 					// Update starting and ending points
-					if (!populateStartsEnds()) {
+					if (!populateStartsEnds())
+					{
 						JOptionPane.showMessageDialog(null, "Can't have intersections on the edge!", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
+					}
+
+					// Compare with what is was before populateStartsEnds()
+					int[][] currentStarts = new int[starts.size()][];
+					currentStarts = starts.toArray(currentStarts);
+					if (prevStarts.length != currentStarts.length)
+						startsHaveChanged = true;
+					else
+					{
+						for (int i = 0; i < starts.size(); i++)
+							if (prevStarts[i][0] != currentStarts[i][0] || prevStarts[i][1] != currentStarts[i][1])
+								startsHaveChanged = true;
 					}
 
 					int[][] startCoords = new int[0][];
 					int[][] endCoords = new int[0][];
 					startCoords = starts.toArray(startCoords);
 					endCoords = ends.toArray(endCoords);
-					new CarEditor(startCoords, endCoords);
+
+					// New empty list of cars
+					if (startsHaveChanged)
+						cars = new ArrayList<Car>();
+
+					new CarEditor(cars, startCoords, endCoords);
 				}
 			}
 		};
 
-		carEditor.addActionListener(clickListener);
+		editCars.addActionListener(clickListener);
 		export.addActionListener(clickListener);
 		cancel.addActionListener(clickListener);
-		buttons.add(carEditor);
+		buttons.add(editCars);
 		buttons.add(export);
 		buttons.add(cancel);
 
@@ -389,15 +422,20 @@ public class MapEditor extends JDialog
 			return;
 		}
 
+		// Add normal grids
 		for (int i = 0; i < gridGroups.length; i++)
 			for (int j = 0; j < gridGroups[0].length; j++)
 				gridGroups[i][j].addElement(doc, map);
 
+		// Add car info
+		Element cars = doc.createElement("cars");
+		addCarsElement(doc, cars);
+
+		// Append all child nodes
 		level.appendChild(map);
-
-		// TODO: car info
-
+		level.appendChild(cars);
 		doc.appendChild(level);
+
 		// Write out
 		Transformer transformer = null;
 		try
@@ -523,6 +561,43 @@ public class MapEditor extends JDialog
 
 		// Shouldn't come here
 		return null;
+	}
+
+	/** Adds a "car" elements to the given Element.
+	 * 
+	 * @param doc
+	 *            Document object of the XML.
+	 * @param cars
+	 *            The "cars" node of the document. */
+	private void addCarsElement(Document doc, Element cars)
+	{
+		for (int i = 0; i < this.cars.size(); i++)
+		{
+			Car c = this.cars.get(i);
+
+			int[] startCoord = c.getStart();
+			int[] endCoord = c.getEnd();
+			int delay = c.getDelay();
+
+			Element carNode = doc.createElement("car");
+			// Start
+			Element startNode = doc.createElement("start");
+			startNode.setAttribute("x", Integer.toString(startCoord[0]));
+			startNode.setAttribute("y", Integer.toString(startCoord[1]));
+			// End
+			Element endNode = doc.createElement("end");
+			endNode.setAttribute("x", Integer.toString(endCoord[0]));
+			endNode.setAttribute("y", Integer.toString(endCoord[1]));
+			// Delay
+			Element delayNode = doc.createElement("delay");
+			delayNode.appendChild(doc.createTextNode(Integer.toString(delay)));
+
+			carNode.appendChild(startNode);
+			carNode.appendChild(endNode);
+			carNode.appendChild(delayNode);
+
+			cars.appendChild(carNode);
+		}
 	}
 
 	public BufferedImage getBufferedImage()
