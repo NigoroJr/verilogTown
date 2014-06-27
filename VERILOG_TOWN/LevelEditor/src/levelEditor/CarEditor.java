@@ -17,9 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 /** Car editor for the level.
  * 
  * @author Naoki Mizuno */

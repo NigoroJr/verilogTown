@@ -30,15 +30,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class LevelEditor extends JFrame
 {
 	/** Generated serial version ID. */
-	private static final long	serialVersionUID	= -1326785106168812433L;
+	private static final long	serialVersionUID			= -1326785106168812433L;
 
-	public static final String	BUTTON_OK			= "OK";
-	public static final String	BUTTON_CANCEL		= "Cancel";
-	public static final String	BUTTON_SELECT		= "Select";
 	/** Environment variable set when developing. Non-zero value indicates
 	 * development mode. In development mode, the directory structure is
 	 * different. */
 	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
+
+	public static final String	BUTTON_OK					= "OK";
+	public static final String	BUTTON_CANCEL				= "Cancel";
+	public static final String	BUTTON_SELECT				= "Select";
 
 	private JRadioButton		create;
 	private JRadioButton		update;
