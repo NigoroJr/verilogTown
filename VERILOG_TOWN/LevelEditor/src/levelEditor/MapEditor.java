@@ -53,9 +53,16 @@ public class MapEditor extends JDialog
 
 	private StateTracker		tracker;
 	private File				xmlFile;
+	/** True if program read from existing XML, false if created level from
+	 * scratch */
+	private boolean				readFromXML;
 	private int					levelNumber;
 	private int					sizeX;
 	private int					sizeY;
+	/** Defined so that gridGroups[x-coord][y-coord] and gridGroups[0][0] is the
+	 * bottom-left corner of the map. */
+	/* Need to be careful when actually generating the image because the
+	 * y-coordinate must go from max to 0. */
 	private MapGridGroup[][]	gridGroups;
 	/** ArrayList of start and end coordinates. startsEnds[0] has the starting
 	 * coordinates and startsEnds[1] has the ending coordinates. */
@@ -69,16 +76,21 @@ public class MapEditor extends JDialog
 	 * 
 	 * @param levelNumber
 	 * @param sizeX
-	 *            Size of the map in the X direction.
+	 *            Size of the map in the X direction. This does not account for
+	 *            the borders, so the size shown in the XML is 2 larger than
+	 *            this number.
 	 * @param sizeY
-	 *            Size of the map in the Y direction. */
+	 *            Size of the map in the Y direction. This does not account for
+	 *            the borders, so the size shown in the XML is 2 larger than
+	 *            this number. */
 	public MapEditor(int levelNumber, int sizeX, int sizeY)
 	{
+		this.readFromXML = false;
 		this.levelNumber = levelNumber;
 		this.sizeX = sizeX;
 		this.sizeY = sizeY;
 		this.tracker = new StateTracker();
-		this.gridGroups = new MapGridGroup[sizeY / 2][sizeX / 2];
+		this.gridGroups = new MapGridGroup[sizeX / 2][sizeY / 2];
 		starts = new ArrayList<int[]>();
 		ends = new ArrayList<int[]>();
 		cars = new ArrayList<Car>();
@@ -88,6 +100,7 @@ public class MapEditor extends JDialog
 		new File(mapDirectory).mkdirs();
 		xmlFile = new File(String.format("%s/lv%02d.xml", mapDirectory, levelNumber));
 
+		initMapGridGroup();
 		mapPanel = mapBuilder();
 		add(mapPanel);
 		add(buttonsBuilder(), BorderLayout.SOUTH);
@@ -103,15 +116,52 @@ public class MapEditor extends JDialog
 
 	/** Constructor for updating an existing level file.
 	 * 
-	 * @param xmlFile
-	 *            File object of the XML file. */
-	public MapEditor(File xmlFile)
+	 * @param xmlFilePath
+	 *            Path to the XML file. */
+	public MapEditor(String xmlFilePath)
 	{
-		this.xmlFile = xmlFile;
-		// TODO: parse existing xml
+		mapDirectory = String.format("%s/Levels/Lv%d/map/", LevelEditor.getRootPath(), levelNumber);
+		this.readFromXML = true;
+		this.xmlFile = new File(xmlFilePath);
+		this.tracker = new StateTracker();
+
+		LevelXMLParser parser = new LevelXMLParser(xmlFile);
+		this.levelNumber = parser.getLevelNumber();
+		this.sizeX = parser.getSizeX();
+		this.sizeY = parser.getSizeY();
+		this.gridGroups = parser.getGridGroups();
+		this.starts = parser.getStarts();
+		this.ends = parser.getEnds();
+		this.cars = parser.getCars();
+
+		// Set tracker for all MapGridGroups since they are set to null after
+		// reading the XML
+		for (int x = 0; x < sizeX / 2; x++)
+			for (int y = 0; y < sizeY / 2; y++)
+				gridGroups[x][y].setTracker(tracker);
+		mapPanel = mapBuilder();
+		add(mapPanel);
+		add(buttonsBuilder(), BorderLayout.SOUTH);
+
+		pack();
+		setLocationRelativeTo(null);
+		setMinimumSize(getSize());
+		setTitle("Edit Level " + levelNumber);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setModalityType(ModalityType.DOCUMENT_MODAL);
+		setVisible(true);
 	}
 
-	/** Builds the JPanel with the grids and the borders.
+	/** Initializes all the MapGridGroups of this map to NON_ROAD. */
+	private void initMapGridGroup()
+	{
+		for (int x = 0; x < sizeX / 2; x++)
+			for (int y = 0; y < sizeY / 2; y++)
+				gridGroups[x][y] = new MapGridGroup(tracker, MapGridGroup.NON_ROAD, x, y);
+	}
+
+	/** Builds the JPanel with the grids and the borders. MapGridGroup array must
+	 * be initialized or populated before calling this method.
 	 * 
 	 * @return JPanel with the grids and the borders. */
 	private JPanel mapBuilder()
@@ -175,6 +225,10 @@ public class MapEditor extends JDialog
 		return mapPanel;
 	}
 
+	/** Adds the MapGridGroups to a JPanel. MapGridGroups must be initialized or
+	 * populated before calling this method.
+	 * 
+	 * @return JPanel with the MapGridGroups. */
 	private JPanel gridsBuilder()
 	{
 		JPanel grids = new JPanel();
@@ -186,17 +240,16 @@ public class MapEditor extends JDialog
 		grids.setLayout(gbl);
 		GridBagConstraints gbc = new GridBagConstraints();
 
-		for (int i = 0; i < sizeX / 2; i++)
+		for (int x = 0; x < sizeX / 2; x++)
 		{
-			for (int j = 0; j < sizeY / 2; j++)
+			for (int y = 0; y < sizeY / 2; y++)
 			{
-				gbc.gridx = i;
-				gbc.gridy = j;
+				gbc.gridx = x;
+				gbc.gridy = y;
 
-				MapGridGroup g = new MapGridGroup(tracker, MapGridGroup.NON_ROAD, i, sizeY / 2 - 1 - j);
+				MapGridGroup g = gridGroups[x][sizeY / 2 - 1 - y];
 				gbl.setConstraints(g, gbc);
 				grids.add(g);
-				gridGroups[j][i] = g;
 			}
 		}
 
@@ -265,7 +318,7 @@ public class MapEditor extends JDialog
 					endCoords = ends.toArray(endCoords);
 
 					// New empty list of cars
-					if (startsHaveChanged)
+					if (!readFromXML && startsHaveChanged)
 						cars = new ArrayList<Car>();
 
 					new CarEditor(cars, startCoords, endCoords);
@@ -289,6 +342,7 @@ public class MapEditor extends JDialog
 	private void clearMap()
 	{
 		remove(mapPanel);
+		initMapGridGroup();
 		mapPanel = mapBuilder();
 		add(mapPanel);
 		repaint();
@@ -308,7 +362,7 @@ public class MapEditor extends JDialog
 		// Look at north border
 		for (int i = 0; i < sizeX / 2; i++)
 		{
-			String type = gridGroups[0][i].getType();
+			String type = gridGroups[i][sizeY / 2 - 1].getType();
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
 			Matcher m = p.matcher(type);
@@ -335,7 +389,7 @@ public class MapEditor extends JDialog
 		// Look at south border
 		for (int i = 0; i < sizeX / 2; i++)
 		{
-			String type = gridGroups[sizeY / 2 - 1][i].getType();
+			String type = gridGroups[i][0].getType();
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
 			Matcher m = p.matcher(type);
@@ -362,7 +416,7 @@ public class MapEditor extends JDialog
 		// Look at east border
 		for (int i = 0; i < sizeY / 2; i++)
 		{
-			String type = gridGroups[i][sizeX / 2 - 1].getType();
+			String type = gridGroups[sizeX / 2 - 1][i].getType();
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^W]{3})");
 			Matcher m = p.matcher(type);
@@ -389,7 +443,7 @@ public class MapEditor extends JDialog
 		// Look at west border
 		for (int i = 0; i < sizeY / 2; i++)
 		{
-			String type = gridGroups[i][0].getType();
+			String type = gridGroups[0][i].getType();
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^E]{3})");
 			Matcher m = p.matcher(type);
@@ -452,9 +506,9 @@ public class MapEditor extends JDialog
 		}
 
 		// Add normal grids
-		for (int i = 0; i < gridGroups.length; i++)
-			for (int j = 0; j < gridGroups[0].length; j++)
-				gridGroups[i][j].addElement(doc, map);
+		for (int x = 0; x < sizeX / 2; x++)
+			for (int y = 0; y < sizeY / 2; y++)
+				gridGroups[x][y].addElement(doc, map);
 
 		// Add car info
 		Element cars = doc.createElement("cars");
@@ -625,14 +679,14 @@ public class MapEditor extends JDialog
 		BufferedImage mapImage = new BufferedImage(sizeX / 2 * imageSize, sizeY / 2 * imageSize, BufferedImage.TYPE_INT_RGB);
 
 		Graphics2D g = mapImage.createGraphics();
-		for (int i = 0; i < sizeX / 2; i++)
+		for (int x = 0; x < sizeX / 2; x++)
 		{
-			for (int j = 0; j < sizeY / 2; j++)
+			for (int y = 0; y < sizeY / 2; y++)
 			{
-				int xCoord = i * imageSize;
-				int yCoord = j * imageSize;
+				int xCoord = x * imageSize;
+				int yCoord = y * imageSize;
 
-				g.drawImage(gridGroups[j][i].getBufferedImage(), xCoord, yCoord, this);
+				g.drawImage(gridGroups[x][y].getBufferedImage(), xCoord, yCoord, this);
 			}
 		}
 

@@ -53,9 +53,11 @@ public class CarEditor extends JDialog
 		{
 			// Update the CarEditor that each car belongs to
 			this.cars.get(i).setCarEditor(this);
+			this.cars.get(i).setID(i);
 			// Deep copy given cars
 			Car copy = cars.get(i).clone();
 			copy.setCarEditor(this);
+			copy.setID(i);
 			this.givenCars.add(copy);
 		}
 

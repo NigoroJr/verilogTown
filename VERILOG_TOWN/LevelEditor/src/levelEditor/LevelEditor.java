@@ -267,12 +267,13 @@ public class LevelEditor extends JFrame
 			}
 			else if (update.isSelected())
 			{
-				File xmlFile = new File(textFilePath.getText());
-				if (!xmlFile.exists())
+				String xmlFilePath = textFilePath.getText();
+
+				if (!new File(xmlFilePath).exists())
 					throw new FileNotFoundException();
 
 				setVisible(false);
-				new MapEditor(xmlFile);
+				new MapEditor(xmlFilePath);
 				setVisible(true);
 			}
 		}

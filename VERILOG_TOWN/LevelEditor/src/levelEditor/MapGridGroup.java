@@ -611,4 +611,9 @@ public class MapGridGroup extends JPanel implements MouseListener
 	{
 		return type;
 	}
+
+	public void setTracker(StateTracker tracker)
+	{
+		this.tracker = tracker;
+	}
 }

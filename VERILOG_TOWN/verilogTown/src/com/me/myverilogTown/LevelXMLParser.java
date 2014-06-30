@@ -125,11 +125,11 @@ public class LevelXMLParser
 	 * @param grids */
 	private void initGrids(GridNode[][] grids)
 	{
-		for (int y = 0; y < grids.length; y++)
+		for (int i = 0; i < grids.length; i++)
 		{
-			for (int x = 0; x < grids[0].length; x++)
+			for (int j = 0; j < grids[0].length; j++)
 			{
-				grids[y][x] = new GridNode(x, y, GridType.NON_ROAD);
+				grids[i][j] = new GridNode(i, j, GridType.NON_ROAD);
 			}
 		}
 	}
