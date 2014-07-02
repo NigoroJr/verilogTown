@@ -64,7 +64,7 @@ public class MapEditor extends JDialog
 	 * bottom-left corner of the map. */
 	/* Need to be careful when actually generating the image because the
 	 * y-coordinate must go from max to 0. */
-	private MapGrid[][]	gridGroups;
+	private MapGrid[][]			gridGroups;
 	/** ArrayList of start and end coordinates. startsEnds[0] has the starting
 	 * coordinates and startsEnds[1] has the ending coordinates. */
 	private ArrayList<int[]>	starts;
