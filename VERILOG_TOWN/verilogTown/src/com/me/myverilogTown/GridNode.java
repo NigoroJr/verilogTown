@@ -35,7 +35,7 @@ public class GridNode
 	private GridNode		south;
 	private GridNode		east;
 	private GridNode		west;
-	
+
 	private GeneralSensor	sensor;
 	private int				endingCounter;
 
@@ -218,20 +218,24 @@ public class GridNode
 		this.signal = traffic_signal;
 		this.location = location;
 	}
-	
-	public void setSensor(GeneralSensor sensor){
+
+	public void setSensor(GeneralSensor sensor)
+	{
 		this.sensor = sensor;
 	}
-	
-	public GeneralSensor getSensor(){
+
+	public GeneralSensor getSensor()
+	{
 		return this.sensor;
 	}
-	
-	public void setEndingCounter(int endingCounter){
+
+	public void setEndingCounter(int endingCounter)
+	{
 		this.endingCounter = endingCounter;
 	}
-	
-	public int getEndingCounter(){
+
+	public int getEndingCounter()
+	{
 		return this.endingCounter;
 	}
 }

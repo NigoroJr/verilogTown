@@ -5,63 +5,75 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class GeneralSensor
 {
-	private Texture					sensorTexture;
-	private int						gridX;
-	private int						gridY;
-	private SpriteBatch				batch;
-	private GridNode				gridNode;
-	private int						number;
-	
-	public GeneralSensor(SpriteBatch batch, int number, int x, int y){
+	private Texture		sensorTexture;
+	private int			gridX;
+	private int			gridY;
+	private SpriteBatch	batch;
+	private GridNode	gridNode;
+	private int			number;
+
+	public GeneralSensor(SpriteBatch batch, int number, int x, int y)
+	{
 		this.batch = batch;
 		this.number = number;
 		this.sensorTexture = new Texture("data/sensor" + number + ".png");
 		this.gridX = x;
 		this.gridY = y;
 	}
-	
-	public void setXY(int x, int y){
+
+	public void setXY(int x, int y)
+	{
 		this.gridX = x;
 		this.gridY = y;
 	}
-	
-	public int getX(){
+
+	public int getX()
+	{
 		return this.gridX;
 	}
-	
-	public int getY(){
+
+	public int getY()
+	{
 		return this.gridY;
 	}
-	
-	public void setGridNode(GridNode gridNode){
+
+	public void setGridNode(GridNode gridNode)
+	{
 		this.gridNode = gridNode;
 	}
-	
-	public GridNode getGridNode(){
+
+	public GridNode getGridNode()
+	{
 		return this.gridNode;
 	}
-	
-	public void draw(){
+
+	public void draw()
+	{
 		batch.draw(sensorTexture, 64 * (gridX - 1), 64 * (gridY - 1));
 	}
-	
-	public void drawUnused(){
+
+	public void drawUnused()
+	{
 		batch.draw(sensorTexture, 64 * gridX, 64 * gridY);
 	}
-	
-	public int getNumber(){
+
+	public int getNumber()
+	{
 		return number;
 	}
-	
-	public Texture getTexture(){
+
+	public Texture getTexture()
+	{
 		return sensorTexture;
 	}
-	
-	public String readSensorInfo(){
+
+	public String readSensorInfo()
+	{
 		String temp = "";
-		if(this.gridNode == null || this.gridNode.getCar() == null)
+		if (this.gridNode == null || this.gridNode.getCar() == null)
 			temp = "0000";
-		else if(this.gridNode != null && this.gridNode.getCar() != null){
+		else if (this.gridNode != null && this.gridNode.getCar() != null)
+		{
 			temp = "00" + Integer.toBinaryString(this.gridNode.getCar().get_end_point().getEndingCounter());
 			temp = temp.substring(temp.length() - 3);
 			temp = "1" + temp;

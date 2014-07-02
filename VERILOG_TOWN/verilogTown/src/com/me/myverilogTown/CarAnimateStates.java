@@ -1,8 +1,6 @@
 package com.me.myverilogTown;
 
-public enum CarAnimateStates 
+public enum CarAnimateStates
 {
-	STOPPED,
-	MOVING
+	STOPPED, MOVING
 }
-

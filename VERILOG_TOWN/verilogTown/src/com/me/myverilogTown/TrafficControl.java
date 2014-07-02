@@ -148,30 +148,27 @@ public class TrafficControl
 		}
 	}
 
-	
-	public void render_complied_failed_stop(SpriteBatch batch, Texture stop_complied_failed){
-		 if (goNorth != null)
-		 {
-			 batch.draw(stop_complied_failed, (goNorth.getX() - 1) * 64, (goNorth.getY() - 1) * 64, 
-					 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
-		 }
-		 if (goSouth != null)
-		 {
-			 batch.draw(stop_complied_failed, (goSouth.getX() - 1) * 64, (goSouth.getY() - 1) * 64, 
-					 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
-		 }
-		 if (goEast != null)
-		 {
-			 batch.draw(stop_complied_failed, (goEast.getX() - 1) * 64, (goEast.getY() - 1) * 64, 
-					 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
-		 }
-		 if (goWest != null)
-		 {
-			 batch.draw(stop_complied_failed, (goWest.getX() - 1) * 64, (goWest.getY() - 1) * 64, 
-					 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false); 
-		 }
+	public void render_complied_failed_stop(
+			SpriteBatch batch,
+			Texture stop_complied_failed)
+	{
+		if (goNorth != null)
+		{
+			batch.draw(stop_complied_failed, (goNorth.getX() - 1) * 64, (goNorth.getY() - 1) * 64, 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false);
+		}
+		if (goSouth != null)
+		{
+			batch.draw(stop_complied_failed, (goSouth.getX() - 1) * 64, (goSouth.getY() - 1) * 64, 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false);
+		}
+		if (goEast != null)
+		{
+			batch.draw(stop_complied_failed, (goEast.getX() - 1) * 64, (goEast.getY() - 1) * 64, 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false);
+		}
+		if (goWest != null)
+		{
+			batch.draw(stop_complied_failed, (goWest.getX() - 1) * 64, (goWest.getY() - 1) * 64, 32, 32, 64, 64, 0.7f, 0.7f, 0f, 0, 0, 64, 64, false, false);
+		}
 	}
-			
 
 	/** Sets the nodes surrounding this traffic light.
 	 * 

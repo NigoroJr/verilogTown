@@ -70,8 +70,6 @@ public class TextureButton
 		this.pressed = pressed;
 	}
 
-
-
 	/** Sets the texture to the appropriate texture according to the state of the
 	 * mouse. The state must be either NORMAL, HOVER, or CLICK.
 	 * 
@@ -79,21 +77,25 @@ public class TextureButton
 	 *            State of the mouse. Select from NORMAL, HOVER, or CLICK. */
 	public void drawTexture(int type)
 	{
-		switch (type){
-		case NORMAL:{
-			batch.draw(normal, x, y, width, height);
-			break;
+		switch (type)
+		{
+			case NORMAL:
+			{
+				batch.draw(normal, x, y, width, height);
+				break;
+			}
+			case HOVER:
+			{
+				batch.draw(hover, x, y, width, height);
+				break;
+			}
+			case PRESSED:
+			{
+				batch.draw(pressed, x, y, width, height);
+				break;
+			}
 		}
-		case HOVER :{
-			batch.draw(hover, x, y, width, height);
-			break;
-		}
-		case PRESSED:{
-			batch.draw(pressed, x, y, width, height);
-			break;
-		}
-		}
-		
+
 	}
 
 	/** Returns whether the given x and y coordinates of the mouse is above this

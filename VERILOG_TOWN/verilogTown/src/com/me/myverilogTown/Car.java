@@ -75,7 +75,7 @@ public class Car
 	private float				animating_turn_x;
 	private float				animating_turn_y;
 	private float				turn_rotation;
-	
+
 	private boolean				is_forced_turned;
 
 	/** Sets the start and end grid and the start time of this car. TODO:
@@ -530,7 +530,7 @@ public class Car
 		animating_turn_x = p1_x;
 		animating_turn_y = p1_y;
 
-		/*p2-->p3 | | p1 */
+		/* p2-->p3 | | p1 */
 		if (p1.getX() < p3.getX() && p1.getY() < p3.getY() && p2.getX() == p1.getX())
 		{
 			direction_clockwise = true;
@@ -539,7 +539,7 @@ public class Car
 			turn_rotation = 90; // relative to direction animation
 			start_angle = 180; // relative to the center to p1
 		}
-		/*p1-- | | v */
+		/* p1-- | | v */
 		else if (p1.getX() < p3.getX() && p1.getY() > p3.getY() && p2.getX() == p3.getX())
 		{
 			direction_clockwise = true;
@@ -548,8 +548,7 @@ public class Car
 			turn_rotation = 360;
 			start_angle = 90;
 		}
-		/*
-		 * p1 | | <-- */
+		/* p1 | | <-- */
 		else if (p1.getX() > p3.getX() && p1.getY() > p3.getY() && p2.getX() == p1.getX())
 		{
 			direction_clockwise = true;
@@ -558,7 +557,7 @@ public class Car
 			turn_rotation = 270;
 			start_angle = 360;
 		}
-		/*A | | --p1 */
+		/* A | | --p1 */
 		else if (p1.getX() > p3.getX() && p1.getY() < p3.getY() && p2.getX() == p3.getX())
 		{
 			direction_clockwise = true;
@@ -576,7 +575,7 @@ public class Car
 			turn_rotation = 180;
 			start_angle = 90;
 		}
-		/*p3-- | | A */
+		/* p3-- | | A */
 		else if (p1.getX() > p3.getX() && p1.getY() < p3.getY() && p2.getX() == p1.getX())
 		{
 			direction_clockwise = false;
@@ -585,8 +584,7 @@ public class Car
 			turn_rotation = 90;
 			start_angle = 0;
 		}
-		/*
-		 * p3 | | >-- */
+		/* p3 | | >-- */
 		else if (p1.getX() < p3.getX() && p1.getY() < p3.getY() && p2.getX() == p3.getX())
 		{
 			direction_clockwise = false;
@@ -595,7 +593,7 @@ public class Car
 			turn_rotation = 0;
 			start_angle = 270;
 		}
-		/*v | | --p3 */
+		/* v | | --p3 */
 		else if (p1.getX() < p3.getX() && p1.getY() > p3.getY() && p2.getX() == p1.getX())
 		{
 			direction_clockwise = false;
@@ -621,7 +619,7 @@ public class Car
 		animating_turn_x = p1_x;
 		animating_turn_y = p1_y;
 
-		/*p3--p2 | | | | p4 p1 */
+		/* p3--p2 | | | | p4 p1 */
 		if (p1.getY() == p4.getY() && p1.getY() < p2.getY())
 		{
 			direction_clockwise = false;
@@ -630,7 +628,7 @@ public class Car
 			turn_rotation = 90; // relative to direction animation
 			start_angle = 0; // relative to the center to p1
 		}
-		/*p4--p3 | | p1--p2 */
+		/* p4--p3 | | p1--p2 */
 		else if (p1.getX() == p4.getX() && p1.getX() < p2.getX())
 		{
 			direction_clockwise = false;
@@ -639,7 +637,7 @@ public class Car
 			turn_rotation = 0; // relative to direction animation
 			start_angle = 270; // relative to the center to p1
 		}
-		/*p1 p4 | | | | p2--p3 */
+		/* p1 p4 | | | | p2--p3 */
 		else if (p1.getY() == p4.getY() && p1.getY() > p2.getY())
 		{
 			direction_clockwise = false;
@@ -648,7 +646,7 @@ public class Car
 			turn_rotation = 270; // relative to direction animation
 			start_angle = 180; // relative to the center to p1
 		}
-		/*p2--p1 | | p3--p4 */
+		/* p2--p1 | | p3--p4 */
 		else if (p1.getX() == p4.getX() && p1.getX() > p2.getX())
 		{
 			direction_clockwise = false;
@@ -802,8 +800,9 @@ public class Car
 	{
 		this.path.push(point);
 	}
-	
-	public Stack<GridNode> getPath(){
+
+	public Stack<GridNode> getPath()
+	{
 		return path;
 	}
 
@@ -890,13 +889,15 @@ public class Car
 	{
 		return this.direction;
 	}
-	
-	public void set_forced_turned(boolean is_forced_turned){
+
+	public void set_forced_turned(boolean is_forced_turned)
+	{
 		this.is_forced_turned = is_forced_turned;
 	}
-	
-	public boolean get_forced_turned(){
+
+	public boolean get_forced_turned()
+	{
 		return this.is_forced_turned;
 	}
-		
+
 }
