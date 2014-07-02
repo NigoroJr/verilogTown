@@ -43,7 +43,7 @@ public class LevelLogic
 		 * car's front to travel through a grid point */
 		time_step = 0;
 		count_cars_done = 0;
-		num_general_sensors = 30;
+		num_general_sensors = 7;
 
 		/* Queues to do processing steps */
 		car_processing_q = new LinkedList<Integer>();
@@ -55,19 +55,20 @@ public class LevelLogic
 			int num_cars,
 			VerilogTownMap clevel,
 			Random randomno,
-			Parse Compiler[])
+			Parse Compiler[],
+			GeneralSensor sensor[])
 	{
 		ArrayList<Integer> light_values;
 		String general_sensors;
 		/* increment time */
 		time_step++; // a second of time at 25 FPS
 
-		general_sensors = "";
+		general_sensors = "00";
 		/* setup general sensors - NOT DONE */
-		for (int i = 0; i < num_general_sensors; i++)
+		for (int i = sensor.length - 1; i >= 0; i--)
 		{
 			/* Check sensor */
-			general_sensors = general_sensors + "0";
+			general_sensors = general_sensors + sensor[i].readSensorInfo();
 		}
 
 		/* simulation of traffic lights. This is where the Verilog simulation

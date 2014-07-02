@@ -24,8 +24,13 @@ THE SOFTWARE.
 
 package com.me.myverilogTown;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -43,6 +48,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class LevelScreen implements Screen
 {
@@ -83,6 +89,15 @@ public class LevelScreen implements Screen
 	private Texture[]			numbers_chiller;
 	private Texture				colon_chiller;
 	private Texture				press_h;
+	private Texture				main_menu;
+	private Texture				next_level;
+	private Texture				try_again;
+	private Texture				sensorTexture[];
+	private Sprite				sensorTextureTrans[];
+	private Texture				non_sensor;
+	private Texture				ban;
+	private Texture				redDot;
+	private Texture				greenDot;
 
 	private int					LEVEL_WIDTH;
 	private int					LEVEL_HEIGHT;
@@ -132,6 +147,8 @@ public class LevelScreen implements Screen
 
 	private boolean				lastButtonPressed			= false;
 	private boolean				currentButtonPressed		= false;
+	private boolean 			lastRightButtonPressed 		= false;
+	private boolean 			currentRightButtonPressed	= false;
 	private LevelXMLParser		parser;
 
 	private boolean				problem_with_compile;
@@ -141,6 +158,22 @@ public class LevelScreen implements Screen
 
 	private int					three_way_int				= 0;
 	private int					four_way_int				= 0;
+	
+	private int					currentSensorCounter;
+	private int					lastSensorCounter;
+	private int					sensorNumber;
+	private int					sensorX;
+	private int					sensorY;
+	private GeneralSensor		sensor[];
+	private boolean				isPlacingSensor;
+	private Sprite				tempSprite;
+	private File				sensorFile;
+	private GeneralSensor		tempSensor;
+	
+	private Car					lastCarShowDestination;
+	private ArrayList<Integer>	pathToDestinationX;
+	private ArrayList<Integer>	pathToDestinationY;
+	private double				showDestinationTime;
 
 	public LevelScreen(final VerilogTown gam, int level_number)
 	{
@@ -257,6 +290,32 @@ public class LevelScreen implements Screen
 		level_finish.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		press_h = new Texture("data/press_h_for_help.png");
 		press_h.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		main_menu = new Texture("ASSET_RESOURCES/main_menu_normal.png");
+		main_menu.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		next_level = new Texture("ASSET_RESOURCES/next_level_normal.png");
+		next_level.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		try_again = new Texture("ASSET_RESOURCES/try_again_normal.png");
+		try_again.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		ban = new Texture("data/ban.png");
+		ban.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		non_sensor = new Texture("data/sensor_non.png");
+		non_sensor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		sensorTexture = new Texture[8];
+		sensorTextureTrans = new Sprite[8];
+		for(int i = 0; i < 8; i++){
+			sensorTexture[i] = new Texture("data/sensor" + i + ".png");
+			sensorTextureTrans[i] = new Sprite(sensorTexture[i]);
+			sensorTextureTrans[i].setColor(sensorTextureTrans[i].getColor().r, sensorTextureTrans[i].getColor().g, sensorTextureTrans[i].getColor().b, 0.7f);
+		}
+		
+		redDot = new Texture("data/red_dot.png");
+		redDot.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		greenDot = new Texture("data/green_dot.png");
+		greenDot.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
 
 		inputProcessor = new InputHandler(camera, LEVEL_WIDTH, LEVEL_HEIGHT, SCORE_BAR_HEIGHT, disableZoom);
 
@@ -284,6 +343,72 @@ public class LevelScreen implements Screen
 
 		helpYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
 		finishYPosition = LEVEL_HEIGHT + SCORE_BAR_HEIGHT;
+		
+		//setup the sensors
+		sensor = new GeneralSensor[7];
+		for(int i = 0; i < 7; i++){
+			sensor[i] = new GeneralSensor(thebatch, i, 0, 0);
+		}
+		sensorFile = new File(VerilogTown.getRootPath() + "/Levels/Lv" + level_number + "/sensorFile.txt");
+		try
+		{
+			InputStreamReader sensorFileReader = new InputStreamReader(new FileInputStream(sensorFile));
+			BufferedReader br = new BufferedReader(sensorFileReader);
+			String temp = null;
+			for(int i = 0; i < 7; i++){
+				if((temp = br.readLine()) != null){
+					sensorNumber = Integer.parseInt(temp.substring(0, temp.indexOf(" ")));
+					sensorX = Integer.parseInt(temp.substring(temp.indexOf(" ") + 1, temp.lastIndexOf(" ")));
+					sensorY = Integer.parseInt(temp.substring(temp.lastIndexOf(" ") + 1));
+					sensor[sensorNumber] = new GeneralSensor(thebatch, sensorNumber, sensorX, sensorY);
+				}
+			}
+			br.close();
+			sensorFileReader.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		//attach the existed sensors to the grid node
+		for(int i = 0; i < sensor.length; i++){
+			if(sensor[i].getX() != 0 && sensor[i].getY() != 0){
+				clevel.grid[sensor[i].getX()][sensor[i].getY()].setSensor(sensor[i]);
+				sensor[i].setGridNode(clevel.grid[sensor[i].getX()][sensor[i].getY()]);
+			}
+		}
+		
+		//mark the ending points with numbers
+		int endingCounter = 0;
+		for(int i = 0; i < clevel.grid.length; i++){
+			if(clevel.grid[i][clevel.grid.length - 1].getType() == GridType.END_N2NEDGE){
+				clevel.grid[i][clevel.grid.length - 1].setEndingCounter(endingCounter);
+				endingCounter++;
+			}
+		}
+		for(int i = clevel.grid[0].length - 1; i >= 0; i--){
+			if(clevel.grid[clevel.grid.length - 1][i].getType() == GridType.END_E2EEDGE){
+				clevel.grid[clevel.grid.length - 1][i].setEndingCounter(endingCounter);
+				endingCounter++;
+			}
+		}
+		for(int i = clevel.grid.length - 1; i >= 0; i--){
+			if(clevel.grid[i][0].getType() == GridType.END_S2SEDGE){
+				clevel.grid[i][0].setEndingCounter(endingCounter);
+				endingCounter++;
+			}
+		}
+		for(int i = 0; i < clevel.grid[0].length; i++){
+			if(clevel.grid[0][i].getType() == GridType.END_W2WEDGE){
+				clevel.grid[0][i].setEndingCounter(endingCounter);
+				endingCounter++;
+			}
+		}
+		
+		lastCarShowDestination = null;
+		pathToDestinationX = new ArrayList<Integer>();
+		pathToDestinationY = new ArrayList<Integer>();
 	}
 
 	@Override
@@ -311,6 +436,37 @@ public class LevelScreen implements Screen
 		thebatch.setProjectionMatrix(camera.combined);
 		uibatch.setProjectionMatrix(uiCamera.combined);
 
+		double pixOfWindowX = LEVEL_WIDTH * camera.zoom;
+		double pixOfWindowY = (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) * camera.zoom;
+
+		double sizeOfWindowX = Gdx.graphics.getWidth();
+		double sizeOfWindowY = Gdx.graphics.getHeight();
+
+		double mousePositionX = Gdx.input.getX();
+		double mousePositionY = Gdx.input.getY();
+
+		double centerX = camera.position.x;
+		double centerY = camera.position.y;
+
+		double realX = (centerX - pixOfWindowX / 2) + ((mousePositionX / sizeOfWindowX) * pixOfWindowX);
+		double realY = (centerY - pixOfWindowY / 2) + ((1 - mousePositionY / sizeOfWindowY) * pixOfWindowY);
+
+		realX = Math.min(realX, LEVEL_WIDTH);
+		realY = Math.min(realY, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
+		
+		int gridX = 0, gridY = 0;
+
+		if (realY <= LEVEL_HEIGHT)
+		{
+			gridX = (int) (realX / 64);
+			gridY = (int) (realY / 64);
+		}
+		
+		lastButtonPressed = currentButtonPressed;
+		currentButtonPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+		lastRightButtonPressed = currentRightButtonPressed;
+		currentRightButtonPressed = Gdx.input.isButtonPressed(Input.Buttons.RIGHT); 
+		
 		Gdx.input.setInputProcessor(inputProcessor);
 
 		Time += Gdx.graphics.getDeltaTime();
@@ -327,6 +483,10 @@ public class LevelScreen implements Screen
 			thebatch.begin();
 			thebatch.draw(level_map, 0, 0, LEVEL_WIDTH, LEVEL_HEIGHT);
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
+			
+			drawBiggestUnusedSensor();
+			drawUsedSensor();
+			
 			thebatch.end();
 		}
 
@@ -350,7 +510,7 @@ public class LevelScreen implements Screen
 		{
 			/* IF - tick happends and simulating then simulate a time frame */
 			/* Gdx.app.log("Time Since last simulation:", "="+ Time); */
-			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number, Compiler);
+			this.level_done = levelLogic.update(this.cars, this.num_cars, clevel, random_number, Compiler, sensor);
 			this.crash_cars = levelLogic.crash_cars;
 			this.forced_cars = clevel.forced_cars;
 			this.failed_cars = clevel.forced_cars + levelLogic.crash_cars;
@@ -379,6 +539,9 @@ public class LevelScreen implements Screen
 
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
 
+			drawBiggestUnusedSensor();
+			drawUsedSensor();
+			
 			thebatch.end();
 		}
 
@@ -387,6 +550,9 @@ public class LevelScreen implements Screen
 			/* Normal animation of simulation */
 			thebatch.begin();
 			thebatch.draw(level_map, 0, 0, LEVEL_WIDTH, LEVEL_HEIGHT);
+			
+			drawUsedSensor();
+			drawBiggestUnusedSensor();
 
 			for (int i = 0; i < num_cars; i++)
 			{
@@ -411,10 +577,93 @@ public class LevelScreen implements Screen
 
 			/* update the traffic light images */
 			clevel.render_traffic_signal_lights(thebatch, stop, go, go_left, go_right, go_forward);
-
+			
 			thebatch.end();
 		}
-
+		
+		
+		if(((gridX + 1 == 1 && gridY + 1 == 1 && getBiggestUnusedSensor() != null) || (clevel.grid[gridX + 1][gridY + 1].getSensor() != null)) 
+			&& !currentButtonPressed && lastButtonPressed && !isPlacingSensor && !simulation_started ){
+			isPlacingSensor = true;
+			if(clevel.grid[gridX + 1][gridY + 1].getSensor() != null){
+				tempSensor = clevel.grid[gridX + 1][gridY + 1].getSensor();
+			}
+			else{
+				tempSensor = getBiggestUnusedSensor();
+			}
+		}
+					
+		if(isPlacingSensor){
+			thebatch.begin();
+			
+			tempSprite = new Sprite(tempSensor.getTexture());
+			tempSprite.setColor(tempSprite.getColor().r, tempSprite.getColor().g, tempSprite.getColor().b, 0.65f);
+			tempSprite.setPosition((float)realX - 32, (float)realY - 32);
+			tempSprite.draw(thebatch);
+			if((clevel.grid[gridX + 1][gridY + 1].signal != null) || (clevel.grid[gridX + 1][gridY + 1].getType() == GridType.NON_ROAD))
+				thebatch.draw(ban, (float)(realX - 32), (float)(realY - 32));
+			else{
+				if(!currentButtonPressed && lastButtonPressed && (tempSensor.getX() != (gridX + 1) || tempSensor.getY() != (gridY + 1))){
+					clevel.grid[tempSensor.getX()][tempSensor.getY()].setSensor(null);
+					tempSensor.setXY((gridX + 1), (gridY + 1));
+					tempSensor.setGridNode(clevel.grid[gridX + 1][gridY + 1]);
+					clevel.grid[gridX + 1][gridY + 1].setSensor(tempSensor);
+					updateSensorFile();
+					isPlacingSensor = false;
+				}
+			}
+			
+			thebatch.end();
+		}
+		
+		if(!isPlacingSensor && !simulation_started && clevel.grid[gridX + 1][gridY + 1].getSensor() != null
+				&& !currentRightButtonPressed && lastRightButtonPressed){
+			clevel.grid[gridX + 1][gridY + 1].getSensor().setXY(0, 0);
+			clevel.grid[gridX + 1][gridY + 1].getSensor().setGridNode(null);
+			clevel.grid[gridX + 1][gridY + 1].setSensor(null);
+			updateSensorFile();
+		}
+		
+		if(isPlacingSensor && !currentRightButtonPressed && lastRightButtonPressed){
+			isPlacingSensor = false;
+		}
+		
+		//show cars destination
+		if(simulation_started && isSimulationPaused && !help_menu_pop){
+			Car tempCar = clevel.grid[gridX + 1][gridY + 1].getCar(); 
+			if(tempCar != null && tempCar != lastCarShowDestination){
+				for(GridNode gridNode : tempCar.getPath()){
+					pathToDestinationX.add(gridNode.getX());
+					pathToDestinationY.add(gridNode.getY());
+				}
+				lastCarShowDestination = tempCar;
+				showDestinationTime = 0;
+			}
+			else if(tempCar != null && tempCar == lastCarShowDestination){
+				showDestinationTime += 1;
+				Texture tempTexture;
+				thebatch.begin();
+				if(tempCar.get_forced_turned())
+					tempTexture = redDot;
+				else
+					tempTexture = greenDot;
+				/*for(int i = 0; i < Math.min(pathToDestinationX.size(), (int)showDestinationTime / 4); i++){
+					thebatch.draw(tempTexture, (pathToDestinationX.get(i) - 1) * 64, (pathToDestinationY.get(i) - 1) * 64);
+				}*/
+				for(int i = pathToDestinationX.size() - 1; i >= pathToDestinationX.size() - Math.min(pathToDestinationX.size(), (int)showDestinationTime / 4); i--){
+					thebatch.draw(tempTexture, (pathToDestinationX.get(i) - 1) * 64, (pathToDestinationY.get(i) - 1) * 64);
+				}
+				thebatch.end();
+			}
+			else if(tempCar == null){
+				pathToDestinationX.clear();
+				pathToDestinationY.clear();
+				lastCarShowDestination = null;
+				showDestinationTime = 0;
+			}
+		}
+		
+		
 		/* Draw the UI ontop of the level map */
 		draw_score_bar();
 
@@ -447,6 +696,10 @@ public class LevelScreen implements Screen
 			thebatch.draw(colon_chiller, 840, finishYPosition + 895, 75, 75);
 			thebatch.draw(numbers_chiller[((int) playTime % 60) / 10], 895, finishYPosition + 895, 75, 75);
 			thebatch.draw(numbers_chiller[((int) playTime % 60) % 10], 960, finishYPosition + 895, 75, 75);
+			
+			thebatch.draw(main_menu, 150, finishYPosition + 150, 300, 98);
+			thebatch.draw(try_again, 500, finishYPosition + 150, 300, 98);
+			thebatch.draw(next_level, 850, finishYPosition + 151, 300, 98);
 
 			if (finishYPosition == 0 && finish_time >= 0.7)
 			{
@@ -457,31 +710,6 @@ public class LevelScreen implements Screen
 		}
 
 		// determine the type of tile that the mouse is click
-		double pixOfWindowX = LEVEL_WIDTH * camera.zoom;
-		double pixOfWindowY = (LEVEL_HEIGHT + SCORE_BAR_HEIGHT) * camera.zoom;
-
-		double sizeOfWindowX = Gdx.graphics.getWidth();
-		double sizeOfWindowY = Gdx.graphics.getHeight();
-
-		double mousePositionX = Gdx.input.getX();
-		double mousePositionY = Gdx.input.getY();
-
-		double centerX = camera.position.x;
-		double centerY = camera.position.y;
-
-		double realX = (centerX - pixOfWindowX / 2) + ((mousePositionX / sizeOfWindowX) * pixOfWindowX);
-		double realY = (centerY - pixOfWindowY / 2) + ((1 - mousePositionY / sizeOfWindowY) * pixOfWindowY);
-
-		realX = Math.min(realX, LEVEL_WIDTH);
-		realY = Math.min(realY, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
-
-		int gridX = 0, gridY = 0;
-
-		if (realY <= LEVEL_HEIGHT)
-		{
-			gridX = (int) (realX / 64);
-			gridY = (int) (realY / 64);
-		}
 
 		int counter;
 		for (counter = 0; counter < clevel.get_num_traffic_signals(); counter++)
@@ -491,17 +719,15 @@ public class LevelScreen implements Screen
 		}
 
 		// traffic lights highlighting
-		if (clevel.grid[gridX + 1][gridY + 1].signal != null && !simulation_started && isSimulationPaused)
+		if (clevel.grid[gridX + 1][gridY + 1].signal != null && !simulation_started && isSimulationPaused && !isPlacingSensor)
 		{
 			thebatch.begin();
 			clevel.traffic_signals[counter].render_highlighted_stop(thebatch, stop_highlighted);
 			thebatch.end();
-			draw_score_bar();
 		}
 
-		lastButtonPressed = currentButtonPressed;
-		currentButtonPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
-		if (!currentButtonPressed && (clevel.grid[gridX + 1][gridY + 1].signal != null) && lastButtonPressed && (Time - lastTime) >= 0.6 && !simulation_started && isSimulationPaused)
+		
+		if (!currentButtonPressed && (clevel.grid[gridX + 1][gridY + 1].signal != null) && lastButtonPressed && (Time - lastTime) >= 0.6 && !simulation_started && isSimulationPaused && !isPlacingSensor)
 		{
 			/* Open the editor from an external jar */
 			String jar_path;
@@ -531,6 +757,7 @@ public class LevelScreen implements Screen
 
 			lastTime = Time;
 		}
+		
 		if (help_menu_pop)
 		{
 			thebatch.begin();
@@ -631,7 +858,7 @@ public class LevelScreen implements Screen
 		/* Polling solution at present */
 
 		/* Sim on and off */
-		if ((Gdx.input.isKeyPressed(Keys.S) && isSimulationPaused && !help_menu_pop) || (Gdx.input.isKeyPressed(Keys.X) && !isSimulationPaused))
+		if ((Gdx.input.isKeyPressed(Keys.S) && isSimulationPaused && !help_menu_pop) || (Gdx.input.isKeyPressed(Keys.P) && !isSimulationPaused))
 		{
 			if (!simulation_started)
 			{
@@ -707,7 +934,7 @@ public class LevelScreen implements Screen
 		}
 
 		/* Zoom out */
-		if (Gdx.input.isKeyPressed(Keys.A) && !disableZoom)
+		if (Gdx.input.isKeyPressed(Keys.MINUS) && !disableZoom)
 		{
 			if (zoom_initial != camera.zoom)
 			{
@@ -718,7 +945,7 @@ public class LevelScreen implements Screen
 		}
 
 		/* Zoom in */
-		if (Gdx.input.isKeyPressed(Keys.Q) && !disableZoom)
+		if (Gdx.input.isKeyPressed(Keys.EQUALS) && !disableZoom)
 		{
 			if (camera.zoom >= 0.1)
 				camera.zoom -= 0.02;
@@ -767,6 +994,12 @@ public class LevelScreen implements Screen
 			// +"camera position y: " + camera.position.y);
 			// System.out.println("mouse position x: " + Gdx.input.getX() +
 			// "mouse position y: " + Gdx.input.getY());
+		}
+		if(Gdx.input.isKeyPressed(Keys.C) && !simulation_started){
+			for(int i = 0; i < 7; i++){
+				sensor[i].setXY(0, 0);
+			}
+			updateSensorFile();
 		}
 	}
 
@@ -820,6 +1053,44 @@ public class LevelScreen implements Screen
 
 		/* reset position */
 		camera.position.set(camX, camY, camera.position.z);
+	}
+	
+	public GeneralSensor getBiggestUnusedSensor(){
+		GeneralSensor temp = null;
+		for(int i = 0; i < 7; i++){
+			if(sensor[i].getX() == 0 && sensor[i].getY() == 0)
+				temp = sensor[i];
+		}
+		return temp;
+	}
+	
+	public void drawBiggestUnusedSensor(){
+		if(getBiggestUnusedSensor() != null){
+			getBiggestUnusedSensor().drawUnused();
+		}
+		else
+			thebatch.draw(non_sensor, 0, 0);
+	}
+	
+	public void drawUsedSensor(){
+		for(int i = 0; i < 7; i++){
+			if(sensor[i].getX() != 0 && sensor[i].getY() != 0)
+				sensor[i].draw();
+		}
+	}
+	
+	public void updateSensorFile(){
+		try{
+			FileWriter out = new FileWriter(sensorFile);
+			for(int i = 0; i < 7; i++){
+				out.write(sensor[i].getNumber() + " " + sensor[i].getX() + " " + sensor[i].getY() + "\n");
+			}
+			out.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -961,6 +1232,7 @@ class InputHandler extends InputAdapter
 		sizeOfWindowY = Gdx.graphics.getHeight();
 		centerX = camera.position.x;
 		centerY = camera.position.y;
+		
 		currentRealX = (centerX - pixOfWindowX / 2) + ((currentMousePositionX / sizeOfWindowX) * pixOfWindowX);
 		currentRealY = (centerY - pixOfWindowY / 2) + ((1 - currentMousePositionY / sizeOfWindowY) * pixOfWindowY);
 		currentRealX = Math.min(currentRealX, LEVEL_WIDTH);

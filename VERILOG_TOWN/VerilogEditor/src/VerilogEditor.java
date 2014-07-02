@@ -690,6 +690,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 				/* Reset the system - takes a double simulation */
 				Compiler.sim_cycle("0", "00000000", "000000000000000000000000000000");
 				Compiler.sim_cycle("1", "00000000", "000000000000000000000000000000");
+				errorText.setText(errorText.getText() + "\nCompiling done!");
 			}
 		}
 		catch (Exception e1)
@@ -1282,6 +1283,8 @@ class searchAndReplaceDialog extends JDialog
 		cTargetField.anchor = GridBagConstraints.LINE_START;
 		cTargetField.insets = new Insets(0,7,0,10);
 		targetField.setFont(font2);
+		targetField.setPreferredSize(new Dimension(1200, 22));
+		targetField.setMinimumSize(new Dimension(1200, 22));
 		targetField.addKeyListener(new KeyAdapter()
 		{
 			@Override
@@ -1307,6 +1310,8 @@ class searchAndReplaceDialog extends JDialog
 		cReplaceField.anchor = GridBagConstraints.LINE_START;
 		cReplaceField.insets = new Insets(0,7,10,10);
 		replaceField.setFont(font2);
+		replaceField.setPreferredSize(new Dimension(1200,22));
+		replaceField.setMinimumSize(new Dimension(1200, 22));
 		contentPane.add(replaceField, cReplaceField);
 		
 		GridBagConstraints cFind = new GridBagConstraints();

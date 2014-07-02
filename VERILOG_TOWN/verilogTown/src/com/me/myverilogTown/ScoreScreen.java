@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 
+import java.io.*;
+
 public class ScoreScreen implements Screen
 {
 	private final VerilogTown		game;
@@ -15,6 +17,7 @@ public class ScoreScreen implements Screen
 	private Texture[] 				numbers_chiller;
 	private TextureButton			main_menu;
 	private TextureButton			next_level;
+	private TextureButton			try_again;
 	private Texture					background;
 	private Texture					colon_chiller;
 	private int						level_number;
@@ -54,6 +57,14 @@ public class ScoreScreen implements Screen
 	private Texture					next_level_hover;
 	private Texture					next_level_pressed;
 	
+	private Texture					try_again_normal;
+	private Texture					try_again_hover;
+	private Texture					try_again_pressed;
+	
+	private File					high_score_file;
+	private int						high_score_car_passed[];
+	private int 					high_score_time[];
+	
 	public ScoreScreen (VerilogTown game, int level_number, int car_success, int car_failed,
 						double time, int three_way_int, int four_way_int){
 		this.game = game;
@@ -77,14 +88,103 @@ public class ScoreScreen implements Screen
 		next_level_hover = new Texture("ASSET_RESOURCES/next_level_mouse_on.png");
 		next_level_pressed = new Texture("ASSET_RESOURCES/next_level_pressed.png");
 		
-		next_level = new TextureButton(game.batch, 722, 152, 350, 106, next_level_normal, next_level_hover, next_level_pressed);
-		main_menu = new TextureButton(game.batch, 190, 150, 350, 112, main_menu_normal, main_menu_hover, main_menu_pressed);
+		try_again_normal = new Texture("ASSET_RESOURCES/try_again_normal.png");
+		try_again_hover = new Texture("ASSET_RESOURCES/try_again_mouse_on.png");
+		try_again_pressed = new Texture("ASSET_RESOURCES/try_again_pressed.png");
+		
+		main_menu = new TextureButton(game.batch, 150, 150, 300, 98, main_menu_normal, main_menu_hover, main_menu_pressed);
+		try_again = new TextureButton(game.batch, 500, 150, 300, 98, try_again_normal, try_again_hover, try_again_pressed);
+		next_level = new TextureButton(game.batch, 850, 151, 300, 98, next_level_normal, next_level_hover, next_level_pressed);
+		
 		for(int i = 0; i < 10; i++){
 			numbers_chiller[i] = new Texture("data/chiller_num_" + i + ".png");
 			numbers_chiller[i].setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		}
 		colon_chiller = new Texture("data/chiller_colon.png");
 		colon_chiller.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		high_score_car_passed = new int[10];
+		high_score_time = new int[10];
+		high_score_file = new File(VerilogTown.getRootPath() + "/Levels/" + "Lv" + level_number + "/high_score.txt");
+		if(!high_score_file.exists()){
+			try
+			{
+				high_score_file.createNewFile();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else{
+			try
+			{
+				InputStreamReader reader = new InputStreamReader(new FileInputStream(high_score_file));
+				BufferedReader br = new BufferedReader(reader);
+				String temp = null;
+				for(int i = 0; i < 10; i++){
+					if((temp = br.readLine()) != null){
+						high_score_car_passed[i] = Integer.parseInt(temp.substring(0, temp.indexOf(" ")));
+						high_score_time[i] = Integer.parseInt(temp.substring(temp.indexOf(" ") + 1));
+					}
+					else{
+						high_score_car_passed[i] = 0;
+						high_score_time[i] = 0;
+					}
+				}
+				br.close();
+				reader.close();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		for(int i = 0; i < 10; i++){
+			if(this.success_cars == high_score_car_passed[i]){
+				if((int)this.playTime == high_score_time[i])
+					break;
+				else if((int)this.playTime > high_score_time[i])
+					continue;
+				else {
+					for(int j = 9; j > i; j--){
+						high_score_car_passed[j] = high_score_car_passed[j - 1];
+						high_score_time[j] = high_score_time[j - 1];
+					}
+					high_score_car_passed[i] = this.success_cars;
+					high_score_time[i] = (int)this.playTime;
+				}
+			}
+			else if(this.success_cars > high_score_car_passed[i]){
+				for(int j = 9; j > i; j--){
+					high_score_car_passed[j] = high_score_car_passed[j - 1];
+					high_score_time[j] = high_score_time[j - 1];
+				}
+				high_score_car_passed[i] = this.success_cars;
+				high_score_time[i] = (int)this.playTime;
+				break;
+			}
+			else if(this.success_cars < high_score_car_passed[i])
+				continue;
+		}
+		
+		try
+		{
+			FileWriter out = new FileWriter(high_score_file);
+			for(int i = 0; i < 10; i++){
+				out.write(high_score_car_passed[i] + " " + high_score_time[i] + "\n");
+			}
+			out.close();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -137,18 +237,31 @@ public class ScoreScreen implements Screen
 		game.batch.draw(numbers_chiller[((int) playTime % 60) / 10], 895, 895, 75, 75);
 		game.batch.draw(numbers_chiller[((int) playTime % 60) % 10], 960, 895, 75, 75);
 		
-		
-		
 		if(main_menu.isOnButton(realX, realY)){
 			if (isPressed)
 				main_menu.drawTexture(TextureButton.PRESSED);
-			else if (wasPressed)
+			else if (wasPressed){
+				this.dispose();
 				game.setScreen(new MainMenu(game));
+			}
 			else 
 				main_menu.drawTexture(TextureButton.HOVER);
 		}
 		else
 			main_menu.drawTexture(TextureButton.NORMAL);
+		
+		if(try_again.isOnButton(realX, realY)){
+			if (isPressed)
+				try_again.drawTexture(TextureButton.PRESSED);
+			else if (wasPressed){
+				this.dispose();
+				game.setScreen(new LevelScreen(game, level_number));
+			}
+			else 
+				try_again.drawTexture(TextureButton.HOVER);
+		}
+		else
+			try_again.drawTexture(TextureButton.NORMAL);
 		
 		if(next_level.isOnButton(realX, realY)){
 			if (isPressed)

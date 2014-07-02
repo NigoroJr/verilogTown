@@ -802,6 +802,10 @@ public class Car
 	{
 		this.path.push(point);
 	}
+	
+	public Stack<GridNode> getPath(){
+		return path;
+	}
 
 	public int get_start_time()
 	{

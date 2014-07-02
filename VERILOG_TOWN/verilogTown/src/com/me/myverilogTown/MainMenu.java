@@ -65,6 +65,7 @@ public class MainMenu implements Screen
 	private TextureButton  		level3;
 	private TextureButton		tutorial;
 	private TextureButton		credits;
+	private TextureButton       high_score;
 	
 	private Texture				level1_normal;
 	private Texture				level1_hover;
@@ -86,6 +87,9 @@ public class MainMenu implements Screen
 	private Texture				credits_hover;
 	private Texture				credits_pressed;
 	
+	private Texture				high_score_normal;
+	private Texture				high_score_hover;
+	private Texture				high_score_pressed;	
 
 	public MainMenu(final VerilogTown gam)
 	{
@@ -121,11 +125,16 @@ public class MainMenu implements Screen
 		credits_hover = new Texture("ASSET_RESOURCES/credits_mouse_on.png");
 		credits_pressed = new Texture("ASSET_RESOURCES/credits_pressed.png");
 		
+		high_score_normal = new Texture("ASSET_RESOURCES/high_score_normal.png");
+		high_score_hover = new Texture("ASSET_RESOURCES/high_score_mouse_on.png");
+		high_score_pressed = new Texture("ASSET_RESOURCES/high_score_pressed.png");
+		
 		level1 = new TextureButton(game.batch, 512, 705, 250, 60, level1_normal, level1_hover, level1_pressed);
 		level2 = new TextureButton(game.batch, 512, 605, 250, 60, level2_normal, level2_hover, level2_pressed);
 		level3 = new TextureButton(game.batch, 512, 505, 250, 60, level3_normal, level3_hover, level3_pressed);
 		tutorial = new TextureButton(game.batch, 512, 805, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
-		credits = new TextureButton(game.batch, 512, 405, 250, 60, credits_normal, credits_hover, credits_pressed);
+		high_score = new TextureButton(game.batch, 512, 405, 250, 60, high_score_normal, high_score_hover, high_score_pressed);
+		credits = new TextureButton(game.batch, 512, 305, 250, 60, credits_normal, credits_hover, credits_pressed);
 		
 		time = 0;
 	}
@@ -227,6 +236,21 @@ public class MainMenu implements Screen
 		}
 		else
 			tutorial.drawTexture(TextureButton.NORMAL);
+		
+		if(high_score.isOnButton(realX, realY))
+		{
+			if(isPressed)
+				high_score.drawTexture(TextureButton.PRESSED);
+			else if (wasPressed){
+				this.dispose();
+				//show the high score screen here
+				game.setScreen(new LocalHighScoreScreen(game));
+			}
+			else
+				high_score.drawTexture(TextureButton.HOVER);				
+		}
+		else 
+			high_score.drawTexture(TextureButton.NORMAL);
 
 		// Credits button
 		if (credits.isOnButton(realX, realY))
