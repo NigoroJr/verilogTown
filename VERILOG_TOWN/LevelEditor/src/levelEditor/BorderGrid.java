@@ -60,6 +60,9 @@ public class BorderGrid extends JPanel implements MouseListener
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
+		if (!tracker.isDragging())
+			return;
+
 		int exitedFrom = MapGrid.NIL;
 
 		switch (border)
