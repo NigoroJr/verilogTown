@@ -29,8 +29,8 @@ public class BorderGrid extends JPanel implements MouseListener
 
 		addMouseListener(this);
 
-		int width = border == MapGridGroup.NORTH || border == MapGridGroup.SOUTH ? length * (MapGrid.GRID_SIZE + MapEditor.BORDER) : MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER;
-		int height = border == MapGridGroup.NORTH || border == MapGridGroup.SOUTH ? MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER : length * (MapGrid.GRID_SIZE + MapEditor.BORDER);
+		int width = border == MapGridGroup.NORTH || border == MapGridGroup.SOUTH ? length * (MapGridGroup.GRID_SIZE / 2 + MapEditor.BORDER) : MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER;
+		int height = border == MapGridGroup.NORTH || border == MapGridGroup.SOUTH ? MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER : length * (MapGridGroup.GRID_SIZE / 2 + MapEditor.BORDER);
 
 		setPreferredSize(new Dimension(width, height));
 	}
@@ -79,29 +79,5 @@ public class BorderGrid extends JPanel implements MouseListener
 		}
 
 		tracker.setPreviouslyExitedFrom(exitedFrom);
-
-		if (MapGridGroup.DEBUG)
-			printInfo("EXIT", exitedFrom);
-	}
-
-	private void printInfo(String state, int dir)
-	{
-		String s = "NIL";
-		switch (dir)
-		{
-			case MapGridGroup.NORTH:
-				s = "NORTH";
-			break;
-			case MapGridGroup.SOUTH:
-				s = "SOUTH";
-			break;
-			case MapGridGroup.EAST:
-				s = "EAST";
-			break;
-			case MapGridGroup.WEST:
-				s = "WEST";
-			break;
-		}
-		System.out.printf("%-5s border from %-5s Dragging: %s\n", state, s, tracker.isDragging());
 	}
 }

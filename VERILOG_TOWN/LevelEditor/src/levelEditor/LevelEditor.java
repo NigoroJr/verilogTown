@@ -252,14 +252,14 @@ public class LevelEditor extends JFrame
 
 				// Set appropriate size of the grids in MapEditor
 				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-				int optimalGridWidth = (screenSize.width - 2 * MapEditor.EDGE_SIZE) / mapSizeX;
+				int optimalGridWidth = 2 * (screenSize.width - 2 * MapEditor.EDGE_SIZE) / mapSizeX;
 				// Account for the task bar, title bar, and buttons
-				int optimalGridHeight = (screenSize.height - 2 * MapEditor.EDGE_SIZE - 200) / mapSizeY;
+				int optimalGridHeight = 2 * (screenSize.height - 2 * MapEditor.EDGE_SIZE - 200) / mapSizeY;
 				int min = Math.min(optimalGridWidth, optimalGridHeight);
-				if (min < MapGrid.DEFAULT_GRID_SIZE)
-					MapGrid.GRID_SIZE = min;
+				if (min < MapGridGroup.DEFAULT_GRID_SIZE)
+					MapGridGroup.GRID_SIZE = min;
 				else
-					MapGrid.GRID_SIZE = MapGrid.DEFAULT_GRID_SIZE;
+					MapGridGroup.GRID_SIZE = MapGridGroup.DEFAULT_GRID_SIZE;
 
 				setVisible(false);
 				new MapEditor(levelNumber, mapSizeX, mapSizeY);

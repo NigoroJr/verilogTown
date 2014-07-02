@@ -2,13 +2,17 @@ package levelEditor;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
@@ -22,8 +26,6 @@ import org.w3c.dom.Element;
 
 public class MapGridGroup extends JPanel implements MouseListener
 {
-	public static boolean		DEBUG				= false;
-
 	/* Corners and straight roads */
 	public static final String	STRAIGHT_NS			= "STRAIGHT_NS";
 	public static final String	STRAIGHT_EW			= "STRAIGHT_EW";
@@ -47,6 +49,12 @@ public class MapGridGroup extends JPanel implements MouseListener
 
 	public static final String	NON_ROAD			= "NON_ROAD";
 
+	/** Size of each grid in pixels */
+	public static final int		DEFAULT_GRID_SIZE	= 60;
+	/* Can be changed when there is not enough screen height */
+	/** Size of each grid in pixels */
+	public static int			GRID_SIZE			= 60;
+
 	/* Directions */
 	public static final int		NIL					= 0;
 	public static final int		NORTH				= 1;
@@ -54,17 +62,12 @@ public class MapGridGroup extends JPanel implements MouseListener
 	public static final int		EAST				= 3;
 	public static final int		WEST				= 4;
 
+	private BufferedImage		image;
 	private StateTracker		tracker;
 
 	private String				type;
-	// Note that these are not the same as the x, y in MapGrid class
 	private int					x;
 	private int					y;
-
-	private MapGrid				topLeft;
-	private MapGrid				topRight;
-	private MapGrid				bottomLeft;
-	private MapGrid				bottomRight;
 
 	private boolean				isStartingPoint;
 	private int					enteredFrom;
@@ -84,17 +87,15 @@ public class MapGridGroup extends JPanel implements MouseListener
 		resetEnterExit();
 
 		setBorder(BorderFactory.createLineBorder(Color.RED));
-		setSize(new Dimension(2 * (MapGrid.GRID_SIZE + MapEditor.BORDER), 2 * (MapGrid.GRID_SIZE + MapEditor.BORDER)));
+		setSize(new Dimension(GRID_SIZE + 2 * MapEditor.BORDER, GRID_SIZE + 2 * MapEditor.BORDER));
 		setMaximumSize(getSize());
 		setMinimumSize(getSize());
 		setPreferredSize(getSize());
 
-		setGrids();
+		setType(type);
 
 		gbl = new GridBagLayout();
 		setLayout(gbl);
-
-		addGrids();
 
 		addMouseListener(this);
 	}
@@ -102,123 +103,61 @@ public class MapGridGroup extends JPanel implements MouseListener
 	public void setType(String type)
 	{
 		this.type = type;
-		setGrids();
-		removeAll();
-		addGrids();
+		repaint();
 		revalidate();
 	}
 
-	private void addGrids()
+	/** Adds the image of this grid type to this JPanel. */
+	@Override
+	protected void paintComponent(Graphics g)
 	{
-		GridBagConstraints gbc = new GridBagConstraints();
-		// Add top left
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbl.setConstraints(topLeft, gbc);
-		add(topLeft);
-		// Add top right
-		gbc.gridx = 1;
-		gbc.gridy = 0;
-		gbl.setConstraints(topRight, gbc);
-		add(topRight);
-		// Add bottom left
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbl.setConstraints(bottomLeft, gbc);
-		add(bottomLeft);
-		// Add bottom right
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbl.setConstraints(bottomRight, gbc);
-		add(bottomRight);
-	}
+		super.paintComponent(g);
 
-	private void setGrids()
-	{
-		/* Types of grid for each grid in group */
-		String tl = null, tr = null, bl = null, br = null;
-
-		switch (type)
+		try
 		{
-			case STRAIGHT_NS:
-				tl = MapGrid.STRAIGHT_ROAD_S2S;
-				tr = MapGrid.STRAIGHT_ROAD_N2N;
-				bl = MapGrid.STRAIGHT_ROAD_S2S;
-				br = MapGrid.STRAIGHT_ROAD_N2N;
-			break;
-			case STRAIGHT_EW:
-				tl = MapGrid.STRAIGHT_ROAD_W2W;
-				tr = MapGrid.STRAIGHT_ROAD_W2W;
-				bl = MapGrid.STRAIGHT_ROAD_E2E;
-				br = MapGrid.STRAIGHT_ROAD_E2E;
-			break;
-			case CORNER_NW:
-				tl = MapGrid.CORNER_ROAD_S2W;
-				tr = MapGrid.STRAIGHT_ROAD_N2N;
-				bl = MapGrid.STRAIGHT_ROAD_E2E;
-				br = MapGrid.CORNER_ROAD_E2N;
-			break;
-			case CORNER_SW:
-				tl = MapGrid.STRAIGHT_ROAD_W2W;
-				tr = MapGrid.CORNER_ROAD_N2W;
-				bl = MapGrid.CORNER_ROAD_E2S;
-				br = MapGrid.STRAIGHT_ROAD_N2N;
-			break;
-			case CORNER_NE:
-				tl = MapGrid.STRAIGHT_ROAD_S2S;
-				tr = MapGrid.CORNER_ROAD_W2N;
-				bl = MapGrid.CORNER_ROAD_S2E;
-				br = MapGrid.STRAIGHT_ROAD_E2E;
-			break;
-			case CORNER_SE:
-				tl = MapGrid.CORNER_ROAD_W2S;
-				tr = MapGrid.STRAIGHT_ROAD_W2W;
-				bl = MapGrid.STRAIGHT_ROAD_S2S;
-				br = MapGrid.CORNER_ROAD_N2E;
-			break;
-
-			case FOUR_WAY:
-				tl = MapGrid.INTER_TURN_S2WS;
-				tr = MapGrid.INTER_TURN_W2NW;
-				bl = MapGrid.INTER_TURN_E2SE;
-				br = MapGrid.INTER_TURN_N2EN;
-			break;
-			case THREE_WAY_NSE:
-				tl = MapGrid.STRAIGHT_ROAD_S2S;
-				tr = MapGrid.INTER_TURN_W2NW;
-				bl = MapGrid.INTER_TURN_S2ES_STR;
-				br = MapGrid.INTER_TURN_N2EN;
-			break;
-			case THREE_WAY_SEW:
-				tl = MapGrid.INTER_TURN_W2SW_STR;
-				tr = MapGrid.STRAIGHT_ROAD_W2W;
-				bl = MapGrid.INTER_TURN_E2SE;
-				br = MapGrid.INTER_TURN_N2EN;
-			break;
-			case THREE_WAY_NSW:
-				tl = MapGrid.INTER_TURN_S2WS;
-				tr = MapGrid.INTER_TURN_N2WN_STR;
-				bl = MapGrid.INTER_TURN_E2SE;
-				br = MapGrid.STRAIGHT_ROAD_N2N;
-			break;
-			case THREE_WAY_NEW:
-				tl = MapGrid.INTER_TURN_S2WS;
-				tr = MapGrid.INTER_TURN_W2NW;
-				bl = MapGrid.STRAIGHT_ROAD_E2E;
-				br = MapGrid.INTER_TURN_E2NE_STR;
-			break;
-			default:
-				tl = tr = bl = br = MapGrid.NON_ROAD;
+			String fileName = getFileName(type);
+			this.image = ImageIO.read(new File("images/" + fileName));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 
-		int x = this.x * 2;
-		int y = this.y * 2;
+		Graphics2D g2D = (Graphics2D) g;
 
-		// Bottom-left grid is (0, 0)
-		this.topLeft = new MapGrid(tl, x, y + 1);
-		this.topRight = new MapGrid(tr, x + 1, y + 1);
-		this.bottomLeft = new MapGrid(bl, x, y);
-		this.bottomRight = new MapGrid(br, x + 1, y);
+		double imageWidth = image.getWidth();
+		double imageHeight = image.getHeight();
+
+		// How big is the image compared to the grid size?
+		double sx = GRID_SIZE / imageWidth;
+		double sy = GRID_SIZE / imageHeight;
+
+		// Scale
+		AffineTransform af = AffineTransform.getScaleInstance(sx, sy);
+		g2D.drawImage(image, af, this);
+	}
+
+	private String getFileName(String type)
+	{
+		String fileName = "";
+		switch (type)
+		{
+			case THREE_WAY_NSE:
+				fileName = "THREE_WAY_NSE";
+			break;
+			case THREE_WAY_NSW:
+				fileName = "THREE_WAY_NSW";
+			break;
+			case THREE_WAY_SEW:
+				fileName = "THREE_WAY_SEW";
+			break;
+			case THREE_WAY_NEW:
+				fileName = "THREE_WAY_NEW";
+			break;
+			default:
+				fileName = type;
+		}
+		return fileName + ".png";
 	}
 
 	/** Updates the type of this grid, if necessary, according to the direction
@@ -228,8 +167,6 @@ public class MapGridGroup extends JPanel implements MouseListener
 		if (!tracker.isDragging())
 			return;
 
-		String prevType = type;
-
 		if (type.startsWith("THREE_WAY"))
 			checkThreeWay();
 		else if (type.startsWith("STRAIGHT"))
@@ -238,9 +175,6 @@ public class MapGridGroup extends JPanel implements MouseListener
 			checkCorner();
 		else if (type.equals(NON_ROAD))
 			checkNonRoad();
-
-		if (DEBUG && !prevType.equals(type))
-			System.out.println("Grid changed to " + type);
 	}
 
 	/** Checks when the current type of this grid is a three-way intersection. */
@@ -473,9 +407,6 @@ public class MapGridGroup extends JPanel implements MouseListener
 		exitedFrom = NIL;
 		tracker.setPreviouslyExitedFrom(exitedFrom);
 		updateGridType();
-
-		if (DEBUG)
-			printInfo("ENTER", enteredFrom);
 	}
 
 	@Override
@@ -486,42 +417,18 @@ public class MapGridGroup extends JPanel implements MouseListener
 
 		if (e.getX() <= 0)
 			exitedFrom = WEST;
-		else if (e.getX() >= 2 * (MapGrid.GRID_SIZE + MapEditor.BORDER))
+		else if (e.getX() >= GRID_SIZE + 2 * MapEditor.BORDER)
 			exitedFrom = EAST;
 		else if (e.getY() <= 0)
 			exitedFrom = NORTH;
-		else if (e.getY() >= 2 * (MapGrid.GRID_SIZE + MapEditor.BORDER))
+		else if (e.getY() >= GRID_SIZE + 2 * MapEditor.BORDER)
 			exitedFrom = SOUTH;
 
 		tracker.setPreviouslyExitedFrom(exitedFrom);
 
 		updateGridType();
 
-		if (DEBUG)
-			printInfo("EXIT", exitedFrom);
-
 		resetEnterExit();
-	}
-
-	private void printInfo(String action, int dir)
-	{
-		String s = "NIL";
-		switch (dir)
-		{
-			case NORTH:
-				s = "NORTH";
-			break;
-			case SOUTH:
-				s = "SOUTH";
-			break;
-			case EAST:
-				s = "EAST";
-			break;
-			case WEST:
-				s = "WEST";
-			break;
-		}
-		System.out.printf("%-5s (%d, %d) from %-5s Dragging: %s\n", action, x, y, s, tracker.isDragging());
 	}
 
 	/** This is used to make it seem like the cursor entered from the opposite
@@ -556,22 +463,15 @@ public class MapGridGroup extends JPanel implements MouseListener
 
 	public void addElement(Document doc, Element map)
 	{
-		MapGrid[] grids =
-		{ topLeft, topRight, bottomLeft, bottomRight };
+		String[] smallerGridTypes = getSmallerGridTypes();
+
 		for (int i = 0; i < 4; i++)
 		{
 			Element grid = doc.createElement("grid");
-			// x, y coordinates don't account for the borders, but the XML uses
-			// x = 0 as the left border, y = 0 as the bottom border.
-			grid.setAttribute("x", Integer.toString(grids[i].getGridX() + 1));
-			grid.setAttribute("y", Integer.toString(grids[i].getGridY() + 1));
 
-			Element type = doc.createElement("type");
-			// "_STR" is used to identify which image to use for intersections
-			type.appendChild(doc.createTextNode(grids[i].getType().replace("_STR", "")));
-
-			// Add <intersection> if it's the top-left of an intersection
-			if (grids[i] == topLeft && (this.type.startsWith("THREE_WAY") || this.type.equals(FOUR_WAY)))
+			// Add <intersection> if this is the top-left grid of an
+			// intersection
+			if (i == 0 && (this.type.startsWith("THREE_WAY") || this.type.equals(FOUR_WAY)))
 			{
 				Element intersection = doc.createElement("intersection");
 				intersection.appendChild(doc.createTextNode(this.type));
@@ -579,23 +479,129 @@ public class MapGridGroup extends JPanel implements MouseListener
 				grid.appendChild(intersection);
 			}
 
+			// x, y coordinates don't account for the borders, but the XML uses
+			// x = 0 as the left border, y = 0 as the bottom border.
+			int xCoord, yCoord;
+			switch (i)
+			{
+			// Top-left
+				case 0:
+					xCoord = 2 * x + 1;
+					yCoord = 2 * y + 2;
+				break;
+				// Top-right
+				case 1:
+					xCoord = 2 * x + 2;
+					yCoord = 2 * y + 2;
+				break;
+				// Bottom-left
+				case 2:
+					xCoord = 2 * x + 1;
+					yCoord = 2 * y + 1;
+				break;
+				// Bottom-right
+				case 3:
+					xCoord = 2 * x + 2;
+					yCoord = 2 * y + 1;
+				break;
+				// Shouldn't happen
+				default:
+					xCoord = yCoord = -1;
+			}
+			grid.setAttribute("x", Integer.toString(xCoord));
+			grid.setAttribute("y", Integer.toString(yCoord));
+
+			Element type = doc.createElement("type");
+			type.appendChild(doc.createTextNode(smallerGridTypes[i]));
+
 			grid.appendChild(type);
 			map.appendChild(grid);
 		}
 	}
 
+	private String[] getSmallerGridTypes()
+	{
+		String tl, tr, bl, br;
+		switch (type)
+		{
+			case STRAIGHT_NS:
+				tl = "STRAIGHT_ROAD_S2S";
+				tr = "STRAIGHT_ROAD_N2N";
+				bl = "STRAIGHT_ROAD_S2S";
+				br = "STRAIGHT_ROAD_N2N";
+			break;
+			case STRAIGHT_EW:
+				tl = "STRAIGHT_ROAD_W2W";
+				tr = "STRAIGHT_ROAD_W2W";
+				bl = "STRAIGHT_ROAD_E2E";
+				br = "STRAIGHT_ROAD_E2E";
+			break;
+			case CORNER_NW:
+				tl = "CORNER_ROAD_S2W";
+				tr = "STRAIGHT_ROAD_N2N";
+				bl = "STRAIGHT_ROAD_E2E";
+				br = "CORNER_ROAD_E2N";
+			break;
+			case CORNER_SW:
+				tl = "STRAIGHT_ROAD_W2W";
+				tr = "CORNER_ROAD_N2W";
+				bl = "CORNER_ROAD_E2S";
+				br = "STRAIGHT_ROAD_N2N";
+			break;
+			case CORNER_NE:
+				tl = "STRAIGHT_ROAD_S2S";
+				tr = "CORNER_ROAD_W2N";
+				bl = "CORNER_ROAD_S2E";
+				br = "STRAIGHT_ROAD_E2E";
+			break;
+			case CORNER_SE:
+				tl = "CORNER_ROAD_W2S";
+				tr = "STRAIGHT_ROAD_W2W";
+				bl = "STRAIGHT_ROAD_S2S";
+				br = "CORNER_ROAD_N2E";
+			break;
+
+			case FOUR_WAY:
+				tl = "INTER_TURN_S2WS";
+				tr = "INTER_TURN_W2NW";
+				bl = "INTER_TURN_E2SE";
+				br = "INTER_TURN_N2EN";
+			break;
+			case THREE_WAY_NSE:
+				tl = "STRAIGHT_ROAD_S2S";
+				tr = "INTER_TURN_W2NW";
+				bl = "INTER_TURN_S2ES";
+				br = "INTER_TURN_N2EN";
+			break;
+			case THREE_WAY_SEW:
+				tl = "INTER_TURN_W2SW";
+				tr = "STRAIGHT_ROAD_W2W";
+				bl = "INTER_TURN_E2SE";
+				br = "INTER_TURN_N2EN";
+			break;
+			case THREE_WAY_NSW:
+				tl = "INTER_TURN_S2WS";
+				tr = "INTER_TURN_N2WN";
+				bl = "INTER_TURN_E2SE";
+				br = "STRAIGHT_ROAD_N2N";
+			break;
+			case THREE_WAY_NEW:
+				tl = "INTER_TURN_S2WS";
+				tr = "INTER_TURN_W2NW";
+				bl = "STRAIGHT_ROAD_E2E";
+				br = "INTER_TURN_E2NE";
+			break;
+			default:
+				tl = tr = bl = br = "NON_ROAD";
+		}
+
+		return new String[]
+		{ tl, tr, bl, br };
+	}
+
 	public BufferedImage getBufferedImage()
 	{
-		int imageSize = topLeft.getOriginalImageSize();
-		BufferedImage group = new BufferedImage(2 * imageSize, 2 * imageSize, BufferedImage.TYPE_INT_RGB);
-
-		Graphics2D g = group.createGraphics();
-		g.drawImage(topLeft.getBufferedImage(), 0, 0, this);
-		g.drawImage(topRight.getBufferedImage(), imageSize, 0, this);
-		g.drawImage(bottomLeft.getBufferedImage(), 0, imageSize, this);
-		g.drawImage(bottomRight.getBufferedImage(), imageSize, imageSize, this);
-
-		return group;
+		return image;
 	}
 
 	/** Returns the size of the original image. Since the image is a square and
@@ -604,7 +610,7 @@ public class MapGridGroup extends JPanel implements MouseListener
 	 * @return The size of the original image. */
 	public int getImageSize()
 	{
-		return 2 * topLeft.getOriginalImageSize();
+		return image.getWidth();
 	}
 
 	public String getType()

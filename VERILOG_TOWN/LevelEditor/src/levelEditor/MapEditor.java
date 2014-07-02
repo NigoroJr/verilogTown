@@ -120,13 +120,14 @@ public class MapEditor extends JDialog
 	 *            Path to the XML file. */
 	public MapEditor(String xmlFilePath)
 	{
-		mapDirectory = String.format("%s/Levels/Lv%d/map/", LevelEditor.getRootPath(), levelNumber);
 		this.readFromXML = true;
 		this.xmlFile = new File(xmlFilePath);
 		this.tracker = new StateTracker();
 
 		LevelXMLParser parser = new LevelXMLParser(xmlFile);
 		this.levelNumber = parser.getLevelNumber();
+		mapDirectory = String.format("%s/Levels/Lv%d/map/", LevelEditor.getRootPath(), levelNumber);
+
 		this.sizeX = parser.getSizeX();
 		this.sizeY = parser.getSizeY();
 		this.gridGroups = parser.getGridGroups();
@@ -167,7 +168,7 @@ public class MapEditor extends JDialog
 	private JPanel mapBuilder()
 	{
 		JPanel mapPanel = new JPanel();
-		Dimension size = new Dimension(sizeX * (MapGrid.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER), sizeY * (MapGrid.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER));
+		Dimension size = new Dimension((sizeX / 2) * (MapGridGroup.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER), (sizeY / 2) * (MapGridGroup.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER));
 		mapPanel.setPreferredSize(size);
 		mapPanel.setMinimumSize(size);
 
@@ -234,7 +235,7 @@ public class MapEditor extends JDialog
 		JPanel grids = new JPanel();
 		grids.setMinimumSize(new Dimension(
 		// Account for border
-		sizeX * (MapGrid.GRID_SIZE + BORDER), sizeY * (MapGrid.GRID_SIZE + BORDER)));
+		(sizeX / 2) * (MapGridGroup.GRID_SIZE + BORDER), (sizeY / 2) * (MapGridGroup.GRID_SIZE + BORDER)));
 
 		GridBagLayout gbl = new GridBagLayout();
 		grids.setLayout(gbl);
@@ -242,12 +243,12 @@ public class MapEditor extends JDialog
 
 		for (int x = 0; x < sizeX / 2; x++)
 		{
-			for (int y = 0; y < sizeY / 2; y++)
+			for (int y = sizeY / 2 - 1; y >= 0; y--)
 			{
 				gbc.gridx = x;
 				gbc.gridy = y;
 
-				MapGridGroup g = gridGroups[x][sizeY / 2 - 1 - y];
+				MapGridGroup g = gridGroups[x][y];
 				gbl.setConstraints(g, gbc);
 				grids.add(g);
 			}
@@ -602,30 +603,30 @@ public class MapEditor extends JDialog
 		if (x == 0)
 		{
 			if (isStart)
-				return MapGrid.START_WEDGE2E;
+				return "START_WEDGE2E";
 			else
-				return MapGrid.END_W2WEDGE;
+				return "END_W2WEDGE";
 		}
 		else if (y == 0)
 		{
 			if (isStart)
-				return MapGrid.START_SEDGE2N;
+				return "START_SEDGE2N";
 			else
-				return MapGrid.END_S2SEDGE;
+				return "END_S2SEDGE";
 		}
 		else if (x == maxX)
 		{
 			if (isStart)
-				return MapGrid.START_EEDGE2W;
+				return "START_EEDGE2W";
 			else
-				return MapGrid.END_E2EEDGE;
+				return "END_E2EEDGE";
 		}
 		else if (y == maxY)
 		{
 			if (isStart)
-				return MapGrid.START_NEDGE2S;
+				return "START_NEDGE2S";
 			else
-				return MapGrid.END_N2NEDGE;
+				return "END_N2NEDGE";
 		}
 
 		// Shouldn't come here
