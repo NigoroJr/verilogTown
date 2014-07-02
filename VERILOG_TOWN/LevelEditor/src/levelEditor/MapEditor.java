@@ -263,12 +263,13 @@ public class MapEditor extends JDialog
 		grids.setLayout(gbl);
 		GridBagConstraints gbc = new GridBagConstraints();
 
+		// Note that [0][0] is the "bottom-left"
 		for (int x = 0; x < sizeX / 2; x++)
 		{
-			for (int y = sizeY / 2 - 1; y >= 0; y--)
+			for (int y = 0; y < sizeY / 2; y++)
 			{
 				gbc.gridx = x;
-				gbc.gridy = y;
+				gbc.gridy = sizeY / 2 - y;
 
 				MapGrid g = gridGroups[x][y];
 				gbl.setConstraints(g, gbc);
@@ -385,7 +386,7 @@ public class MapEditor extends JDialog
 		// Look at north border
 		for (int i = 0; i < sizeX / 2; i++)
 		{
-			String type = gridGroups[i][sizeY / 2 - 1].getType();
+			String type = gridGroups[i][0].getType();
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
 			Matcher m = p.matcher(type);
@@ -412,7 +413,7 @@ public class MapEditor extends JDialog
 		// Look at south border
 		for (int i = 0; i < sizeX / 2; i++)
 		{
-			String type = gridGroups[i][0].getType();
+			String type = gridGroups[i][sizeY / 2 - 1].getType();
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
 			Matcher m = p.matcher(type);

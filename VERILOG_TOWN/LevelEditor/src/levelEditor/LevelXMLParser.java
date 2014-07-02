@@ -221,7 +221,7 @@ public class LevelXMLParser
 			for (int y = 0; y < getSizeY() / 2; y++)
 			{
 				String gridGroupType = getGridGroupType(grids[2 * x][2 * y + 1], grids[2 * x + 1][2 * y + 1], grids[2 * x][2 * y], grids[2 * x + 1][2 * y]);
-				gridGroups[x][getSizeY() / 2 - 1 - y] = new MapGrid(null, gridGroupType, x, y);
+				gridGroups[x][y] = new MapGrid(null, gridGroupType, x, y);
 			}
 		}
 		return gridGroups;
