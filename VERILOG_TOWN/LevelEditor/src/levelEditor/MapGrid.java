@@ -570,18 +570,18 @@ public class MapGrid extends JPanel implements MouseListener
 			case THREE_WAY_NSE:
 				tl = "STRAIGHT_ROAD_S2S";
 				tr = "INTER_TURN_W2NW";
-				bl = "INTER_TURN_S2ES";
+				bl = "INTER_TURN_E2SE";
 				br = "INTER_TURN_N2EN";
 			break;
 			case THREE_WAY_SEW:
-				tl = "INTER_TURN_W2SW";
+				tl = "INTER_TURN_S2WS";
 				tr = "STRAIGHT_ROAD_W2W";
 				bl = "INTER_TURN_E2SE";
 				br = "INTER_TURN_N2EN";
 			break;
 			case THREE_WAY_NSW:
 				tl = "INTER_TURN_S2WS";
-				tr = "INTER_TURN_N2WN";
+				tr = "INTER_TURN_W2NW";
 				bl = "INTER_TURN_E2SE";
 				br = "STRAIGHT_ROAD_N2N";
 			break;
@@ -589,7 +589,7 @@ public class MapGrid extends JPanel implements MouseListener
 				tl = "INTER_TURN_S2WS";
 				tr = "INTER_TURN_W2NW";
 				bl = "STRAIGHT_ROAD_E2E";
-				br = "INTER_TURN_E2NE";
+				br = "INTER_TURN_N2EN";
 			break;
 			default:
 				tl = tr = bl = br = "NON_ROAD";
