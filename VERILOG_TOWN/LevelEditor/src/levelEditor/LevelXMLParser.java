@@ -213,13 +213,15 @@ public class LevelXMLParser
 
 	public MapGrid[][] getGridGroups()
 	{
+		/* Defined so that gridGroups[x-coord][y-coord] and gridGroups[0][0] is
+		 * the bottom-left corner of the map. */
 		MapGrid[][] gridGroups = new MapGrid[getSizeX() / 2][getSizeY() / 2];
 		for (int x = 0; x < getSizeX() / 2; x++)
 		{
 			for (int y = 0; y < getSizeY() / 2; y++)
 			{
 				String gridGroupType = getGridGroupType(grids[2 * x][2 * y + 1], grids[2 * x + 1][2 * y + 1], grids[2 * x][2 * y], grids[2 * x + 1][2 * y]);
-				gridGroups[x][y] = new MapGrid(null, gridGroupType, x, y);
+				gridGroups[x][getSizeY() / 2 - 1 - y] = new MapGrid(null, gridGroupType, x, y);
 			}
 		}
 		return gridGroups;
