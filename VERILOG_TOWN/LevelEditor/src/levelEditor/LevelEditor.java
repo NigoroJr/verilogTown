@@ -3,7 +3,6 @@ package levelEditor;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -250,17 +249,6 @@ public class LevelEditor extends JFrame
 					return;
 				}
 
-				// Set appropriate size of the grids in MapEditor
-				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-				int optimalGridWidth = 2 * (screenSize.width - 2 * MapEditor.EDGE_SIZE) / mapSizeX;
-				// Account for the task bar, title bar, and buttons
-				int optimalGridHeight = 2 * (screenSize.height - 2 * MapEditor.EDGE_SIZE - 200) / mapSizeY;
-				int min = Math.min(optimalGridWidth, optimalGridHeight);
-				if (min < MapGrid.DEFAULT_GRID_SIZE)
-					MapGrid.GRID_SIZE = min;
-				else
-					MapGrid.GRID_SIZE = MapGrid.DEFAULT_GRID_SIZE;
-
 				setVisible(false);
 				new MapEditor(levelNumber, mapSizeX, mapSizeY);
 				setVisible(true);
@@ -273,6 +261,7 @@ public class LevelEditor extends JFrame
 					throw new FileNotFoundException();
 
 				setVisible(false);
+				// GRID_SIZE is set in the MapEditor after reading the map size
 				new MapEditor(xmlFilePath);
 				setVisible(true);
 			}

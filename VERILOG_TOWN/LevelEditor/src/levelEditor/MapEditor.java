@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -95,6 +96,8 @@ public class MapEditor extends JDialog
 		ends = new ArrayList<int[]>();
 		cars = new ArrayList<Car>();
 
+		setGridSize();
+
 		mapDirectory = String.format("%s/Levels/Lv%d/map/", LevelEditor.getRootPath(), levelNumber);
 		// Create directory (if it doesn't exist)
 		new File(mapDirectory).mkdirs();
@@ -130,6 +133,11 @@ public class MapEditor extends JDialog
 
 		this.sizeX = parser.getSizeX();
 		this.sizeY = parser.getSizeY();
+
+		// Set GRID_SIZE before creating MapGrid objects in
+		// parser.getGridGroups()
+		setGridSize();
+
 		this.gridGroups = parser.getGridGroups();
 		this.starts = parser.getStarts();
 		this.ends = parser.getEnds();
@@ -151,6 +159,20 @@ public class MapEditor extends JDialog
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setModalityType(ModalityType.DOCUMENT_MODAL);
 		setVisible(true);
+	}
+
+	private void setGridSize()
+	{
+		// Set appropriate size of the grids in MapEditor
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int optimalGridWidth = 2 * (screenSize.width - 2 * MapEditor.EDGE_SIZE) / sizeX;
+		// Account for the task bar, title bar, and buttons
+		int optimalGridHeight = 2 * (screenSize.height - 2 * MapEditor.EDGE_SIZE - 200) / sizeY;
+		int min = Math.min(optimalGridWidth, optimalGridHeight);
+		if (min < MapGrid.DEFAULT_GRID_SIZE)
+			MapGrid.GRID_SIZE = min;
+		else
+			MapGrid.GRID_SIZE = MapGrid.DEFAULT_GRID_SIZE;
 	}
 
 	/** Initializes all the MapGridGroups of this map to NON_ROAD. */
