@@ -29,8 +29,8 @@ public class BorderGrid extends JPanel implements MouseListener
 
 		addMouseListener(this);
 
-		int width = border == MapGridGroup.NORTH || border == MapGridGroup.SOUTH ? length * (MapGridGroup.GRID_SIZE / 2 + MapEditor.BORDER) : MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER;
-		int height = border == MapGridGroup.NORTH || border == MapGridGroup.SOUTH ? MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER : length * (MapGridGroup.GRID_SIZE / 2 + MapEditor.BORDER);
+		int width = border == MapGrid.NORTH || border == MapGrid.SOUTH ? length * (MapGrid.GRID_SIZE / 2 + MapEditor.BORDER) : MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER;
+		int height = border == MapGrid.NORTH || border == MapGrid.SOUTH ? MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER : length * (MapGrid.GRID_SIZE / 2 + MapEditor.BORDER);
 
 		setPreferredSize(new Dimension(width, height));
 	}
@@ -60,21 +60,21 @@ public class BorderGrid extends JPanel implements MouseListener
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		int exitedFrom = MapGridGroup.NIL;
+		int exitedFrom = MapGrid.NIL;
 
 		switch (border)
 		{
-			case MapGridGroup.NORTH:
-				exitedFrom = MapGridGroup.SOUTH;
+			case MapGrid.NORTH:
+				exitedFrom = MapGrid.SOUTH;
 			break;
-			case MapGridGroup.SOUTH:
-				exitedFrom = MapGridGroup.NORTH;
+			case MapGrid.SOUTH:
+				exitedFrom = MapGrid.NORTH;
 			break;
-			case MapGridGroup.EAST:
-				exitedFrom = MapGridGroup.WEST;
+			case MapGrid.EAST:
+				exitedFrom = MapGrid.WEST;
 			break;
-			case MapGridGroup.WEST:
-				exitedFrom = MapGridGroup.EAST;
+			case MapGrid.WEST:
+				exitedFrom = MapGrid.EAST;
 			break;
 		}
 

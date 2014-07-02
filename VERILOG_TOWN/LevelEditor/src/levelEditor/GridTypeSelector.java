@@ -20,7 +20,7 @@ public class GridTypeSelector extends JDialog implements ActionListener
 	private static final long		serialVersionUID	= 5109971722250367649L;
 
 	public static final String[]	types				=
-														{ MapGridGroup.STRAIGHT_NS, MapGridGroup.STRAIGHT_EW, MapGridGroup.CORNER_NW, MapGridGroup.CORNER_SW, MapGridGroup.CORNER_NE, MapGridGroup.CORNER_SE, MapGridGroup.FOUR_WAY, MapGridGroup.THREE_WAY_NSE, MapGridGroup.THREE_WAY_SEW, MapGridGroup.THREE_WAY_NSW, MapGridGroup.THREE_WAY_NEW, MapGridGroup.NON_ROAD, };
+														{ MapGrid.STRAIGHT_NS, MapGrid.STRAIGHT_EW, MapGrid.CORNER_NW, MapGrid.CORNER_SW, MapGrid.CORNER_NE, MapGrid.CORNER_SE, MapGrid.FOUR_WAY, MapGrid.THREE_WAY_NSE, MapGrid.THREE_WAY_SEW, MapGrid.THREE_WAY_NSW, MapGrid.THREE_WAY_NEW, MapGrid.NON_ROAD, };
 
 	private String					selectedType;
 
@@ -41,7 +41,7 @@ public class GridTypeSelector extends JDialog implements ActionListener
 		ok = new JButton("OK");
 		cancel = new JButton("Cancel");
 		selectionPanel = new JPanel();
-		previewPane = new MapGridGroup(new StateTracker(), type, 0, 0);
+		previewPane = new MapGrid(new StateTracker(), type, 0, 0);
 		buttonsPanel = new JPanel();
 
 		selectionPanelBuilder();
@@ -84,7 +84,7 @@ public class GridTypeSelector extends JDialog implements ActionListener
 		if (e.getSource() == comboBox)
 		{
 			selectionPanel.remove(previewPane);
-			previewPane = new MapGridGroup(new StateTracker(), (String) comboBox.getSelectedItem(), 0, 0);
+			previewPane = new MapGrid(new StateTracker(), (String) comboBox.getSelectedItem(), 0, 0);
 			selectionPanel.add(previewPane);
 			revalidate();
 			return;

@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * 
  * @author Naoki Mizuno */
 
-public class MapGridGroup extends JPanel implements MouseListener
+public class MapGrid extends JPanel implements MouseListener
 {
 	/* Corners and straight roads */
 	public static final String	STRAIGHT_NS			= "STRAIGHT_NS";
@@ -77,7 +77,7 @@ public class MapGridGroup extends JPanel implements MouseListener
 	/** Generated serial version ID. */
 	private static final long	serialVersionUID	= -1460428408091944849L;
 
-	public MapGridGroup(StateTracker tracker, String type, int x, int y)
+	public MapGrid(StateTracker tracker, String type, int x, int y)
 	{
 		this.tracker = tracker;
 		this.type = type;

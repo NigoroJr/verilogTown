@@ -80,10 +80,10 @@ public class LevelXMLParser
 		// Account for the task bar, title bar, and buttons
 		int optimalGridHeight = (screenSize.height - 2 * MapEditor.EDGE_SIZE - 200) / mapSizeY;
 		int min = Math.min(optimalGridWidth, optimalGridHeight);
-		if (min < MapGridGroup.DEFAULT_GRID_SIZE)
-			MapGridGroup.GRID_SIZE = min;
+		if (min < MapGrid.DEFAULT_GRID_SIZE)
+			MapGrid.GRID_SIZE = min;
 		else
-			MapGridGroup.GRID_SIZE = MapGridGroup.DEFAULT_GRID_SIZE;
+			MapGrid.GRID_SIZE = MapGrid.DEFAULT_GRID_SIZE;
 
 		grids = new String[mapSizeX - 2][mapSizeY - 2];
 		initGrids(grids);
@@ -211,15 +211,15 @@ public class LevelXMLParser
 		return mapSizeY - 2;
 	}
 
-	public MapGridGroup[][] getGridGroups()
+	public MapGrid[][] getGridGroups()
 	{
-		MapGridGroup[][] gridGroups = new MapGridGroup[getSizeX() / 2][getSizeY() / 2];
+		MapGrid[][] gridGroups = new MapGrid[getSizeX() / 2][getSizeY() / 2];
 		for (int x = 0; x < getSizeX() / 2; x++)
 		{
 			for (int y = 0; y < getSizeY() / 2; y++)
 			{
 				String gridGroupType = getGridGroupType(grids[2 * x][2 * y + 1], grids[2 * x + 1][2 * y + 1], grids[2 * x][2 * y], grids[2 * x + 1][2 * y]);
-				gridGroups[x][y] = new MapGridGroup(null, gridGroupType, x, y);
+				gridGroups[x][y] = new MapGrid(null, gridGroupType, x, y);
 			}
 		}
 		return gridGroups;
@@ -235,54 +235,54 @@ public class LevelXMLParser
 		// Straight
 		if (topLeft.equals("STRAIGHT_ROAD_S2S") && topRight.equals("STRAIGHT_ROAD_N2N") && bottomLeft.equals("STRAIGHT_ROAD_S2S") && bottomRight.equals("STRAIGHT_ROAD_N2N"))
 		{
-			gridGroupType = MapGridGroup.STRAIGHT_NS;
+			gridGroupType = MapGrid.STRAIGHT_NS;
 		}
 		else if (topLeft.equals("STRAIGHT_ROAD_W2W") && topRight.equals("STRAIGHT_ROAD_W2W") && bottomLeft.equals("STRAIGHT_ROAD_E2E") && bottomRight.equals("STRAIGHT_ROAD_E2E"))
 		{
-			gridGroupType = MapGridGroup.STRAIGHT_EW;
+			gridGroupType = MapGrid.STRAIGHT_EW;
 		}
 		// Corner
 		else if (topLeft.equals("CORNER_ROAD_S2W") && topRight.equals("STRAIGHT_ROAD_N2N") && bottomLeft.equals("STRAIGHT_ROAD_E2E") && bottomRight.equals("CORNER_ROAD_E2N"))
 		{
-			gridGroupType = MapGridGroup.CORNER_NW;
+			gridGroupType = MapGrid.CORNER_NW;
 		}
 		else if (topLeft.equals("STRAIGHT_ROAD_S2S") && topRight.equals("CORNER_ROAD_W2N") && bottomLeft.equals("CORNER_ROAD_S2E") && bottomRight.equals("STRAIGHT_ROAD_E2E"))
 		{
-			gridGroupType = MapGridGroup.CORNER_NE;
+			gridGroupType = MapGrid.CORNER_NE;
 		}
 		else if (topLeft.equals("STRAIGHT_ROAD_W2W") && topRight.equals("CORNER_ROAD_N2W") && bottomLeft.equals("CORNER_ROAD_E2S") && bottomRight.equals("STRAIGHT_ROAD_N2N"))
 		{
-			gridGroupType = MapGridGroup.CORNER_SW;
+			gridGroupType = MapGrid.CORNER_SW;
 		}
 		else if (topLeft.equals("CORNER_ROAD_W2S") && topRight.equals("STRAIGHT_ROAD_W2W") && bottomLeft.equals("STRAIGHT_ROAD_S2S") && bottomRight.equals("CORNER_ROAD_N2E"))
 		{
-			gridGroupType = MapGridGroup.CORNER_SE;
+			gridGroupType = MapGrid.CORNER_SE;
 		}
 		// Three-way
 		else if (topLeft.equals("INTER_TURN_S2WS") && topRight.equals("INTER_TURN_W2NW") && bottomLeft.equals("INTER_TURN_E2SE") && bottomRight.equals("STRAIGHT_ROAD_N2N"))
 		{
-			gridGroupType = MapGridGroup.THREE_WAY_NSW;
+			gridGroupType = MapGrid.THREE_WAY_NSW;
 		}
 		else if (topLeft.equals("INTER_TURN_S2WS") && topRight.equals("INTER_TURN_W2NW") && bottomLeft.equals("STRAIGHT_ROAD_E2E") && bottomRight.equals("INTER_TURN_N2EN"))
 		{
-			gridGroupType = MapGridGroup.THREE_WAY_NEW;
+			gridGroupType = MapGrid.THREE_WAY_NEW;
 		}
 		else if (topLeft.equals("INTER_TURN_S2WS") && topRight.equals("STRAIGHT_ROAD_W2W") && bottomLeft.equals("INTER_TURN_E2SE") && bottomRight.equals("INTER_TURN_N2EN"))
 		{
-			gridGroupType = MapGridGroup.THREE_WAY_SEW;
+			gridGroupType = MapGrid.THREE_WAY_SEW;
 		}
 		else if (topLeft.equals("STRAIGHT_ROAD_S2S") && topRight.equals("INTER_TURN_W2NW") && bottomLeft.equals("INTER_TURN_E2SE") && bottomRight.equals("INTER_TURN_N2EN"))
 		{
-			gridGroupType = MapGridGroup.THREE_WAY_NSE;
+			gridGroupType = MapGrid.THREE_WAY_NSE;
 		}
 		// Four-way
 		else if (topLeft.equals("INTER_TURN_S2WS") && topRight.equals("INTER_TURN_W2NW") && bottomLeft.equals("INTER_TURN_E2SE") && bottomRight.equals("INTER_TURN_N2EN"))
 		{
-			gridGroupType = MapGridGroup.FOUR_WAY;
+			gridGroupType = MapGrid.FOUR_WAY;
 		}
 		else
 		{
-			gridGroupType = MapGridGroup.NON_ROAD;
+			gridGroupType = MapGrid.NON_ROAD;
 		}
 
 		return gridGroupType;

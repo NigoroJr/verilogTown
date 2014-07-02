@@ -63,7 +63,7 @@ public class MapEditor extends JDialog
 	 * bottom-left corner of the map. */
 	/* Need to be careful when actually generating the image because the
 	 * y-coordinate must go from max to 0. */
-	private MapGridGroup[][]	gridGroups;
+	private MapGrid[][]	gridGroups;
 	/** ArrayList of start and end coordinates. startsEnds[0] has the starting
 	 * coordinates and startsEnds[1] has the ending coordinates. */
 	private ArrayList<int[]>	starts;
@@ -90,7 +90,7 @@ public class MapEditor extends JDialog
 		this.sizeX = sizeX;
 		this.sizeY = sizeY;
 		this.tracker = new StateTracker();
-		this.gridGroups = new MapGridGroup[sizeX / 2][sizeY / 2];
+		this.gridGroups = new MapGrid[sizeX / 2][sizeY / 2];
 		starts = new ArrayList<int[]>();
 		ends = new ArrayList<int[]>();
 		cars = new ArrayList<Car>();
@@ -158,7 +158,7 @@ public class MapEditor extends JDialog
 	{
 		for (int x = 0; x < sizeX / 2; x++)
 			for (int y = 0; y < sizeY / 2; y++)
-				gridGroups[x][y] = new MapGridGroup(tracker, MapGridGroup.NON_ROAD, x, y);
+				gridGroups[x][y] = new MapGrid(tracker, MapGrid.NON_ROAD, x, y);
 	}
 
 	/** Builds the JPanel with the grids and the borders. MapGridGroup array must
@@ -168,15 +168,15 @@ public class MapEditor extends JDialog
 	private JPanel mapBuilder()
 	{
 		JPanel mapPanel = new JPanel();
-		Dimension size = new Dimension((sizeX / 2) * (MapGridGroup.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER), (sizeY / 2) * (MapGridGroup.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER));
+		Dimension size = new Dimension((sizeX / 2) * (MapGrid.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER), (sizeY / 2) * (MapGrid.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER));
 		mapPanel.setPreferredSize(size);
 		mapPanel.setMinimumSize(size);
 
 		JPanel gridsPanel = gridsBuilder();
-		BorderGrid northBorder = new BorderGrid(tracker, MapGridGroup.NORTH, sizeX);
-		BorderGrid southBorder = new BorderGrid(tracker, MapGridGroup.SOUTH, sizeX);
-		BorderGrid eastBorder = new BorderGrid(tracker, MapGridGroup.EAST, sizeY);
-		BorderGrid westBorder = new BorderGrid(tracker, MapGridGroup.WEST, sizeY);
+		BorderGrid northBorder = new BorderGrid(tracker, MapGrid.NORTH, sizeX);
+		BorderGrid southBorder = new BorderGrid(tracker, MapGrid.SOUTH, sizeX);
+		BorderGrid eastBorder = new BorderGrid(tracker, MapGrid.EAST, sizeY);
+		BorderGrid westBorder = new BorderGrid(tracker, MapGrid.WEST, sizeY);
 
 		GridBagLayout gbl = new GridBagLayout();
 		mapPanel.setLayout(gbl);
@@ -235,7 +235,7 @@ public class MapEditor extends JDialog
 		JPanel grids = new JPanel();
 		grids.setMinimumSize(new Dimension(
 		// Account for border
-		(sizeX / 2) * (MapGridGroup.GRID_SIZE + BORDER), (sizeY / 2) * (MapGridGroup.GRID_SIZE + BORDER)));
+		(sizeX / 2) * (MapGrid.GRID_SIZE + BORDER), (sizeY / 2) * (MapGrid.GRID_SIZE + BORDER)));
 
 		GridBagLayout gbl = new GridBagLayout();
 		grids.setLayout(gbl);
@@ -248,7 +248,7 @@ public class MapEditor extends JDialog
 				gbc.gridx = x;
 				gbc.gridy = y;
 
-				MapGridGroup g = gridGroups[x][y];
+				MapGrid g = gridGroups[x][y];
 				gbl.setConstraints(g, gbc);
 				grids.add(g);
 			}
@@ -367,10 +367,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+			if (m.find() || type.equals(MapGrid.FOUR_WAY))
 				return false;
 
-			if (type.equals(MapGridGroup.STRAIGHT_NS) || type.startsWith("CORNER_N"))
+			if (type.equals(MapGrid.STRAIGHT_NS) || type.startsWith("CORNER_N"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.
@@ -394,10 +394,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+			if (m.find() || type.equals(MapGrid.FOUR_WAY))
 				return false;
 
-			if (type.equals(MapGridGroup.STRAIGHT_NS) || type.startsWith("CORNER_S"))
+			if (type.equals(MapGrid.STRAIGHT_NS) || type.startsWith("CORNER_S"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.
@@ -421,10 +421,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^W]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+			if (m.find() || type.equals(MapGrid.FOUR_WAY))
 				return false;
 
-			if (type.equals(MapGridGroup.STRAIGHT_EW) || type.matches("CORNER_.E"))
+			if (type.equals(MapGrid.STRAIGHT_EW) || type.matches("CORNER_.E"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.
@@ -448,10 +448,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^E]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGridGroup.FOUR_WAY))
+			if (m.find() || type.equals(MapGrid.FOUR_WAY))
 				return false;
 
-			if (type.equals(MapGridGroup.STRAIGHT_EW) || type.matches("CORNER_.W"))
+			if (type.equals(MapGrid.STRAIGHT_EW) || type.matches("CORNER_.W"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.

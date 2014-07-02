@@ -16,7 +16,7 @@ class StateTracker {
 
     public StateTracker() {
         isDragging = false;
-        previouslyExitedFrom = MapGridGroup.NIL;
+        previouslyExitedFrom = MapGrid.NIL;
     }
 
     public boolean isDragging() {
@@ -44,19 +44,19 @@ class StateTracker {
      * @return The direction the cursor entered from.
      */
     public int getEnteredFrom() {
-        int ret = MapGridGroup.NIL;
+        int ret = MapGrid.NIL;
         switch (previouslyExitedFrom) {
-            case MapGridGroup.NORTH:
-                ret = MapGridGroup.SOUTH;
+            case MapGrid.NORTH:
+                ret = MapGrid.SOUTH;
                 break;
-            case MapGridGroup.SOUTH:
-                ret = MapGridGroup.NORTH;
+            case MapGrid.SOUTH:
+                ret = MapGrid.NORTH;
                 break;
-            case MapGridGroup.EAST:
-                ret = MapGridGroup.WEST;
+            case MapGrid.EAST:
+                ret = MapGrid.WEST;
                 break;
-            case MapGridGroup.WEST:
-                ret = MapGridGroup.EAST;
+            case MapGrid.WEST:
+                ret = MapGrid.EAST;
                 break;
         }
         return ret;
