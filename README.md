@@ -20,3 +20,6 @@ Check out the [trailer](http://youtu.be/UNoLR8NG6EU) for a quick overview of the
 * [Understanding Verilog for verilogTown](http://www.users.miamioh.edu/jamiespa/verilogTown/verilog.html)
 
 [verilogTown]: http://www.users.miamioh.edu/jamiespa/verilogTown/ "verilogTown"
+
+## Development
+This project adopts MIT licensee. See `development` directory for more information on development.
