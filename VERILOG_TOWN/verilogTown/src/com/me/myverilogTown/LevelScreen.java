@@ -892,7 +892,7 @@ public class LevelScreen implements Screen
 				{
 					try
 					{
-						Compiler[i].compileFileForGame(pathOfVerilogFile + "Traffic_signal_set_" + i + ".txt");
+						Compiler[i].compileFileForGame(pathOfVerilogFile + "Traffic_signal_set_" + i + ".v");
 					}
 					catch (IOException e)
 					{

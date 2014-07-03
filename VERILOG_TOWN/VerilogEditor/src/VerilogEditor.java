@@ -31,8 +31,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.PlainDocument;
@@ -84,6 +86,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 	MyTextPane codeText = null;
 	MyTextPane errorText = null;
 	MyUndo1 myUndoManager1 = null;
+	IntegerRangeDocumentFilter filterOne;
 	static String name;
 	static String pathOfEditorJar;
 	static String rootPath;
@@ -185,7 +188,11 @@ public class VerilogEditor extends JFrame implements ActionListener
 		setTabs(codeText,8);
 		Font font1 = new Font("Consolas",Font.PLAIN,16);
 		codeText.setFont(font1);
+		codeText.setBorder(new LineNumberBorder());
 		
+		//non-editable text panel
+		filterOne = new IntegerRangeDocumentFilter(codeText);
+	    ((AbstractDocument)codeText.getDocument()).setDocumentFilter(filterOne);
 		//for keywords highlight
 		codeText.getDocument().addDocumentListener(new SyntaxHighlighter(codeText));
 		//something strange with the JTextPane's new line character.
@@ -198,7 +205,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		
 		//read in the already existed file or create a new file
 		//verilogFiles = new File(pathOfEditorJar + "VerilogFiles/" + name + ".txt");
-		verilogFiles = new File(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
+		verilogFiles = new File(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".v");
 		if(!verilogFiles.exists())
 		{
 			try
@@ -225,6 +232,12 @@ public class VerilogEditor extends JFrame implements ActionListener
 				Document docCode = codeText.getDocument();
 				docCode.insertString(0, line, null);
 				myUndoManager1.discardAllEdits();
+				//non-editable text panel
+				if(codeText.getText().indexOf("count") == -1)
+					filterOne.setStart(940);
+				else
+					filterOne.setStart(962);
+				
 				br.close();
 				reader.close();
 			} catch (IOException e)
@@ -680,10 +693,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 			out.close();
 			
 			/* print out what we're compiling */
-			errorText.setText("Compiling "+rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
+			errorText.setText("Compiling "+rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".v");
 
 			/* parse the base file */
-			Compiler.compileFileForEditor(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
+			Compiler.compileFileForEditor(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".v");
 
 			if (Compiler.is_compiled_yet())
 			{
@@ -769,7 +782,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 	//search and replace
 	public void salButtonFunction()
 	{
-		new searchAndReplaceDialog(this, codeText);
+		new SearchAndReplaceDialog(this, codeText);
 	}
 	
 	public void simulateButtonFunction()
@@ -813,10 +826,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 			out.close();
 			
 			/* print out what we're compiling */
-			errorText.setText("Compiling "+rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
+			errorText.setText("Compiling "+rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".v");
 
 			/* parse the base file */
-			Compiler.compileFileForEditor(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".txt");
+			Compiler.compileFileForEditor(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".v");
 
 			if (Compiler.is_compiled_yet())
 			{
@@ -832,11 +845,13 @@ public class VerilogEditor extends JFrame implements ActionListener
 	}
 	
 	public void comboHeaderButtonFunction(){
-		codeText.setText(readHeaderFile("header/stop_light_combo.txt"));
+		codeText.setText(readHeaderFile("header/stop_light_combo.v"));
+		filterOne.setStart(940);
 	}
 	
 	public void seqHeaderButtonFunction(){
-		codeText.setText(readHeaderFile("header/stop_light_seq.txt"));
+		codeText.setText(readHeaderFile("header/stop_light_seq.v"));
+		filterOne.setStart(962);
 	}
 	
 	public void closingPopFunction(){
@@ -877,613 +892,6 @@ public class VerilogEditor extends JFrame implements ActionListener
 			e1.printStackTrace();
 		}
 		return headerContent;
-	}
-}
-
-
-
-
-//extend undomanager to handle the undo and redo
-class MyUndo1 extends UndoManager
-{
-	
-	@Override
-	public void undoableEditHappened(UndoableEditEvent e)
-	{
-		//only if the change is not belongs to style change, it remembered by the stuck
-		if(!e.getEdit().getPresentationName().equals("style change"))
-		{
-			this.addEdit(e.getEdit());
-		}
-	}
-	@Override
-	public void trimEdits(int from, int to)
-	{
-		super.trimEdits(from,to);
-	}
-}
-
-
-
-//This block of code implements the text highlight
-class SyntaxHighlighter implements DocumentListener
-{
-	private Set<String> keywords;
-	private Style keywordStyle;
-	private Style normalStyle;
-	
-	public SyntaxHighlighter(JTextPane editor)
-	{
-		//prepare the style
-		keywordStyle = ((StyledDocument) editor.getDocument()).addStyle("Keyword_Style", null);
-		normalStyle = ((StyledDocument) editor.getDocument()).addStyle("Keyword_Style", null);
-		StyleConstants.setForeground(keywordStyle, Color.RED);
-		StyleConstants.setBold(keywordStyle, true);
-		StyleConstants.setForeground(normalStyle, Color.BLACK);
-		
-		//prepare the keywords
-		String[] keywordsSet = new String[]
-		{"always","assign","begin",
-		"case","else","endcase","end","for","function","if",
-		"input","integer","module","negedge","output","parameter",
-		"posedge","real","reg","task","signed","wire","while","endmodule"};
-		keywords = new HashSet<String>();
-
-		for(int i = 0; i < keywordsSet.length; i++)
-		{
-			keywords.add(keywordsSet[i]);
-		}
-	}
-	
-	public void colouring(StyledDocument doc, int pos, int len) throws BadLocationException
-	{
-		
-		int start = indexOfWordStart(doc, pos);
-		int end = indexOfWordEnd(doc, pos + len);
-		
-		char ch;
-		while (start < end)
-		{
-			ch = getCharAt(doc, start);
-			if (Character.isLetter(ch) || ch == '_')
-			{
-				start = colouringWord(doc, start);
-			} 
-			else
-			{
-				SwingUtilities.invokeLater(new ColouringTask(doc, start, 1, normalStyle));
-				++start;
-			}
-		}
-	}
-	
-	
-	public int colouringWord(StyledDocument doc, int pos) throws BadLocationException
-	{
-		int wordEnd = indexOfWordEnd(doc, pos);
-		String word = doc.getText(pos, wordEnd - pos);
-		
-		if (keywords.contains(word))
-		{
-			
-			SwingUtilities.invokeLater(new ColouringTask(doc, pos, wordEnd - pos, keywordStyle));
-		} 
-		else
-		{
-			SwingUtilities.invokeLater(new ColouringTask(doc, pos, wordEnd - pos, normalStyle));
-		}
-		
-		return wordEnd;
-	}
-	
-	
-	public char getCharAt(Document doc, int pos) throws BadLocationException
-	{
-		return doc.getText(pos, 1).charAt(0);
-	}
-	
-	
-	public int indexOfWordStart(Document doc, int pos) throws BadLocationException
-	{
-		//find the first non-character before "pos"
-		for (; pos > 0 && isWordCharacter(doc, pos - 1); --pos);
-		
-		return pos;
-	}
-	
-	
-	public int indexOfWordEnd(Document doc, int pos) throws BadLocationException
-	{
-		//find the fist non-character after "pos"
-		for (; isWordCharacter(doc, pos); ++pos);
-		
-		return pos;
-	}
-	
-	
-	public boolean isWordCharacter(Document doc, int pos) throws BadLocationException
-	{
-		char ch = getCharAt(doc, pos);
-		if (Character.isLetter(ch) || Character.isDigit(ch) || ch == '_')
-		{ return true; }
-		return false;
-	}
-	
-	@Override
-	public void changedUpdate(DocumentEvent e)
-	{
-	
-	}
-	
-	@Override
-	public void insertUpdate(DocumentEvent e)
-	{
-		try
-		{
-			colouring((StyledDocument) e.getDocument(), e.getOffset(), e.getLength());
-		} catch (BadLocationException e1)
-		{
-			e1.printStackTrace();
-		}
-	}
-	
-	@Override
-	public void removeUpdate(DocumentEvent e)
-	{
-		try
-		{
-			colouring((StyledDocument) e.getDocument(), e.getOffset(), 0);
-		} catch (BadLocationException e1)
-		{
-			e1.printStackTrace();
-		}
-	}
-	
-	
-	private class ColouringTask implements Runnable
-	{
-		private StyledDocument doc;
-		private Style style;
-		private int pos;
-		private int len;
-		
-		public ColouringTask(StyledDocument doc, int pos, int len, Style style)
-		{
-			this.doc = doc;
-			this.pos = pos;
-			this.len = len;
-			this.style = style;
-		}
-		
-		@Override
-		public void run()
-		{
-			try
-			{
-				//here is where the coloring is actually happen
-				doc.setCharacterAttributes(pos, len, style, true);
-			} catch (Exception e)
-			{}
-		}
-	}
-}
-
-//Pop up menu for cut, paste, and copy
-class MyTextPane extends JTextPane implements MouseListener
-{
-	private static final long serialVersionUID = -2308615404205560180L;
-	
-	private JPopupMenu pop = null; //pop up menu
-	
-	private JMenuItem copy = null, paste = null, cut = null; //three menu item
-	
-	public MyTextPane()
-	{
-		super();
-		init();
-	}
-	
-	private void init()
-	{
-		this.addMouseListener(this);
-		pop = new JPopupMenu();
-		pop.add(copy = new JMenuItem("Copy"));
-		pop.add(paste = new JMenuItem("Paste"));
-		pop.add(cut = new JMenuItem("Cut"));
-		copy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_MASK));
-		paste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_MASK));
-		cut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_MASK));
-		copy.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				action(e);
-			}
-		});
-		paste.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				action(e);
-			}
-		});
-		cut.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				action(e);
-			}
-		});
-		this.add(pop);
-	}
-	
-	//Do something according to the menu
-	public void action(ActionEvent e)
-	{
-		String str = e.getActionCommand();
-		if (str.equals(copy.getText()))
-		{
-			this.copy();
-		} 
-		else if (str.equals(paste.getText()))
-		{
-			this.paste();
-		} 
-		else if (str.equals(cut.getText()))
-		{
-			this.cut();
-		}
-	}
-	
-	public JPopupMenu getPop()
-	{
-		return pop;
-	}
-	
-	public void setPop(JPopupMenu pop)
-	{
-		this.pop = pop;
-	}
-	
-	//Check if there is anything in the clipboard
-	public boolean isClipboardString()
-	{
-		boolean b = false;
-		Clipboard clipboard = this.getToolkit().getSystemClipboard();
-		Transferable content = clipboard.getContents(this);
-		try
-		{
-			if (content.getTransferData(DataFlavor.stringFlavor) instanceof String)
-			{
-				b = true;
-			}
-		} catch (Exception e)
-		{
-		}
-		return b;
-	}
-	
-	//Check if anything is been selected and thus can be copied and cut.
-	public boolean isCanCopy()
-	{
-		boolean b = false;
-		int start = this.getSelectionStart();
-		int end = this.getSelectionEnd();
-		if (start != end)
-		b = true;
-		return b;
-	}
-	
-	@Override
-	public void mouseClicked(MouseEvent e)
-	{
-	}
-	
-	@Override
-	public void mouseEntered(MouseEvent e)
-	{
-	}
-	
-	@Override
-	public void mouseExited(MouseEvent e)
-	{
-	}
-	
-	@Override
-	public void mousePressed(MouseEvent e)
-	{
-		if (e.getButton() == MouseEvent.BUTTON3)
-		{
-			copy.setEnabled(isCanCopy());
-			paste.setEnabled(isClipboardString());
-			cut.setEnabled(isCanCopy());
-			pop.show(this, e.getX(), e.getY());
-		}
-	}
-	
-	@Override
-	public void mouseReleased(MouseEvent e)
-	{
-	}
-	
-}
-
-class searchAndReplaceDialog extends JDialog
-{
-	private static int WIDTH = 550;
-	private static int HEIGHT = 160;
-	private JTextPane codeTextTemp;
-	private JLabel search = new JLabel("Search: ");
-	private JLabel replace = new JLabel("Replace: ");
-	private JButton find = new JButton("Search");
-	private JButton rAndS = new JButton("Replace & Search");
-	private JButton next = new JButton("Next");
-	private JButton replaceAll = new JButton("Replace All");
-	private JButton replaceButton = new JButton("Replace");
-	private JCheckBox caseSensitive = new JCheckBox("<html>case<br>sensitive");
-	private Highlighter hilit;
-	private Highlighter.HighlightPainter painter;
-	
-	private JTextField targetField = new JTextField(40);
-	private JTextField replaceField = new JTextField(40);
-	
-	private JPanel contentPane = new JPanel();
-	private GridBagLayout gridBagLayout = new GridBagLayout();
-	private Insets insetsButton = new Insets(9,7,5,7);
-	
-	private int findPosition = 0;
-	
-	private Font font2 = new Font("Consolas",Font.PLAIN,14);
-	
-	public searchAndReplaceDialog(JFrame verilogEditor, JTextPane codeText)
-	{
-		super(verilogEditor, "Search and Replace",true);
-		
-		this.codeTextTemp = codeText;
-		this.setSize(WIDTH, HEIGHT);
-		this.setResizable(false);
-		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		
-		hilit = new DefaultHighlighter();
-		painter = new DefaultHighlighter.DefaultHighlightPainter(codeTextTemp.getSelectionColor());
-		codeTextTemp.setHighlighter(hilit);
-		this.addWindowListener(new WindowAdapter()
-		{
-			@Override
-			public void windowClosed(WindowEvent e)
-			{
-				hilit.removeAllHighlights();
-			}
-		});
-		
-		contentPane.setLayout(gridBagLayout);
-		this.setContentPane(contentPane);
-		
-		GridBagConstraints cSearch = new GridBagConstraints();
-		cSearch.gridx = 0;
-		cSearch.gridy = 0;
-		cSearch.anchor = GridBagConstraints.LINE_END;
-		cSearch.insets = new Insets(0,5,0,3);
-		contentPane.add(search, cSearch);
-		
-		GridBagConstraints cReplace = new GridBagConstraints();
-		cReplace.gridx = 0;
-		cReplace.gridy = 1;
-		cReplace.anchor = GridBagConstraints.FIRST_LINE_END;
-		cReplace.insets = new Insets(0,5,10,3);
-		contentPane.add(replace, cReplace);
-		
-		GridBagConstraints cTargetField = new GridBagConstraints();
-		cTargetField.gridx = 1;
-		cTargetField.gridy = 0;
-		cTargetField.gridwidth = 4;
-		cTargetField.anchor = GridBagConstraints.LINE_START;
-		cTargetField.insets = new Insets(0,7,0,10);
-		targetField.setFont(font2);
-		targetField.setPreferredSize(new Dimension(1200, 22));
-		targetField.setMinimumSize(new Dimension(1200, 22));
-		targetField.addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if(e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
-					String str = codeTextTemp.getSelectedText();
-					if(str == null || str.equals(""))
-					{
-						findPosition = 0;
-					}
-					findFunction(codeTextTemp,targetField.getText());
-				}
-			}
-		});
-		contentPane.add(targetField, cTargetField);
-		
-		GridBagConstraints cReplaceField = new GridBagConstraints();
-		cReplaceField.gridx = 1;
-		cReplaceField.gridy = 1;
-		cReplaceField.gridwidth = 4;
-		cReplaceField.anchor = GridBagConstraints.LINE_START;
-		cReplaceField.insets = new Insets(0,7,10,10);
-		replaceField.setFont(font2);
-		replaceField.setPreferredSize(new Dimension(1200,22));
-		replaceField.setMinimumSize(new Dimension(1200, 22));
-		contentPane.add(replaceField, cReplaceField);
-		
-		GridBagConstraints cFind = new GridBagConstraints();
-		cFind.gridx = 0;
-		cFind.gridy = 2;
-		cFind.insets = insetsButton;
-		find.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				findPosition = 0;
-				findFunction(codeTextTemp,targetField.getText());
-			}
-		});
-		contentPane.add(find, cFind);
-		
-		GridBagConstraints cReplaceButton = new GridBagConstraints();
-		cReplaceButton.gridx = 1;
-		cReplaceButton.gridy = 2;
-		cReplaceButton.insets = insetsButton;
-		replaceButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				String str = codeTextTemp.getSelectedText();
-				if(str != null && !str.equals(""))
-				{
-					codeTextTemp.replaceSelection(replaceField.getText());
-				}
-			}
-		});
-		contentPane.add(replaceButton, cReplaceButton);
-		
-		GridBagConstraints cRAndS = new GridBagConstraints();
-		cRAndS.gridx = 2;
-		cRAndS.gridy = 2;
-		cRAndS.insets = insetsButton;
-		rAndS.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				String str = codeTextTemp.getSelectedText();
-				if(str != null && !str.equals(""))
-				{
-					codeTextTemp.replaceSelection(replaceField.getText());
-				}
-				if(str == null || str.equals(""))
-				{
-					
-					findPosition = 0;
-				}
-				findFunction(codeTextTemp,targetField.getText());
-			}
-		});
-		contentPane.add(rAndS, cRAndS);
-		
-		GridBagConstraints cNext = new GridBagConstraints();
-		cNext.gridx = 3;
-		cNext.gridy = 2;
-		cNext.insets = insetsButton;
-		next.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				String str = codeTextTemp.getSelectedText();
-				if(str == null || str.equals(""))
-				{
-					findPosition = 0;
-				}
-				findFunction(codeTextTemp,targetField.getText());
-			}
-		});
-		contentPane.add(next, cNext);
-		
-		GridBagConstraints cReplaceAll = new GridBagConstraints();
-		cReplaceAll.gridx = 4;
-		cReplaceAll.gridy = 2;
-		cReplaceAll.insets = insetsButton;
-		replaceAll.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				String str = targetField.getText();
-				if(str != null && !str.equals(""))
-				{
-					findPosition = 0;
-					replaceAllFunction(codeTextTemp, str, replaceField.getText());
-				}
-			}
-		});
-		contentPane.add(replaceAll, cReplaceAll);
-		
-		GridBagConstraints cCaseSensitive = new GridBagConstraints();
-		cCaseSensitive.gridx = 4;
-		cCaseSensitive.gridy = 0;
-		cCaseSensitive.weighty = 2;
-		cCaseSensitive.insets = new Insets(0,30,0,5);
-		contentPane.add(caseSensitive, cCaseSensitive);
-		
-		this.setLocationRelativeTo(verilogEditor);
-		this.setVisible(true);
-		
-	}
-	
-	public void findFunction(JTextPane textArea, String target)
-	{
-		hilit.removeAllHighlights();
-		int i = -1;
-		String textAreaText = textArea.getText();
-		if(!caseSensitive.isSelected())
-		{
-			i = textAreaText.toLowerCase().indexOf(target.toLowerCase(), findPosition);
-			System.out.println(i);
-		}
-		else
-		{
-			i = textAreaText.indexOf(target, findPosition);
-		}
-		if(i >= 0)
-		{
-			textArea.setSelectionStart(i);
-			textArea.setSelectionEnd(i + target.length());
-			try
-			{
-				hilit.addHighlight(i, i + target.length(), painter);
-			} catch (BadLocationException e)
-			{
-				e.printStackTrace();
-			}
-			findPosition = i + 1;
-		}
-		else
-		{
-			if(findPosition == 0)
-			return;
-			else
-			{
-				findPosition = 0;
-				findFunction(textArea, target);
-			}
-		}
-	}
-	
-	public void replaceAllFunction(JTextPane textArea, String fromStr, String toStr)
-	{
-		int i = -1;
-		String textAreaText = textArea.getText();
-		if(!caseSensitive.isSelected())
-		{
-			i = textAreaText.toLowerCase().indexOf(fromStr.toLowerCase(), findPosition);
-		}
-		else
-		{
-			i = textAreaText.indexOf(fromStr, findPosition);
-		}
-		if(i >= 0)
-		{
-			textArea.setSelectionStart(i);
-			textArea.setSelectionEnd(i + fromStr.length());
-			findPosition = i + 1;
-			textArea.replaceSelection(toStr);
-			replaceAllFunction(textArea, fromStr, toStr);
-		}
-		else
-		{
-			return;
-		}
 	}
 }
 
