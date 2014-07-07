@@ -11,6 +11,7 @@ import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -157,6 +158,38 @@ public class CarEditor extends JDialog
 		readdCarsToPanel();
 	}
 
+	/** Checks whether there are no cars coming from the same intersections at
+	 * the same time. If there is, this method will show a pop-up message and
+	 * return false to the calling method.
+	 * 
+	 * @return True if starting points and delays are valid, false if not. */
+	private boolean checkStartAndDelayValidity()
+	{
+		ArrayList<String> invalidCars = new ArrayList<String>();
+		for (int i = 0; i < cars.size(); i++)
+		{
+			Car car1 = cars.get(i);
+			for (int j = i + 1; j < cars.size(); j++)
+			{
+				Car car2 = cars.get(j);
+
+				if (car1.getStart()[0] == car2.getStart()[0] && car1.getStart()[1] == car2.getStart()[1] && car1.getDelay() == car2.getDelay())
+					invalidCars.add(String.format("Car %d and %d", i, j));
+			}
+		}
+
+		if (invalidCars.isEmpty())
+			return true;
+
+		// Show an error message
+		String message = "The following cars start at the same place at the same time:\n";
+		for (int i = 0; i < invalidCars.size(); i++)
+			message += invalidCars.get(i) + "\n";
+		JOptionPane.showMessageDialog(this, message, "Error!", JOptionPane.ERROR_MESSAGE);
+
+		return false;
+	}
+
 	class ClickListener implements ActionListener
 	{
 		@Override
@@ -164,7 +197,8 @@ public class CarEditor extends JDialog
 		{
 			if (e.getSource() == saveButton)
 			{
-				dispose();
+				if (checkStartAndDelayValidity())
+					dispose();
 			}
 			else if (e.getSource() == cancelButton)
 			{
