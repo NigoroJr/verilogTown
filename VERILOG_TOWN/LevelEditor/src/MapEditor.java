@@ -378,7 +378,11 @@ public class MapEditor extends JDialog
 	{
 		starts.clear();
 		ends.clear();
-		return checkNorthStartsEnds() && checkSouthStartsEnds() && checkEastStartsEnds() && checkWestStartsEnds();
+		/* The order of calling these methods is important. The naming
+		 * convention of the intersections (in the game) is that intersection 0
+		 * is the first intersection you hit when starting from the top-left
+		 * corner of the map and going clockwise. */
+		return checkNorthStartsEnds() && checkEastStartsEnds() && checkSouthStartsEnds() && checkWestStartsEnds();
 	}
 
 	private boolean checkNorthStartsEnds()
@@ -411,7 +415,7 @@ public class MapEditor extends JDialog
 	private boolean checkSouthStartsEnds()
 	{
 		// Look at south border
-		for (int i = 0; i < sizeX / 2; i++)
+		for (int i = sizeX / 2 - 1; i >= 0; i--)
 		{
 			String type = gridGroups[i][0].getType();
 			// Naming convention difference. See MapGridGroup
@@ -438,7 +442,7 @@ public class MapEditor extends JDialog
 	private boolean checkEastStartsEnds()
 	{
 		// Look at east border
-		for (int i = 0; i < sizeY / 2; i++)
+		for (int i = sizeY / 2 - 1; i >= 0; i--)
 		{
 			String type = gridGroups[sizeX / 2 - 1][i].getType();
 			// Naming convention difference. See MapGridGroup

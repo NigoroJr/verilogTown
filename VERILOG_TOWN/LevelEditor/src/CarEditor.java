@@ -26,7 +26,7 @@ public class CarEditor extends JDialog
 	/** Generated serial version ID. */
 	private static final long	serialVersionUID	= -2100886388622797805L;
 
-	public static final int		WINDOW_WIDTH		= 300;
+	public static final int		WINDOW_WIDTH		= 400;
 
 	private int[][]				starts;
 	private int[][]				ends;

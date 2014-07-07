@@ -140,7 +140,9 @@ class Car extends JPanel implements ActionListener
 		this.add(removeButton);
 	}
 
-	/** Converts the array of coordinates into String representation.
+	/** Converts the array of coordinates into String representation. The
+	 * start/end ID is the number assigned to the intersection, starting from 0,
+	 * when you start from the top-left corner of the map and go clockwise.
 	 * 
 	 * @param coordinates
 	 *            Array of coordinates. Has to be size [n][2] for any n.
@@ -149,7 +151,7 @@ class Car extends JPanel implements ActionListener
 	{
 		String[] ret = new String[coordinates.length];
 		for (int i = 0; i < coordinates.length; i++)
-			ret[i] = String.format("%s, %s", coordinates[i][0], coordinates[i][1]);
+			ret[i] = String.format("%d (%s, %s)", i, coordinates[i][0], coordinates[i][1]);
 
 		return ret;
 	}
