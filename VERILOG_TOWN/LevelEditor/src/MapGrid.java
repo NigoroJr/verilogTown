@@ -419,13 +419,13 @@ public class MapGrid extends JPanel implements MouseListener
 		if (!tracker.isDragging())
 			return;
 
-		if (e.getX() <= MapEditor.BORDER)
+		if (e.getX() <= 0)
 			exitedFrom = WEST;
-		else if (e.getX() >= GRID_SIZE + MapEditor.BORDER)
+		else if (e.getX() >= GRID_SIZE - 1)
 			exitedFrom = EAST;
-		else if (e.getY() <= MapEditor.BORDER)
+		else if (e.getY() <= 0)
 			exitedFrom = NORTH;
-		else if (e.getY() >= GRID_SIZE + MapEditor.BORDER)
+		else if (e.getY() >= GRID_SIZE - 1)
 			exitedFrom = SOUTH;
 
 		tracker.setPreviouslyExitedFrom(exitedFrom);
