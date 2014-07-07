@@ -1,5 +1,3 @@
-package levelEditor;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -9,8 +7,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -121,7 +119,8 @@ public class MapGrid extends JPanel implements MouseListener
 		try
 		{
 			String fileName = getFileName(type);
-			this.image = ImageIO.read(new File("images/" + fileName));
+			URL path = LevelEditor.class.getResource("images/" + fileName);
+			this.image = ImageIO.read(path);
 		}
 		catch (IOException e)
 		{

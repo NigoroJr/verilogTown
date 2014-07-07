@@ -1,4 +1,4 @@
-package levelEditor;
+
 
 public class EmptyTextFieldException extends Exception {
 

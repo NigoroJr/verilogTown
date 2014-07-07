@@ -1,4 +1,4 @@
-package levelEditor;
+
 
 /**
  * Class shared among grids used in order to keep track of the cursor entered
