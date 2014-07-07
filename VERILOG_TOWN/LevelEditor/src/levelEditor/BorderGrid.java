@@ -29,8 +29,8 @@ public class BorderGrid extends JPanel implements MouseListener
 
 		addMouseListener(this);
 
-		int width = border == MapGrid.NORTH || border == MapGrid.SOUTH ? length * (MapGrid.GRID_SIZE / 2 + MapEditor.BORDER) : MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER;
-		int height = border == MapGrid.NORTH || border == MapGrid.SOUTH ? MapEditor.EDGE_SIZE + 2 * MapEditor.BORDER : length * (MapGrid.GRID_SIZE / 2 + MapEditor.BORDER);
+		int width = border == MapGrid.NORTH || border == MapGrid.SOUTH ? length * (MapGrid.GRID_SIZE / 2) : MapEditor.EDGE_SIZE;
+		int height = border == MapGrid.NORTH || border == MapGrid.SOUTH ? MapEditor.EDGE_SIZE : length * (MapGrid.GRID_SIZE / 2);
 
 		setPreferredSize(new Dimension(width, height));
 	}

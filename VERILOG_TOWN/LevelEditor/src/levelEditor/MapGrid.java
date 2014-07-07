@@ -87,7 +87,7 @@ public class MapGrid extends JPanel implements MouseListener
 		resetEnterExit();
 
 		setBorder(BorderFactory.createLineBorder(Color.RED));
-		setSize(new Dimension(GRID_SIZE + 2 * MapEditor.BORDER, GRID_SIZE + 2 * MapEditor.BORDER));
+		setSize(new Dimension(GRID_SIZE, GRID_SIZE));
 		setMaximumSize(getSize());
 		setMinimumSize(getSize());
 		setPreferredSize(getSize());

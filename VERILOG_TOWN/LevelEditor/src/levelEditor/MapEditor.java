@@ -190,7 +190,7 @@ public class MapEditor extends JDialog
 	private JPanel mapBuilder()
 	{
 		JPanel mapPanel = new JPanel();
-		Dimension size = new Dimension((sizeX / 2) * (MapGrid.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER), (sizeY / 2) * (MapGrid.GRID_SIZE + BORDER) + 2 * (EDGE_SIZE + 2 * BORDER));
+		Dimension size = new Dimension((sizeX / 2) * (MapGrid.GRID_SIZE) + 2 * EDGE_SIZE, (sizeY / 2) * MapGrid.GRID_SIZE + 2 * EDGE_SIZE);
 		mapPanel.setPreferredSize(size);
 		mapPanel.setMinimumSize(size);
 
@@ -257,7 +257,7 @@ public class MapEditor extends JDialog
 		JPanel grids = new JPanel();
 		grids.setMinimumSize(new Dimension(
 		// Account for border
-		(sizeX / 2) * (MapGrid.GRID_SIZE + BORDER), (sizeY / 2) * (MapGrid.GRID_SIZE + BORDER)));
+		(sizeX / 2) * MapGrid.GRID_SIZE, (sizeY / 2) * MapGrid.GRID_SIZE));
 
 		GridBagLayout gbl = new GridBagLayout();
 		grids.setLayout(gbl);
