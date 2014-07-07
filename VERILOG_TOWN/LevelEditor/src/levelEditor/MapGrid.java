@@ -28,7 +28,10 @@ public class MapGrid extends JPanel implements MouseListener
 {
 	/* Corners and straight roads */
 	public static final String	STRAIGHT_NS			= "STRAIGHT_NS";
+	public static final String	STRAIGHT_NS_2		= "STRAIGHT_NS_2";
+	public static final String	STRAIGHT_NS_3		= "STRAIGHT_NS_3";
 	public static final String	STRAIGHT_EW			= "STRAIGHT_EW";
+	public static final String	STRAIGHT_EW_2		= "STRAIGHT_EW_2";
 	public static final String	CORNER_NW			= "CORNER_NW";
 	public static final String	CORNER_SW			= "CORNER_SW";
 	public static final String	CORNER_NE			= "CORNER_NE";
@@ -36,6 +39,7 @@ public class MapGrid extends JPanel implements MouseListener
 
 	/* Intersections */
 	public static final String	FOUR_WAY			= "FOUR_WAY";
+	public static final String	FOUR_WAY_2			= "FOUR_WAY_2";
 	/* The naming convention of three-way intersection is different from the
 	 * main game program. The reason of this is because it is easier to process
 	 * intersections by specifying them by where the intersection is open to.
@@ -48,6 +52,7 @@ public class MapGrid extends JPanel implements MouseListener
 	public static final String	THREE_WAY_NEW		= "THREE_WAY_SEW";
 
 	public static final String	NON_ROAD			= "NON_ROAD";
+	public static final String	NON_ROAD_2			= "NON_ROAD_2";
 
 	/** Size of each grid in pixels */
 	public static final int		DEFAULT_GRID_SIZE	= 60;
@@ -173,7 +178,7 @@ public class MapGrid extends JPanel implements MouseListener
 			checkStraight();
 		else if (type.startsWith("CORNER"))
 			checkCorner();
-		else if (type.equals(NON_ROAD))
+		else if (type.startsWith("NON_ROAD"))
 			checkNonRoad();
 	}
 
@@ -203,7 +208,7 @@ public class MapGrid extends JPanel implements MouseListener
 
 	private void checkStraight()
 	{
-		if (type.equals(STRAIGHT_NS))
+		if (type.startsWith("STRAIGHT_NS"))
 		{
 			// enteredFrom == NIL but exitedFrom != NIL
 			if (isStartingPoint)
@@ -236,7 +241,7 @@ public class MapGrid extends JPanel implements MouseListener
 			}
 		}
 
-		else if (type.equals(STRAIGHT_EW))
+		else if (type.startsWith("STRAIGHT_EW"))
 		{
 			// enteredFrom == NIL but exitedFrom != NIL
 			if (isStartingPoint)
@@ -471,7 +476,7 @@ public class MapGrid extends JPanel implements MouseListener
 
 			// Add <intersection> if this is the top-left grid of an
 			// intersection
-			if (i == 0 && (this.type.startsWith("THREE_WAY") || this.type.equals(FOUR_WAY)))
+			if (i == 0 && (this.type.startsWith("THREE_WAY") || this.type.startsWith("FOUR_WAY")))
 			{
 				Element intersection = doc.createElement("intersection");
 				intersection.appendChild(doc.createTextNode(this.type));
@@ -525,12 +530,15 @@ public class MapGrid extends JPanel implements MouseListener
 		switch (type)
 		{
 			case STRAIGHT_NS:
+			case STRAIGHT_NS_2:
+			case STRAIGHT_NS_3:
 				tl = "STRAIGHT_ROAD_S2S";
 				tr = "STRAIGHT_ROAD_N2N";
 				bl = "STRAIGHT_ROAD_S2S";
 				br = "STRAIGHT_ROAD_N2N";
 			break;
 			case STRAIGHT_EW:
+			case STRAIGHT_EW_2:
 				tl = "STRAIGHT_ROAD_W2W";
 				tr = "STRAIGHT_ROAD_W2W";
 				bl = "STRAIGHT_ROAD_E2E";
@@ -562,6 +570,7 @@ public class MapGrid extends JPanel implements MouseListener
 			break;
 
 			case FOUR_WAY:
+			case FOUR_WAY_2:
 				tl = "INTER_TURN_S2WS";
 				tr = "INTER_TURN_W2NW";
 				bl = "INTER_TURN_E2SE";

@@ -20,7 +20,7 @@ public class GridTypeSelector extends JDialog implements ActionListener
 	private static final long		serialVersionUID	= 5109971722250367649L;
 
 	public static final String[]	types				=
-														{ MapGrid.STRAIGHT_NS, MapGrid.STRAIGHT_EW, MapGrid.CORNER_NW, MapGrid.CORNER_SW, MapGrid.CORNER_NE, MapGrid.CORNER_SE, MapGrid.FOUR_WAY, MapGrid.THREE_WAY_NSE, MapGrid.THREE_WAY_SEW, MapGrid.THREE_WAY_NSW, MapGrid.THREE_WAY_NEW, MapGrid.NON_ROAD, };
+														{ MapGrid.STRAIGHT_NS, MapGrid.STRAIGHT_NS_2, MapGrid.STRAIGHT_NS_3, MapGrid.STRAIGHT_EW, MapGrid.STRAIGHT_EW_2, MapGrid.CORNER_NW, MapGrid.CORNER_SW, MapGrid.CORNER_NE, MapGrid.CORNER_SE, MapGrid.FOUR_WAY, MapGrid.FOUR_WAY_2, MapGrid.THREE_WAY_NSE, MapGrid.THREE_WAY_SEW, MapGrid.THREE_WAY_NSW, MapGrid.THREE_WAY_NEW, MapGrid.NON_ROAD, MapGrid.NON_ROAD_2, };
 
 	private String					selectedType;
 
