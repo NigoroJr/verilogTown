@@ -377,8 +377,17 @@ public class MapGrid extends JPanel implements MouseListener
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-		// Will return the same type passed in if no change
-		setType(new GridTypeSelector(type).getSelectedType());
+		// Manually select grid type
+		if (e.getButton() == MouseEvent.BUTTON1)
+			// Will return the same type passed in if no change
+			setType(new GridTypeSelector(type).getSelectedType());
+		// Rotate through
+		else if (e.getButton() == MouseEvent.BUTTON2)
+			setType(rotateTypes(type));
+		// Right-click changes back to NON_ROAD
+		else if (e.getButton() == MouseEvent.BUTTON3)
+			setType(NON_ROAD);
+
 		updateGridType();
 	}
 
@@ -410,6 +419,14 @@ public class MapGrid extends JPanel implements MouseListener
 		enteredFrom = tracker.getEnteredFrom();
 		exitedFrom = NIL;
 		tracker.setPreviouslyExitedFrom(exitedFrom);
+
+		// Set to NON_ROAD when right-click dragging
+		if (e.getButton() == MouseEvent.BUTTON3)
+		{
+			setType(NON_ROAD);
+			resetEnterExit();
+		}
+
 		updateGridType();
 	}
 
@@ -430,9 +447,73 @@ public class MapGrid extends JPanel implements MouseListener
 
 		tracker.setPreviouslyExitedFrom(exitedFrom);
 
+		// Set to NON_ROAD when right-click dragging
+		if (e.getButton() == MouseEvent.BUTTON3)
+		{
+			setType(NON_ROAD);
+			resetEnterExit();
+		}
+
 		updateGridType();
 
 		resetEnterExit();
+	}
+
+	/** Rotates through the different texture of the same grid type. For example,
+	 * STRAIGHT_NS has 3 different types. Each middle click will go through and
+	 * show different types of grids. If there is only one texture for a grid,
+	 * it will return the same grid type name.
+	 * 
+	 * @param type
+	 *            Current type of grid.
+	 * @return The next grid type name. */
+	private String rotateTypes(String type)
+	{
+		if (type.startsWith("NON_ROAD"))
+		{
+			switch (type)
+			{
+				case NON_ROAD:
+					return NON_ROAD_2;
+				case NON_ROAD_2:
+					return NON_ROAD;
+			}
+		}
+		else if (type.startsWith("STRAIGHT_NS"))
+		{
+			switch (type)
+			{
+				case STRAIGHT_NS:
+					return STRAIGHT_NS_2;
+				case STRAIGHT_NS_2:
+					return STRAIGHT_NS_3;
+				case STRAIGHT_NS_3:
+					return STRAIGHT_NS;
+			}
+		}
+		else if (type.startsWith("STRAIGHT_EW"))
+		{
+			switch (type)
+			{
+				case STRAIGHT_EW:
+					return STRAIGHT_EW_2;
+				case STRAIGHT_EW_2:
+					return STRAIGHT_EW;
+			}
+		}
+		else if (type.startsWith("FOUR_WAY"))
+		{
+			switch (type)
+			{
+				case FOUR_WAY:
+					return FOUR_WAY_2;
+				case FOUR_WAY_2:
+					return FOUR_WAY;
+			}
+		}
+
+		// Return current type name by default
+		return type;
 	}
 
 	/** This is used to make it seem like the cursor entered from the opposite
