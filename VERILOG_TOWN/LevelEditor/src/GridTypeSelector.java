@@ -1,5 +1,3 @@
-
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -12,7 +10,7 @@ import javax.swing.JPanel;
 
 /** Shows a pull-down menu for selecting the type of the grid.
  * 
- * @author Naoki */
+ * @author Naoki Mizuno */
 public class GridTypeSelector extends JDialog implements ActionListener
 {
 

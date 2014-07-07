@@ -1,5 +1,3 @@
-
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -22,9 +20,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/** Level editor for the game Verilog Town.
+/** Level editor for the game verilogTown.
  * 
- * @author Naoki */
+ * @author Naoki Mizuno */
 
 public class LevelEditor extends JFrame
 {

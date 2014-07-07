@@ -1,5 +1,3 @@
-
-
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
@@ -14,6 +12,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+/** Parses an existing XML file for a level.
+ * 
+ * @author Naoki Mizuno */
 
 public class LevelXMLParser
 {
