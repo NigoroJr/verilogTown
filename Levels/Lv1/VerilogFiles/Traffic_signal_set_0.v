@@ -35,10 +35,10 @@ assign debug_port = sensor_light;
 
 always @(*)
 begin
-	outE = Right_only;
-	outW = Right_only;
-	outS = Right_only;
-	outN = Right_only;
+	outN = Go;
+	outS = Stop;
+	outW = Stop;
+	outE = Stop;
 end
 
 

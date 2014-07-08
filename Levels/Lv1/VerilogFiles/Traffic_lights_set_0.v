@@ -35,52 +35,10 @@ assign debug_port = sensor_light;
 
 always @(*)
 begin
-	/* Check if anyone is in the center of the light (as in currently moving through the intersection */
-	if ((sensor_light[0] == 1'b0) && (sensor_light[1] == 1'b0) && (sensor_light[2] == 1'b0) && (sensor_light[3] == 1'b0))
-	begin
-		if (sensor_light[6] == 1'b1)
-		begin
-			/* If sensor going N has a car then let them through */
-			outN = Go;
-			outS = Stop;
-			outE = Stop;
-			outW = Stop;
-		end
-		else if (sensor_light[4] == 1'b1)
-		begin
-			outN = Stop;
-			outS = Go;
-			outE = Stop;
-			outW = Stop;
-		end
-		else if (sensor_light[5] == 1'b1)
-		begin
-			outN = Stop;
-			outS = Stop;
-			outE = Go;
-			outW = Stop;
-		end
-		else if (sensor_light[7] == 1'b1)
-		begin
-			outN = Stop;
-			outS = Stop;
-			outE = Stop;
-			outW = Go;
-		end
-		else
-		begin
-			outN = Go;
-			outS = Go;
-			outE = Go;
-			outW = Go;
-		end
-	end
-	else
-	begin
-		outN = Stop;
-		outS = Stop;
-		outE = Stop;
-		outW = Stop;
-	end
+	outN = Left_only;
+	outW =Right_only;
+	outS = Go;
+	outE = Stop;
 end
+
 endmodule

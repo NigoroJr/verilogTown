@@ -23,6 +23,8 @@ THE SOFTWARE.
  */
 
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
@@ -79,24 +81,26 @@ import java.nio.*;
 
 public class VerilogEditor extends JFrame implements ActionListener
 {
-	static final int WIDTH = 800;
-	static final int HEIGHT = 600;
-	static final int MINWIDTH = 730;
-	static final int MINHEIGHT = 500;
-	MyTextPane codeText = null;
-	MyTextPane errorText = null;
-	MyUndo1 myUndoManager1 = null;
-	IntegerRangeDocumentFilter filterOne;
-	static String name;
-	static String pathOfEditorJar;
-	static String rootPath;
-	static String level_number;
-	public File verilogFiles;
-	JFormattedTextField simulateInput, generalSensorInput1, 
-						generalSensorInput2, generalSensorInput3,
-						generalSensorInput4, generalSensorInput5;
-	private String newLine;
-	Parse Compiler;
+	static final int 						WIDTH = 800;
+	static final int 						HEIGHT = 600;
+	static final int 						MINWIDTH = 730;
+	static final int 						MINHEIGHT = 500;
+	private MyTextPane 						codeText = null;
+	private MyTextPane 						errorText = null;
+	private MyUndo1 						myUndoManager1 = null;
+	private IntegerRangeDocumentFilter 		filterOne;
+	static String 							name;
+	static String 							pathOfEditorJar;
+	static String 							rootPath;
+	static String 							level_number;
+	public File 							verilogFiles;
+	private AnimationPanel 					animationPanel;
+	JFormattedTextField 					simulateInput, generalSensorInput1, 
+											generalSensorInput2, generalSensorInput3,
+											generalSensorInput4, generalSensorInput5,
+											generalSensorInput6, generalSensorInput0;
+	private String 							newLine;
+	private Parse 							Compiler;
 	/**
 	* @param args
 	*/
@@ -157,6 +161,20 @@ public class VerilogEditor extends JFrame implements ActionListener
 		contentPane.setLayout(new GridBagLayout());
 		this.setContentPane(contentPane);
 		
+		//below is the tool bar code
+		JToolBar toolBar = new JToolBar("Still draggable");
+		toolBar.setFloatable(false);
+		toolBar.setRollover(true);
+		GridBagConstraints cToolBar = new GridBagConstraints();
+		cToolBar.gridx = 0;
+		cToolBar.gridy = 0;
+		cToolBar.fill = GridBagConstraints.BOTH;
+		cToolBar.weightx = 0;
+		cToolBar.weighty = 0;
+		contentPane.add(toolBar,cToolBar); 
+		addButtons(toolBar);
+		toolBar.setBorder(BorderFactory.createEtchedBorder());
+		
 		// below is the split panel code
 		final JSplitPane splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -188,6 +206,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		setTabs(codeText,8);
 		Font font1 = new Font("Consolas",Font.PLAIN,16);
 		codeText.setFont(font1);
+		//line number
 		codeText.setBorder(new LineNumberBorder());
 		
 		//non-editable text panel
@@ -204,7 +223,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		codeText.getDocument().addUndoableEditListener(myUndoManager1);
 		
 		//read in the already existed file or create a new file
-		//verilogFiles = new File(pathOfEditorJar + "VerilogFiles/" + name + ".txt");
+		//verilogFiles = new File(pathOfEditorJar + "VerilogFiles/" + name + ".v");
 		verilogFiles = new File(rootPath + "Levels/" + "Lv" + level_number + "/" + "VerilogFiles/" + name + ".v");
 		if(!verilogFiles.exists())
 		{
@@ -258,12 +277,18 @@ public class VerilogEditor extends JFrame implements ActionListener
 		JScrollPane upperArea = new JScrollPane(codeText,
 		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
 		JPanel lowerArea = new JPanel();
 		lowerArea.setLayout(new GridBagLayout());
+		
 		JScrollPane errorArea = new JScrollPane(errorText,
 		ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
 		JLabel errorLog = new JLabel("Error log");
+		
+		animationPanel = new AnimationPanel(simulateInput);
+		
 		
 		this.setVisible(true);
 		
@@ -275,6 +300,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 		cErrorLog.weightx = 0;
 		cErrorLog.weighty = 0;
 		lowerArea.add(errorLog,cErrorLog);
+		
 		GridBagConstraints cErrorArea = new GridBagConstraints();
 		cErrorArea.gridx = 0;
 		cErrorArea.gridy = 1;
@@ -282,22 +308,16 @@ public class VerilogEditor extends JFrame implements ActionListener
 		cErrorArea.weightx = 1;
 		cErrorArea.weighty = 1;
 		lowerArea.add(errorArea,cErrorArea);
+		
+		GridBagConstraints cAnimationPanel = new GridBagConstraints();
+		cAnimationPanel.gridx = 2;
+		cAnimationPanel.gridy = 1;
+		cAnimationPanel.weightx = 0.1;
+		cAnimationPanel.weighty = 1;
+		lowerArea.add(animationPanel,cAnimationPanel);
+		
 		splitPane.add(upperArea,JSplitPane.LEFT,1);
 		splitPane.add(lowerArea,JSplitPane.RIGHT,2);
-		
-		//below is the tool bar code
-		JToolBar toolBar = new JToolBar("Still draggable");
-		toolBar.setFloatable(false);
-		toolBar.setRollover(true);
-		GridBagConstraints cToolBar = new GridBagConstraints();
-		cToolBar.gridx = 0;
-		cToolBar.gridy = 0;
-		cToolBar.fill = GridBagConstraints.BOTH;
-		cToolBar.weightx = 0;
-		cToolBar.weighty = 0;
-		contentPane.add(toolBar,cToolBar);
-		addButtons(toolBar);
-		toolBar.setBorder(BorderFactory.createEtchedBorder());
 		
 		//below is the menu bar code
 		//including listener and short cut key
@@ -582,33 +602,52 @@ public class VerilogEditor extends JFrame implements ActionListener
 		formatterInternal.setPlaceholderCharacter('0');
 		simulateInput = new JFormattedTextField(formatterInternal);
 		simulateInput.setColumns(8);
+		simulateInput.addCaretListener(new CaretListener(){
+			@Override
+			public void caretUpdate(CaretEvent e){
+				String tempStr = "";
+				tempStr = simulateInput.getText();
+				if(tempStr.length() != 8){
+					tempStr = animationPanel.getInternalSignal();
+				}
+				animationPanel.setStates(tempStr);
+			}
+		});
 		toolBar.add(simulateInput);
 		
-		toolBar.add(new JLabel("General Sensors: "));
+		toolBar.add(new JLabel("General Sensors(6~0): "));
 		MaskFormatter formatterGeneral = null;
 		try{
-			formatterGeneral = new MaskFormatter("######");
+			formatterGeneral = new MaskFormatter("####");
 		} catch (ParseException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		formatterGeneral.setValidCharacters("10");
 		formatterGeneral.setPlaceholderCharacter('0');
+		generalSensorInput0 = new JFormattedTextField(formatterGeneral);
 		generalSensorInput1 = new JFormattedTextField(formatterGeneral);
 		generalSensorInput2 = new JFormattedTextField(formatterGeneral);
 		generalSensorInput3 = new JFormattedTextField(formatterGeneral);
 		generalSensorInput4 = new JFormattedTextField(formatterGeneral);
 		generalSensorInput5 = new JFormattedTextField(formatterGeneral);
-		generalSensorInput1.setColumns(5);
-		generalSensorInput2.setColumns(5);
-		generalSensorInput3.setColumns(5);
-		generalSensorInput4.setColumns(5);
-		generalSensorInput5.setColumns(5);
-		toolBar.add(generalSensorInput1);
-		toolBar.add(generalSensorInput2);
-		toolBar.add(generalSensorInput3);
-		toolBar.add(generalSensorInput4);
+		generalSensorInput6 = new JFormattedTextField(formatterGeneral);
+		
+		generalSensorInput0.setColumns(4);
+		generalSensorInput1.setColumns(4);
+		generalSensorInput2.setColumns(4);
+		generalSensorInput3.setColumns(4);
+		generalSensorInput4.setColumns(4);
+		generalSensorInput5.setColumns(4);
+		generalSensorInput6.setColumns(4);
+		
+		toolBar.add(generalSensorInput6);
 		toolBar.add(generalSensorInput5);
+		toolBar.add(generalSensorInput4);
+		toolBar.add(generalSensorInput3);
+		toolBar.add(generalSensorInput2);
+		toolBar.add(generalSensorInput1);
+		toolBar.add(generalSensorInput0);
 	}
 	
 	@Override
@@ -620,6 +659,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 	//distinguish which key is pressed
 	public void action(ActionEvent e)
 	{
+		System.out.println("test");
 		String str = e.getActionCommand();
 		if(str.equals("Save"))
 		{
@@ -704,6 +744,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 				Compiler.sim_cycle("0", "00000000", "000000000000000000000000000000");
 				Compiler.sim_cycle("1", "00000000", "000000000000000000000000000000");
 				errorText.setText(errorText.getText() + "\nCompiling done!");
+				animationPanel.setSimulationResults("00000");
+				animationPanel.drawAnimation(animationPanel.getGraphics());
 			}
 		}
 		catch (Exception e1)
@@ -789,8 +831,9 @@ public class VerilogEditor extends JFrame implements ActionListener
 	{
 		//add the simulate code here
 		String simulateStr = simulateInput.getText();
-		String generalSensorStr = generalSensorInput1.getText() + generalSensorInput2.getText() + generalSensorInput3.getText()
-								+ generalSensorInput4.getText() + generalSensorInput5.getText();
+		String generalSensorStr = "00" + generalSensorInput6.getText() + generalSensorInput5.getText() + generalSensorInput4.getText()
+								+ generalSensorInput3.getText() + generalSensorInput2.getText() + generalSensorInput1.getText()
+								+ generalSensorInput0.getText();
 
 		if (simulateStr.length() == 8 && generalSensorStr.length() == 30)
 		{
@@ -803,7 +846,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 				/* first sim is for the combinational propagation */
 				output_vector_list = Compiler.sim_cycle("1", simulateStr, generalSensorStr);
 			
-				errorText.setText("Simulation Cycle\n" + "Clock Cycle:"+output_vector_list.get(5)+ " Sensors Light: " + simulateStr+" General Sensors: " + generalSensorStr + "\nOut0 Val = "+output_vector_list.get(0) + "\nOut1 Val = "+output_vector_list.get(1) +"\nOut2 Val = "+output_vector_list.get(2) +"\nOut3 Val = "+output_vector_list.get(3)+"\nDebugVector = "+Integer.toBinaryString(output_vector_list.get(4)));
+				errorText.setText("Simulation Cycle\n" + "Clock Cycle:"+output_vector_list.get(5)+ " Sensors Light: " + simulateStr+" General Sensors: " + generalSensorStr + "\nOutN Val = "+output_vector_list.get(0) + "\nOutS Val = "+output_vector_list.get(1) +"\nOutE Val = "+output_vector_list.get(2) +"\nOutW Val = "+output_vector_list.get(3)+"\nDebugVector = "+Integer.toBinaryString(output_vector_list.get(4)));
+				
+				animationPanel.setSimulationResults("1" + output_vector_list.get(0) + output_vector_list.get(1) + output_vector_list.get(2) + output_vector_list.get(3));
+				animationPanel.drawAnimation(animationPanel.getGraphics());
 			}
 			else
 			{
@@ -836,6 +882,9 @@ public class VerilogEditor extends JFrame implements ActionListener
 				/* Reset the system - takes a double simulation */
 				Compiler.sim_cycle("0", "00000000", "000000000000000000000000000000");
 				Compiler.sim_cycle("1", "00000000", "000000000000000000000000000000");
+				errorText.setText(errorText.getText() + "\nCompiling done!");
+				animationPanel.setSimulationResults("00000");
+				animationPanel.drawAnimation(animationPanel.getGraphics());
 			}
 		}
 		catch (Exception e1)
