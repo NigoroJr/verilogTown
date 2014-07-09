@@ -392,10 +392,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGrid
 			Pattern p = Pattern.compile("THREE_WAY_(?![^S]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGrid.FOUR_WAY))
+			if (m.find() || type.startsWith("FOUR_WAY"))
 				return false;
 
-			if (type.equals(MapGrid.STRAIGHT_NS) || type.startsWith("CORNER_N"))
+			if (type.startsWith("STRAIGHT_NS") || type.startsWith("CORNER_N"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.
@@ -419,10 +419,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^N]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGrid.FOUR_WAY))
+			if (m.find() || type.startsWith("FOUR_WAY"))
 				return false;
 
-			if (type.equals(MapGrid.STRAIGHT_NS) || type.startsWith("CORNER_S"))
+			if (type.startsWith("STRAIGHT_NS") || type.startsWith("CORNER_S"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.
@@ -446,10 +446,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^W]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGrid.FOUR_WAY))
+			if (m.find() || type.startsWith("FOUR_WAY"))
 				return false;
 
-			if (type.equals(MapGrid.STRAIGHT_EW) || type.matches("CORNER_.E"))
+			if (type.startsWith("STRAIGHT_EW") || type.matches("CORNER_.E"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.
@@ -473,10 +473,10 @@ public class MapEditor extends JDialog
 			// Naming convention difference. See MapGridGroup
 			Pattern p = Pattern.compile("THREE_WAY_(?![^E]{3})");
 			Matcher m = p.matcher(type);
-			if (m.find() || type.equals(MapGrid.FOUR_WAY))
+			if (m.find() || type.startsWith("FOUR_WAY"))
 				return false;
 
-			if (type.equals(MapGrid.STRAIGHT_EW) || type.matches("CORNER_.W"))
+			if (type.startsWith("STRAIGHT_EW") || type.matches("CORNER_.W"))
 			{
 				// gridGroups doesn't account for the borders, but the XML uses
 				// x = 0 as the left border, y = 0 as the bottom border.
