@@ -3,6 +3,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,6 +35,9 @@ public class LevelEditor extends JFrame
 	 * development mode. In development mode, the directory structure is
 	 * different. */
 	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
+	
+	public static final int DEFAULT_MAP_X = 20;
+	public static final int DEFAULT_MAP_Y = 20;
 
 	public static final String	BUTTON_OK					= "OK";
 	public static final String	BUTTON_CANCEL				= "Cancel";
@@ -58,15 +63,22 @@ public class LevelEditor extends JFrame
 		textMapSizeX = new JTextField(3);
 		textMapSizeY = new JTextField(3);
 		textFilePath = new JTextField(15);
+		// Same as clicking "OK" when hitting enter
+		textLevelNumber.addKeyListener(new KeyboardListener());
+		textMapSizeX.addKeyListener(new KeyboardListener());
+		textMapSizeY.addKeyListener(new KeyboardListener());
+		// Default size is 20
+		textMapSizeX.setText(Integer.toString(DEFAULT_MAP_X));
+		textMapSizeY.setText(Integer.toString(DEFAULT_MAP_Y));
+
 		chooser = new JFileChooser();
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("XML Files", "xml");
 		chooser.setFileFilter(filter);
 
-		setTitle("verilogTown Level Editor");
-
 		add(radioButtonBuilder());
 		add(buttonBuilder(), BorderLayout.SOUTH);
 
+		setTitle("verilogTown Level Editor");
 		setMinimumSize(new Dimension(300, 280));
 		pack();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -177,6 +189,56 @@ public class LevelEditor extends JFrame
 		return ret;
 	}
 
+	/** Called when OK button is clicked. Depending on which option (create or
+	 * update) is selected, this method checks for the prerequisites and starts
+	 * the map editor if those requirements are fulfilled.
+	 * 
+	 * @throws EmptyTextFieldException
+	 *             When create is selected but there is an empty field in the
+	 *             JTextField. Level number and the map size is required to
+	 *             create a new map.
+	 * @throws FileNotFoundException
+	 *             When a file is specified but the file is not found. */
+	private void clickedOK()
+			throws EmptyTextFieldException,
+			FileNotFoundException
+	{
+		if (create.isSelected())
+		{
+
+			if (textLevelNumber.getText().isEmpty() || textMapSizeX.getText().isEmpty() || textMapSizeY.getText().isEmpty())
+				throw new EmptyTextFieldException();
+
+			levelNumber = Integer.parseInt(textLevelNumber.getText());
+			mapSizeX = Integer.parseInt(textMapSizeX.getText());
+			mapSizeY = Integer.parseInt(textMapSizeY.getText());
+
+			// Don't allow odd or negative number size
+			if (mapSizeX % 2 != 0 || mapSizeY % 2 != 0 || mapSizeX <= 0 || mapSizeY <= 0)
+			{
+				String mes = "Both map sizes must be positive even numbers!";
+				JOptionPane.showMessageDialog(null, mes, "Invalid map size", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			setVisible(false);
+			new MapEditor(levelNumber, mapSizeX, mapSizeY);
+			setVisible(true);
+		}
+		else if (update.isSelected())
+		{
+			String xmlFilePath = textFilePath.getText();
+
+			if (!new File(xmlFilePath).exists())
+				throw new FileNotFoundException();
+
+			setVisible(false);
+			/* GRID_SIZE is set in the MapEditor after reading the map size */
+			new MapEditor(xmlFilePath);
+			setVisible(true);
+		}
+	}
+
 	class ButtonListener implements ActionListener
 	{
 		@Override
@@ -217,52 +279,40 @@ public class LevelEditor extends JFrame
 			}
 		}
 
-		/** Called when OK button is clicked.
-		 * 
-		 * @throws EmptyTextFieldException
-		 *             When create is selected but there is an empty field in
-		 *             the JTextField. Level number and the map size is required
-		 *             to create a new map.
-		 * @throws FileNotFoundException
-		 *             When a file is specified but the file is not found. */
-		private void clickedOK()
-				throws EmptyTextFieldException,
-				FileNotFoundException
+	}
+
+	class KeyboardListener implements KeyListener
+	{
+		@Override
+		public void keyTyped(KeyEvent e)
 		{
-			if (create.isSelected())
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e)
+		{
+			if (e.getKeyCode() == KeyEvent.VK_ENTER)
 			{
-
-				if (textLevelNumber.getText().isEmpty() || textMapSizeX.getText().isEmpty() || textMapSizeY.getText().isEmpty())
-					throw new EmptyTextFieldException();
-
-				levelNumber = Integer.parseInt(textLevelNumber.getText());
-				mapSizeX = Integer.parseInt(textMapSizeX.getText());
-				mapSizeY = Integer.parseInt(textMapSizeY.getText());
-
-				// Don't allow odd or negative number size
-				if (mapSizeX % 2 != 0 || mapSizeY % 2 != 0 || mapSizeX <= 0 || mapSizeY <= 0)
+				try
 				{
-					String mes = "Both map sizes must be positive even numbers!";
-					JOptionPane.showMessageDialog(null, mes, "Invalid map size", JOptionPane.ERROR_MESSAGE);
-					return;
+					clickedOK();
 				}
-
-				setVisible(false);
-				new MapEditor(levelNumber, mapSizeX, mapSizeY);
-				setVisible(true);
+				catch (FileNotFoundException e1)
+				{
+					String mes = String.format("File: %s not found", textFilePath.getText());
+					JOptionPane.showMessageDialog(null, mes, "File not found", JOptionPane.ERROR_MESSAGE);
+				}
+				catch (EmptyTextFieldException e1)
+				{
+					String mes = "Text fields must not be empty";
+					JOptionPane.showMessageDialog(null, mes, "Empty text field(s)", JOptionPane.ERROR_MESSAGE);
+				}
 			}
-			else if (update.isSelected())
-			{
-				String xmlFilePath = textFilePath.getText();
+		}
 
-				if (!new File(xmlFilePath).exists())
-					throw new FileNotFoundException();
-
-				setVisible(false);
-				// GRID_SIZE is set in the MapEditor after reading the map size
-				new MapEditor(xmlFilePath);
-				setVisible(true);
-			}
+		@Override
+		public void keyReleased(KeyEvent e)
+		{
 		}
 	}
 

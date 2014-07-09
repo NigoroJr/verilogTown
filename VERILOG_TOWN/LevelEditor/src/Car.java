@@ -10,7 +10,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-/** Class that hold and shows (as a JPanel) information for one car.
+/** This class is each Car entry in the CarEditor. It contains information such
+ * as the list of start/ends that the user can select from, car ID, and the time
+ * which the car should appear in the level.
  * 
  * @author Naoki Mizuno */
 
@@ -114,6 +116,11 @@ class Car extends JPanel implements ActionListener
 		removeButton.setPreferredSize(new Dimension(20, 20));
 		removeButton.addActionListener(this);
 
+		// TAB to move to next delay JTextField
+		startPoints.setFocusable(false);
+		endPoints.setFocusable(false);
+		removeButton.setFocusable(false);
+
 		// Car ID
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -199,8 +206,18 @@ class Car extends JPanel implements ActionListener
 		return allEnds[endPoints.getSelectedIndex()];
 	}
 
-	public int getDelay()
+	/** Returns the delay for this car to depart after the game has started. The
+	 * unit is not seconds. The approximate seconds can calculated by dividing
+	 * the delay by 50. However, only use this to approximate the time.
+	 * 
+	 * @return The delay of this car.
+	 * @throws EmptyTextFieldException
+	 *             When the JTextField is empty. */
+	public int getDelay() throws EmptyTextFieldException
 	{
+		if (delayTextField.getText().isEmpty())
+			throw new EmptyTextFieldException();
+
 		return Integer.parseInt(delayTextField.getText().trim());
 	}
 

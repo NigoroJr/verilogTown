@@ -7,8 +7,28 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 /** Grid on the border where the user clicks to indicate the start/end.
+ * BorderGrid is actually one JPanel (rather than a collection of JPanels for
+ * each grid). The reason why this approach is taken is because the starting and
+ * ending points can be told by looking at the most outer grid type.
  * 
- * @author Naoki */
+ * <pre>
+ *   +-----+-----+
+ *   |     |     |
+ *   |     |     |
+ *   +-----+-----+
+ * E | <-  |     |
+ * S | ->  |     |
+ *   +-----+-----+
+ *   |     |     |
+ *   |     |     |
+ *   +-----+-----+
+ * </pre>
+ * 
+ * In the above figure, it can be told that there is a starting and ending point
+ * at the location marked with an "S" and "E" just from the information that the
+ * adjacent grid is a STRAIGHT_EW grid.
+ * 
+ * @author Naoki Mizuno */
 public class BorderGrid extends JPanel implements MouseListener
 {
 

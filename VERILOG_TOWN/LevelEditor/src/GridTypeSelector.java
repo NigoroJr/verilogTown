@@ -8,7 +8,9 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-/** Shows a pull-down menu for selecting the type of the grid.
+/** Shows a pull-down menu and a preview pane for manually selecting the type of
+ * the grid. After closing the dialog, <code>getSelectedType()</code> can be
+ * used to obtain the selected grid type.
  * 
  * @author Naoki Mizuno */
 public class GridTypeSelector extends JDialog implements ActionListener

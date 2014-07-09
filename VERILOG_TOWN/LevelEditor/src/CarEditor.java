@@ -83,17 +83,16 @@ public class CarEditor extends JDialog
 		gbc.anchor = GridBagConstraints.NORTH;
 		panel.setLayout(gbl);
 
-		// Add to carListPanel
+		// Add cars in ArrayList to carListPanel
 		readdCarsToPanel();
 
+		// Make carListPanel scrollable
 		JViewport viewPort = new JViewport();
 		viewPort.setView(carListPanel);
-
 		JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		/* Important! */
 		scrollPane.setMinimumSize(new Dimension(WINDOW_WIDTH, 600));
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
-
 		scrollPane.setViewport(viewPort);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(5);
 		gbl.setConstraints(scrollPane, gbc);
@@ -158,9 +157,11 @@ public class CarEditor extends JDialog
 		readdCarsToPanel();
 	}
 
-	/** Checks whether there are no cars coming from the same intersections at
-	 * the same time. If there is, this method will show a pop-up message and
-	 * return false to the calling method.
+	/** Does a linear search to check whether there are no cars coming from the
+	 * same intersections at the same time. If there is, this method will show a
+	 * pop-up message and return false to the calling method. This method also
+	 * checks whether all the JTextField is filled and displays a message if
+	 * not.
 	 * 
 	 * @return True if starting points and delays are valid, false if not. */
 	private boolean checkStartAndDelayValidity()
@@ -173,7 +174,20 @@ public class CarEditor extends JDialog
 			{
 				Car car2 = cars.get(j);
 
-				if (car1.getStart()[0] == car2.getStart()[0] && car1.getStart()[1] == car2.getStart()[1] && car1.getDelay() == car2.getDelay())
+				int delayCar1, delayCar2;
+				try
+				{
+					delayCar1 = car1.getDelay();
+					delayCar2 = car2.getDelay();
+				}
+				catch (EmptyTextFieldException e)
+				{
+					String message = "Please input delay for all cars";
+					JOptionPane.showMessageDialog(this, message, "Error!", JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+
+				if (car1.getStart()[0] == car2.getStart()[0] && car1.getStart()[1] == car2.getStart()[1] && delayCar1 == delayCar2)
 					invalidCars.add(String.format("Car %d and %d", i, j));
 			}
 		}
@@ -195,6 +209,7 @@ public class CarEditor extends JDialog
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
+			/* Note: This doesn't actually save to XML */
 			if (e.getSource() == saveButton)
 			{
 				if (checkStartAndDelayValidity())
