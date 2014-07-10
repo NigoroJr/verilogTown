@@ -47,6 +47,8 @@ public class Car
 
 	/* Necessary for displaying car */
 	private Texture				carTexture;
+	private Texture				car4Texture;
+	private Texture				car5Texture;
 	private Sprite				carSprite;
 	private Sprite				crashSprite;
 
@@ -135,8 +137,12 @@ public class Car
 		 * Crash is last one */
 		TextureRegion[] carFrames;
 		TextureRegion[][] tmp = TextureRegion.split(carTexture, carTexture.getWidth() / 2, carTexture.getHeight() / 2);
-		carFrames = new TextureRegion[2 * 2];
-		int index = 0;
+		carFrames = new TextureRegion[2 * 2 + 2];
+		car4Texture = new Texture("data/car_4.png");
+		car5Texture = new Texture("data/car_5.png");	
+		carFrames[0] = new TextureRegion(car4Texture);
+		carFrames[1] = new TextureRegion(car5Texture);
+		int index = 2;
 		for (int i = 0; i < 2; i++)
 		{
 			for (int j = 0; j < 2; j++)
@@ -145,14 +151,14 @@ public class Car
 			}
 		}
 
-		carSprite = new Sprite(carFrames[new Random().nextInt(3)]);
+		carSprite = new Sprite(carFrames[new Random().nextInt(5)]);
 
 		// carSprite = new Sprite(new Texture("data/testCar.png"));
 
 		carSprite.setPosition(this.position_x, this.position_y);
 		carSprite.setSize(width, height);
 
-		crashSprite = new Sprite(carFrames[3]); // crash sprite is last
+		crashSprite = new Sprite(carFrames[5]); // crash sprite is last
 		crashSprite.setSize(width, height);
 	}
 
@@ -898,6 +904,12 @@ public class Car
 	public boolean get_forced_turned()
 	{
 		return this.is_forced_turned;
+	}
+	
+	public void dispose(){
+		carTexture.dispose();
+		car4Texture.dispose();
+		car5Texture.dispose();
 	}
 
 }

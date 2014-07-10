@@ -351,6 +351,19 @@ public class LevelScreen implements Screen
 			sensor[i] = new GeneralSensor(thebatch, i, 0, 0);
 		}
 		sensorFile = new File(VerilogTown.getRootPath() + "/Levels/Lv" + level_number + "/sensorFile.txt");
+		if (!sensorFile.exists())
+		{
+			try
+			{
+				sensorFile.createNewFile();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		try
 		{
 			InputStreamReader sensorFileReader = new InputStreamReader(new FileInputStream(sensorFile));
@@ -373,7 +386,6 @@ public class LevelScreen implements Screen
 		{
 			e.printStackTrace();
 		}
-
 		// attach the existed sensors to the grid node
 		for (int i = 0; i < sensor.length; i++)
 		{
@@ -1155,7 +1167,45 @@ public class LevelScreen implements Screen
 	@Override
 	public void dispose()
 	{
-
+		level_map.dispose();
+		stop.dispose();
+		stop_highlighted.dispose();
+		stop_compiled_failed.dispose();
+		go.dispose();
+		go_forward.dispose();
+		go_right.dispose();
+		go_left.dispose();
+		top_score_bar.dispose();
+		check_mark.dispose();
+		border.dispose();
+		colon1.dispose();
+		colon2.dispose();
+		crash.dispose();
+		letterT.dispose();
+		letterI.dispose();
+		letterM.dispose();
+		letterE.dispose();
+		help_menu.dispose();
+		level_finish.dispose();
+		colon_chiller.dispose();
+		press_h.dispose();
+		main_menu.dispose();
+		next_level.dispose();
+		try_again.dispose();
+		non_sensor.dispose();
+		ban.dispose();
+		redDot.dispose();
+		greenDot.dispose();
+		for(int i = 0; i < 10; i++){
+			numbers[i].dispose();
+			numbers_chiller[i].dispose();
+		}
+		for(int i = 0; i < 8; i++){
+			sensorTexture[i].dispose();
+		}
+		for(int i = 0; i < cars.length; i++){
+			cars[i].dispose();
+		}
 	}
 }
 

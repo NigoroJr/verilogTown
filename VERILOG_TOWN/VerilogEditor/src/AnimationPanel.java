@@ -96,8 +96,6 @@ public class AnimationPanel extends JPanel
     	stop_w = new ImageIcon(imageURL).getImage();
     	imageURL = AnimationPanel.class.getResource("images/stop_e.png");
     	stop_e = new ImageIcon(imageURL).getImage();
-    	imageURL = AnimationPanel.class.getResource("images/blank.png");
-    	blank = new ImageIcon(imageURL).getImage();
     	
     	
         this.setLayout(new GridBagLayout());

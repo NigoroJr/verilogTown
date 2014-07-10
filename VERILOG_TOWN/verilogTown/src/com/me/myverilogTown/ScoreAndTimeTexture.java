@@ -52,4 +52,11 @@ public class ScoreAndTimeTexture
 			batch.draw(numbers_chiller[(int) (score % 10)], x + 2 * gapScore, y, size, size);
 		}
 	}
+	
+	public void dispose(){
+		for(int j = 0; j < 10; j++){
+			numbers_chiller[j].dispose();
+		}
+		colon_chiller.dispose();
+	}
 }

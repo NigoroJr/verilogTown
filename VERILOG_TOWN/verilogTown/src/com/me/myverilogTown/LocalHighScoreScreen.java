@@ -3,7 +3,6 @@ package com.me.myverilogTown;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -13,40 +12,33 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 
 public class LocalHighScoreScreen implements Screen
 {
+	private static final int	level_num 					= 12;
+	
 	private final VerilogTown	game;
 	private OrthographicCamera	camera;
 
-	private int					level1Cars[];
-	private int					level2Cars[];
-	private int					level3Cars[];
-	private int					level1Time[];
-	private int					level2Time[];
-	private int					level3Time[];
-
-	private TextureButton		level1Button;
-	private TextureButton		level2Button;
-	private TextureButton		level3Button;
+	private int					levelsCars[][];
+	private int					levelsTime[][];
+    
+	private Texture				levelsLabel[];
 	private TextureButton		back;
-
-	private Texture				level1normal;
-	private Texture				level1hover;
-	private Texture				level1pressed;
-
-	private Texture				level2normal;
-	private Texture				level2hover;
-	private Texture				level2pressed;
-
-	private Texture				level3normal;
-	private Texture				level3hover;
-	private Texture				level3pressed;
+	private TextureButton		next;
+	private TextureButton		last;
 
 	private Texture				back_normal;
 	private Texture				back_hover;
 	private Texture				back_pressed;
+	
+	private Texture				next_normal;
+	private Texture				next_hover;
+	private Texture				next_pressed;
+	
+	private Texture				last_normal;
+	private Texture				last_hover;
+	private Texture				last_pressed;
 
 	private Texture				title;
 	private Texture				rank_label;
@@ -76,12 +68,8 @@ public class LocalHighScoreScreen implements Screen
 
 	private ScoreAndTimeTexture	scoreAndTimeTexture;
 
-	private final int			STATE1						= 1;
-	private final int			STATE2						= 2;
-	private final int			STATE3						= 3;
-
-	private int					currentState;
-	private int					lastState;
+	private int					currentLevel;
+	private int					lastLevel;
 
 	private float				spriteX;
 	private float				desireX;
@@ -92,100 +80,61 @@ public class LocalHighScoreScreen implements Screen
 		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, HIGH_SCORE_SCREEN_WIDTH, HIGH_SCORE_SCREEN_HEIGHT);
-		currentState = STATE1;
-		lastState = STATE1;
+		currentLevel = 1;
+		lastLevel = 1;
 
-		level1Cars = new int[10];
-		level2Cars = new int[10];
-		level3Cars = new int[10];
-		level1Time = new int[10];
-		level2Time = new int[10];
-		level3Time = new int[10];
-		File highScoreLevel1 = new File(VerilogTown.getRootPath() + "/Levels/Lv1/high_score.txt");
-		File highScoreLevel2 = new File(VerilogTown.getRootPath() + "/Levels/Lv2/high_score.txt");
-		File highScoreLevel3 = new File(VerilogTown.getRootPath() + "/Levels/Lv3/high_score.txt");
-		try
-		{
-			InputStreamReader reader1 = new InputStreamReader(new FileInputStream(highScoreLevel1));
-			InputStreamReader reader2 = new InputStreamReader(new FileInputStream(highScoreLevel2));
-			InputStreamReader reader3 = new InputStreamReader(new FileInputStream(highScoreLevel3));
-			BufferedReader br1 = new BufferedReader(reader1);
-			BufferedReader br2 = new BufferedReader(reader2);
-			BufferedReader br3 = new BufferedReader(reader3);
-			String temp = null;
-			for (int i = 0; i < 10; i++)
-			{
-				if ((temp = br1.readLine()) != null)
-				{
-					level1Cars[i] = Integer.parseInt(temp.substring(0, temp.indexOf(" ")));
-					level1Time[i] = Integer.parseInt(temp.substring(temp.indexOf(" ") + 1));
+		levelsCars = new int[level_num][10];
+		levelsTime = new int[level_num][10];
+		for(int i = 0; i < level_num; i++){
+			File highScoreFile = new File(VerilogTown.getRootPath() + "/Levels/Lv" + (i + 1) + "/high_score.txt");
+			try{
+				InputStreamReader reader = new InputStreamReader(new FileInputStream(highScoreFile));
+				BufferedReader br = new BufferedReader(reader);
+				String temp = null;
+				for(int j = 0; j < 10; j++){
+					if((temp = br.readLine()) != null){
+						levelsCars[i][j] = Integer.parseInt(temp.substring(0, temp.indexOf(" ")));
+						levelsTime[i][j] = Integer.parseInt(temp.substring(temp.indexOf(" ") + 1));
+					}
+					else{
+						levelsCars[i][j] = 0;
+						levelsTime[i][j] = 0;
+					}
 				}
-				else
-				{
-					level1Cars[i] = 0;
-					level1Time[i] = 0;
-				}
-
-				if ((temp = br2.readLine()) != null)
-				{
-					level2Cars[i] = Integer.parseInt(temp.substring(0, temp.indexOf(" ")));
-					level2Time[i] = Integer.parseInt(temp.substring(temp.indexOf(" ") + 1));
-				}
-				else
-				{
-					level2Cars[i] = 0;
-					level2Time[i] = 0;
-				}
-
-				if ((temp = br3.readLine()) != null)
-				{
-					level3Cars[i] = Integer.parseInt(temp.substring(0, temp.indexOf(" ")));
-					level3Time[i] = Integer.parseInt(temp.substring(temp.indexOf(" ") + 1));
-				}
-				else
-				{
-					level3Cars[i] = 0;
-					level3Time[i] = 0;
-				}
+				br.close();
+				reader.close();
 			}
-			reader1.close();
-			reader2.close();
-			reader3.close();
-			br1.close();
-			br2.close();
-			br3.close();
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		levelsLabel = new Texture[level_num];
+		for(int i = 0; i < level_num; i++){
+			levelsLabel[i] = new Texture("ASSET_RESOURCES/score_level" + (i + 1) + "_pressed.png");
 		}
 
-		level1normal = new Texture("ASSET_RESOURCES/score_level1_normal.png");
-		level1hover = new Texture("ASSET_RESOURCES/score_level1_mouse_on.png");
-		level1pressed = new Texture("ASSET_RESOURCES/score_level1_pressed.png");
-
-		level2normal = new Texture("ASSET_RESOURCES/score_level2_normal.png");
-		level2hover = new Texture("ASSET_RESOURCES/score_level2_mouse_on.png");
-		level2pressed = new Texture("ASSET_RESOURCES/score_level2_pressed.png");
-
-		level3normal = new Texture("ASSET_RESOURCES/score_level3_normal.png");
-		level3hover = new Texture("ASSET_RESOURCES/score_level3_mouse_on.png");
-		level3pressed = new Texture("ASSET_RESOURCES/score_level3_pressed.png");
-
+		next_normal = new Texture("ASSET_RESOURCES/next_normal.png");
+		next_hover = new Texture("ASSET_RESOURCES/next_hover.png");
+		next_pressed = new Texture("ASSET_RESOURCES/next_pressed.png");
+		
 		back_normal = new Texture("ASSET_RESOURCES/back_normal.png");
 		back_hover = new Texture("ASSET_RESOURCES/back_mouse_on.png");
 		back_pressed = new Texture("ASSET_RESOURCES/back_pressed.png");
+		
+		last_normal = new Texture("ASSET_RESOURCES/last_normal.png");
+		last_hover = new Texture("ASSET_RESOURCES/last_hover.png");
+		last_pressed = new Texture("ASSET_RESOURCES/last_pressed.png");
 
 		title = new Texture("ASSET_RESOURCES/local_high_score.png");
 		rank_label = new Texture("ASSET_RESOURCES/rank.png");
 		cars_label = new Texture("ASSET_RESOURCES/cars.png");
 		time_label = new Texture("ASSET_RESOURCES/time.png");
 
-		level1Button = new TextureButton(game.batch, 135, 1110, 240, 120, level1normal, level1hover, level1pressed);
-		level2Button = new TextureButton(game.batch, 535, 1110, 240, 120, level2normal, level2hover, level2pressed);
-		level3Button = new TextureButton(game.batch, 935, 1110, 240, 120, level3normal, level3hover, level3pressed);
 		back = new TextureButton(game.batch, 30, 45, 160, 59, back_normal, back_hover, back_pressed);
+		next = new TextureButton(game.batch, 1180, 500, 90, 300, next_normal, next_hover, next_pressed);
+		last = new TextureButton(game.batch, 10, 500, 90, 300, last_normal, last_hover, last_pressed);
 
 		scoreAndTimeTexture = new ScoreAndTimeTexture(game.batch, 48, 53, 55);
 
@@ -224,62 +173,45 @@ public class LocalHighScoreScreen implements Screen
 
 		game.batch.begin();
 
-		game.batch.draw(title, 280, 1130, 750, 280);
+		game.batch.draw(title, 260, 1130, 750, 280);
 		game.batch.draw(rank_label, 180, 1037, 150, 84);
-		game.batch.draw(cars_label, 578, 1037, 150, 84);
-		game.batch.draw(time_label, 975, 1037, 150, 84);
+		game.batch.draw(cars_label, 560, 1037, 150, 84);
+		game.batch.draw(time_label, 940, 1037, 150, 84);
 
-		if (level1Button.isOnButton(realX, realY))
+		if (next.isOnButton(realX, realY))
 		{
 			if (isPressed)
-				level1Button.drawTexture(TextureButton.PRESSED);
+				next.drawTexture(TextureButton.PRESSED);
 			else if (wasPressed)
 			{
-				lastState = currentState;
-				currentState = STATE1;
-				desireX = (currentState - 1) * HIGH_SCORE_SCREEN_WIDTH;
-				actionTime = 0;
+				if(currentLevel < level_num)
+					currentLevel++;
+				desireX = -(currentLevel - 1) * HIGH_SCORE_SCREEN_WIDTH;
 			}
 			else
-				level1Button.drawTexture(TextureButton.HOVER);
+				next.drawTexture(TextureButton.HOVER);
 		}
 		else
-			level1Button.drawTexture(TextureButton.NORMAL);
-
-		if (level2Button.isOnButton(realX, realY))
+			next.drawTexture(TextureButton.NORMAL);
+		
+		
+		if (last.isOnButton(realX, realY))
 		{
 			if (isPressed)
-				level2Button.drawTexture(TextureButton.PRESSED);
+				last.drawTexture(TextureButton.PRESSED);
 			else if (wasPressed)
 			{
-				lastState = currentState;
-				currentState = STATE2;
-				desireX = -(currentState - 1) * HIGH_SCORE_SCREEN_WIDTH;
-				actionTime = 0;
+				if(currentLevel > 1)
+					currentLevel--;
+				desireX = -(currentLevel - 1) * HIGH_SCORE_SCREEN_WIDTH;
 			}
 			else
-				level2Button.drawTexture(TextureButton.HOVER);
+				last.drawTexture(TextureButton.HOVER);
 		}
 		else
-			level2Button.drawTexture(TextureButton.NORMAL);
+			last.drawTexture(TextureButton.NORMAL);
 
-		if (level3Button.isOnButton(realX, realY))
-		{
-			if (isPressed)
-				level3Button.drawTexture(TextureButton.PRESSED);
-			else if (wasPressed)
-			{
-				lastState = currentState;
-				currentState = STATE3;
-				desireX = -(currentState - 1) * HIGH_SCORE_SCREEN_WIDTH;
-				actionTime = 0;
-			}
-			else
-				level3Button.drawTexture(TextureButton.HOVER);
-		}
-		else
-			level3Button.drawTexture(TextureButton.NORMAL);
-
+		
 		if (back.isOnButton(realX, realY))
 		{
 			if (isPressed)
@@ -294,34 +226,32 @@ public class LocalHighScoreScreen implements Screen
 		}
 		else
 			back.drawTexture(TextureButton.NORMAL);
-
-		if (currentState == STATE1)
-			level1Button.drawTexture(TextureButton.PRESSED);
-		else if (currentState == STATE2)
-			level2Button.drawTexture(TextureButton.PRESSED);
-		else if (currentState == STATE3)
-			level3Button.drawTexture(TextureButton.PRESSED);
-
-		if (currentState - lastState > 0)
+		
+		if (currentLevel - lastLevel > 0)
 		{
 			if (spriteX <= desireX)
 			{
 				spriteX = desireX;
+				actionTime = 0;
+				lastLevel = currentLevel;
 			}
 			else
 			{
 				actionTime += Gdx.graphics.getDeltaTime();
-				spriteX += (desireX - spriteX) / Math.abs(spriteX - desireX) * (300 * Math.pow(actionTime + 0.4, 4));
+				spriteX += (desireX - spriteX) / Math.abs(spriteX - desireX) * Math.min((300 * Math.pow(actionTime + 0.4, 4)), 100);
 			}
 		}
-		else if (currentState - lastState < 0)
+		else if (currentLevel - lastLevel < 0)
 		{
-			if (spriteX >= desireX)
+			if (spriteX >= desireX){
 				spriteX = desireX;
+				actionTime = 0;
+				lastLevel = currentLevel;
+			}
 			else
 			{
 				actionTime += Gdx.graphics.getDeltaTime();
-				spriteX += (desireX - spriteX) / Math.abs(spriteX - desireX) * (300 * Math.pow(actionTime + 0.4, 4));
+				spriteX += (desireX - spriteX) / Math.abs(spriteX - desireX) * Math.min((300 * Math.pow(actionTime + 0.4, 4)), 100);
 			}
 		}
 
@@ -357,23 +287,37 @@ public class LocalHighScoreScreen implements Screen
 	@Override
 	public void dispose()
 	{
+		for(int i = 0; i < level_num; i++){
+			levelsLabel[i].dispose();
+		}
+		back_normal.dispose();
+		back_hover.dispose();
+		back_pressed.dispose();
+		next_normal.dispose();
+		next_hover.dispose();
+		next_pressed.dispose();
+		last_normal.dispose();
+		last_hover.dispose();
+		last_pressed.dispose();
+		title.dispose();
+		rank_label.dispose();
+		cars_label.dispose();
+		time_label.dispose();
 	}
-
+	
+	
 	public void showScoresAndTimes(float x, float y)
 	{
-		for (int i = 0; i < 10; i++)
-		{
-			scoreAndTimeTexture.drawScore(x + 200, y + 950 - 100 * i, 1 + i, 2);
-			scoreAndTimeTexture.drawScore(x + 200 + HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * i, i + 1, 2);
-			scoreAndTimeTexture.drawScore(x + 200 + 2 * HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * i, i + 1, 2);
-
-			scoreAndTimeTexture.drawScore(x + 575, y + 950 - 100 * i, level1Cars[i], 3);
-			scoreAndTimeTexture.drawScore(x + 575 + HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * i, level2Cars[i], 3);
-			scoreAndTimeTexture.drawScore(x + 575 + 2 * HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * i, level3Cars[i], 3);
-
-			scoreAndTimeTexture.drawTime(x + 945, y + 950 - 100 * i, level1Time[i]);
-			scoreAndTimeTexture.drawTime(x + 945 + HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * i, level2Time[i]);
-			scoreAndTimeTexture.drawTime(x + 945 + 2 * HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * i, level3Time[i]);
+		for(int i = 0; i < level_num; i++){
+			game.batch.draw(levelsLabel[i], x + 500 + i * HIGH_SCORE_SCREEN_WIDTH, y + 1090, 300, 140);
+			for (int j = 0; j < 10; j++)
+			{
+				scoreAndTimeTexture.drawScore(x + 200 + i * HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * j, 1 + j, 2);
+	
+				scoreAndTimeTexture.drawScore(x + 555 + i * HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * j, levelsCars[i][j], 3);
+	
+				scoreAndTimeTexture.drawTime(x + 905 + i * HIGH_SCORE_SCREEN_WIDTH, y + 950 - 100 * j, levelsTime[i][j]);
+			}
 		}
 	}
 }

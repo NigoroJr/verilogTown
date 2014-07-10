@@ -80,4 +80,8 @@ public class GeneralSensor
 		}
 		return temp;
 	}
+	
+	public void dispose(){
+		sensorTexture.dispose();
+	}
 }

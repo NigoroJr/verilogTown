@@ -1,0 +1,60 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x6943c48a, pid=7032, tid=564
+#
+# JRE version: 7.0_01-b08
+# Java VM: Java HotSpot(TM) Client VM (21.1-b02 mixed mode, sharing windows-x86 )
+# Problematic frame:
+# C  [atioglxx.dll+0x40c48a]
+#
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.sun.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0494dc00):  JavaThread "LWJGL Application" [_thread_in_native, id=564, stack(0x04dd0000,0x04e20000)]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0x04c35d98
+
+Registers:
+EAX=0x00000000, EBX=0x00000004, ECX=0x04c35d98, EDX=0x69e89140
+ESP=0x04e1f380, EBP=0x04e1f398, ESI=0x00000006, EDI=0x00001403
+EIP=0x6943c48a, EFLAGS=0x00010293
+
+Top of Stack: (sp=0x04e1f380)
+0x04e1f380:   04c35d98 69e8a5d8 00000006 0000000d
+0x04e1f390:   00001fd0 00000000 00001403 6943c800
+0x04e1f3a0:   69e89140 04c35d98 00000000 04e1f3c4
+0x04e1f3b0:   04e1f3c8 00000004 00000000 695fc5c0
+0x04e1f3c0:   00000004 00000000 00000000 00000001
+0x04e1f3d0:   00000000 0494dc00 04e1f438 04e1f42c
+0x04e1f3e0:   0494dd28 00000000 10009a28 00000004
+0x04e1f3f0:   00000006 00001403 04c35d98 023a1d48 
+
+Instructions: (pc=0x6943c48a)
+0x6943c46a:   e9 a6 02 00 00 83 fe 0f 76 16 8b 45 18 8b 55 14
+0x6943c47a:   50 52 56 e8 be f6 ff ff 83 c4 0c e9 8b 02 00 00
+0x6943c48a:   0f b7 01 83 c6 fe 0f b7 d0 83 fe 0d 0f 87 38 01
+0x6943c49a:   00 00 ff 24 b5 6c c7 43 69 0f b7 71 1c 66 3b f0 
+
+
+Register to memory mapping:
+
+EAX=0x00000000 is an unknown value
+EBX=0x00000004 is an unknown value
+ECX=0x04c35d98 is an unknown value
+EDX=0x69e89140 is an unknown value
+ESP=0x04e1f380 is pointing into the stack for thread: 0x0494dc00
+EBP=0x04e1f398 is pointing into the stack for thread: 0x0494dc00
+ESI=0x00000006 is an unknown value
+EDI=0x00001403 is an unknown value
+
+
+Stack: [0x04dd0000,0x04e20000],  sp=0x04e1f380,  free space=316k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)

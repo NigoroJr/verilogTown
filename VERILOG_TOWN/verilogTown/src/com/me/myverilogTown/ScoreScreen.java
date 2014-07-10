@@ -12,6 +12,7 @@ import java.io.*;
 
 public class ScoreScreen implements Screen
 {
+	private static final int	level_num 			= 12;
 	private final VerilogTown	game;
 	private OrthographicCamera	camera;
 	private Texture[]			numbers_chiller;
@@ -293,7 +294,7 @@ public class ScoreScreen implements Screen
 			else if (wasPressed)
 			{
 				this.dispose();
-				if (level_number + 1 < 4)
+				if (level_number < level_num)
 					game.setScreen(new LevelScreen(game, level_number + 1));
 				else
 					game.setScreen(new MainMenu(game));
@@ -336,6 +337,20 @@ public class ScoreScreen implements Screen
 	@Override
 	public void dispose()
 	{
+		for(int i = 0; i < 10; i++){
+			numbers_chiller[i].dispose();
+		}
+		background.dispose();
+		colon_chiller.dispose();
+		main_menu_normal.dispose();
+		main_menu_hover.dispose();
+		main_menu_pressed.dispose();
+		next_level_normal.dispose();
+		next_level_hover.dispose();
+		next_level_pressed.dispose();
+		try_again_normal.dispose();
+		try_again_hover.dispose();
+		try_again_pressed.dispose();
 	}
 
 }

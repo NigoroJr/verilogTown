@@ -34,12 +34,15 @@ import com.badlogic.gdx.Input;
 public class MainMenu implements Screen
 
 {
+	private static final int	level_num 		= 12;
+	
 	public final VerilogTown	game;
 	private OrthographicCamera	camera;
 	private Texture				title;
 	private Texture				select_level;
 	private static final int	MAINMENU_WIDTH	= 1280;
 	private static final int	MAINMENU_HEIGHT	= 1280;
+	
 
 	private boolean				isPressed		= false;
 	private boolean				wasPressed		= false;
@@ -60,24 +63,14 @@ public class MainMenu implements Screen
 	public double				realY;
 
 	private double				time;
-	private TextureButton		level1;
-	private TextureButton		level2;
-	private TextureButton		level3;
+	private TextureButton		levels[];
 	private TextureButton		tutorial;
 	private TextureButton		credits;
 	private TextureButton		high_score;
 
-	private Texture				level1_normal;
-	private Texture				level1_hover;
-	private Texture				level1_pressed;
-
-	private Texture				level2_normal;
-	private Texture				level2_hover;
-	private Texture				level2_pressed;
-
-	private Texture				level3_normal;
-	private Texture				level3_hover;
-	private Texture				level3_pressed;
+	private Texture				levels_normal[];
+	private Texture				levels_hover[];
+	private Texture				levels_pressed[];
 
 	private Texture				tutorial_normal;
 	private Texture				tutorial_hover;
@@ -100,27 +93,20 @@ public class MainMenu implements Screen
 		title = new Texture(Gdx.files.internal("ASSET_RESOURCES/welcom_to_verilogtown.png"));
 
 		select_level = new Texture("ASSET_RESOURCES/select_a_level.png");
-
-		level1_normal = new Texture("ASSET_RESOURCES/level1_normal.png");
-		level1_hover = new Texture("ASSET_RESOURCES/level1_mouse_on.png");
-		level1_pressed = new Texture("ASSET_RESOURCES/level1_pressed.png");
-
-		level2_normal = new Texture("ASSET_RESOURCES/level2_normal.png");
-		level2_hover = new Texture("ASSET_RESOURCES/level2_mouse_on.png");
-		level2_pressed = new Texture("ASSET_RESOURCES/level2_pressed.png");
-
-		level3_normal = new Texture("ASSET_RESOURCES/level3_normal.png");
-		level3_hover = new Texture("ASSET_RESOURCES/level3_mouse_on.png");
-		level3_pressed = new Texture("ASSET_RESOURCES/level3_pressed.png");
+		
+		levels_normal = new Texture[level_num];
+		levels_hover = new Texture[level_num];
+		levels_pressed = new Texture[level_num];
+		for(int i = 0; i < level_num; i++){
+			levels_normal[i] = new Texture("ASSET_RESOURCES/level" + (i + 1) + "_normal.png");
+			levels_hover[i] = new Texture("ASSET_RESOURCES/level" + (i + 1) + "_mouse_on.png");
+			levels_pressed[i] = new Texture("ASSET_RESOURCES/level" + (i + 1) + "_pressed.png");	
+		}
 
 		tutorial_normal = new Texture("ASSET_RESOURCES/tutorial_normal.png");
 		tutorial_hover = new Texture("ASSET_RESOURCES/tutorial_mouse_on.png");
 		tutorial_pressed = new Texture("ASSET_RESOURCES/tutorial_pressed.png");
-		/*tutorial_normal = new
-		 * Texture("ASSET_RESOURCES/lv00_thumbnail_normal.png"); tutorial_hover
-		 * = new Texture("ASSET_RESOURCES/lv00_thumbnail_mouse_on.png");
-		 * tutorial_pressed = new
-		 * Texture("ASSET_RESOURCES/lv00_thumbnail_pressed.png"); */
+		
 		credits_normal = new Texture("ASSET_RESOURCES/credits_normal.png");
 		credits_hover = new Texture("ASSET_RESOURCES/credits_mouse_on.png");
 		credits_pressed = new Texture("ASSET_RESOURCES/credits_pressed.png");
@@ -129,12 +115,14 @@ public class MainMenu implements Screen
 		high_score_hover = new Texture("ASSET_RESOURCES/high_score_mouse_on.png");
 		high_score_pressed = new Texture("ASSET_RESOURCES/high_score_pressed.png");
 
-		level1 = new TextureButton(game.batch, 512, 705, 250, 60, level1_normal, level1_hover, level1_pressed);
-		level2 = new TextureButton(game.batch, 512, 605, 250, 60, level2_normal, level2_hover, level2_pressed);
-		level3 = new TextureButton(game.batch, 512, 505, 250, 60, level3_normal, level3_hover, level3_pressed);
+		levels = new TextureButton[level_num];
+		for(int i = 0; i < level_num; i++){
+			levels[i] = new TextureButton(game.batch, 162 + (i % 3) * 350, 705 - 100 * (i / 3), 250, 60, levels_normal[i], levels_hover[i], levels_pressed[i]);
+		}
+		
 		tutorial = new TextureButton(game.batch, 512, 805, 250, 60, tutorial_normal, tutorial_hover, tutorial_pressed);
-		high_score = new TextureButton(game.batch, 512, 405, 250, 60, high_score_normal, high_score_hover, high_score_pressed);
-		credits = new TextureButton(game.batch, 512, 305, 250, 60, credits_normal, credits_hover, credits_pressed);
+		high_score = new TextureButton(game.batch, 512, 305, 250, 60, high_score_normal, high_score_hover, high_score_pressed);
+		credits = new TextureButton(game.batch, 512, 205, 250, 60, credits_normal, credits_hover, credits_pressed);
 
 		time = 0;
 	}
@@ -178,53 +166,23 @@ public class MainMenu implements Screen
 		if ((int) (time * 1.3) % 2 == 0)
 			game.batch.draw(select_level, 370, 850, 540, 120);
 
-		// Level 1 button
-		if (level1.isOnButton(realX, realY))
-		{
-			if (isPressed)
-				level1.drawTexture(TextureButton.PRESSED);
-			else if (wasPressed)
+		for(int i = 0; i < level_num; i++){
+			if (levels[i].isOnButton(realX, realY))
 			{
-				this.dispose();
-				game.setScreen(new LevelScreen(game, 1));
+				if (isPressed)
+					levels[i].drawTexture(TextureButton.PRESSED);
+				else if (wasPressed)
+				{
+					this.dispose();
+					game.setScreen(new LevelScreen(game, i + 1));
+				}
+				else
+					levels[i].drawTexture(TextureButton.HOVER);
 			}
 			else
-				level1.drawTexture(TextureButton.HOVER);
+				levels[i].drawTexture(TextureButton.NORMAL);
 		}
-		else
-			level1.drawTexture(TextureButton.NORMAL);
-
-		// Level 2 button
-		if (level2.isOnButton(realX, realY))
-		{
-			if (isPressed)
-				level2.drawTexture(TextureButton.PRESSED);
-			else if (wasPressed)
-			{
-				this.dispose();
-				game.setScreen(new LevelScreen(game, 2));
-			}
-			else
-				level2.drawTexture(TextureButton.HOVER);
-		}
-		else
-			level2.drawTexture(TextureButton.NORMAL);
-
-		if (level3.isOnButton(realX, realY))
-		{
-			if (isPressed)
-				level3.drawTexture(TextureButton.PRESSED);
-			else if (wasPressed)
-			{
-				this.dispose();
-				game.setScreen(new LevelScreen(game, 3));
-			}
-			else
-				level3.drawTexture(TextureButton.HOVER);
-		}
-		else
-			level3.drawTexture(TextureButton.NORMAL);
-
+		
 		// Tutorial button
 		if (tutorial.isOnButton(realX, realY))
 		{
@@ -304,5 +262,21 @@ public class MainMenu implements Screen
 	@Override
 	public void dispose()
 	{
+		for(int i = 0; i < level_num; i++){
+			levels_normal[i].dispose();
+			levels_hover[i].dispose();
+			levels_pressed[i].dispose();
+		}
+		tutorial_normal.dispose();
+		tutorial_hover.dispose();
+		tutorial_pressed.dispose();
+		credits_normal.dispose();
+		credits_hover.dispose();
+		credits_pressed.dispose();
+		high_score_normal.dispose();
+		high_score_hover.dispose();
+		high_score_pressed.dispose();
+		title.dispose();
+		select_level.dispose();
 	}
 }
