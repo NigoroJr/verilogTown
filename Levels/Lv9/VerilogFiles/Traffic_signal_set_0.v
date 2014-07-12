@@ -1,4 +1,4 @@
-module light1 (clk, rst, outN, outS, outE, outW, sensor_light, general_sensors, debug_port);
+module light1 (clk, rst, outN, outS, outE, outW, sensor_light, general_sensors);
 input clk, rst;
 
 output [29:0]debug_port;
@@ -26,66 +26,20 @@ parameter Stop = 3'b000,
 	  Right_only = 3'b011,
 	  Go = 3'b100;
 
-reg [7:0] count;
 reg [2:0]outN;
 reg [2:0]outS;
 reg [2:0]outE;
 reg [2:0]outW;
 
-assign debug_port = count;
+assign debug_port = sensor_light;
 
-reg counter;
-
-always @(posedge clk or negedge rst)
+always @(*)
 begin
-	if (rst == 1'b0)
-	begin
-		count <= 8'd0;
-		outN <= Go;
-		outS <= Stop;
-		outE <= Stop;
-		outW <= Stop;
-	end
-	else
-	begin
-		count <= count + 1'b1;
-		if(counter == 1'b0)
-		begin
-			outE <= Go;
-			outN <= Stop;
-			outW <= Stop;
-			outS <= Stop;
-		end
-		else
-		begin
-		case (count)
-			8'd0 :
-			begin
-				outN <= Stop;
-				outE <= Go;
-			end
-			8'd64:
-			begin
-				outE <= Stop;
-				outS <= Go;
-			end
-			8'd128:
-			begin
-				outS <= Stop;
-				outW <= Go;
-			end
-			8'd192:
-			begin
-				outW <= Stop;
-				outN <= Go;
-			end
-		endcase
-		end
-		if(count == 8'd255)
-		begin
-			counter <= 1'b1;
-		end
-	end
+		outN = Stop;
+		outS = Stop;
+		outE = Left_only;
+		outW = Stop;
 end
+
 
 endmodule

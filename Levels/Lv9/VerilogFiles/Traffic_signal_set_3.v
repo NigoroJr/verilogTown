@@ -34,8 +34,6 @@ reg [2:0]outW;
 
 assign debug_port = count;
 
-reg firstTime;
-
 always @(posedge clk or negedge rst)
 begin
 	if (rst == 1'b0)
@@ -45,45 +43,23 @@ begin
 		outS <= Stop;
 		outE <= Stop;
 		outW <= Stop;
-		firstTime <= 1'b0;
-		count <= 8'd150;
 	end
 	else
 	begin
 		count <= count + 1'b1;
-		if(count >= 8'd0 && count < 8'd210)
+		if(count >= 8'd150 && count < 8'd255)
 		begin
-			outS <= Go;
-			outN <= Stop;
-			outW <= Stop;
-			outE <= Stop;
-		end
-		else if(count >= 8'd210 && count < 8'd220)
-		begin
-			outS <= Stop;
-			outN <= Stop;
-			outW <= Go;
-			outE <= Stop;
-		end
-		else if(count >= 8'd220 && count < 8'd230)
-		begin
-			outS <= Stop;
 			outN <= Go;
+			outS <= Go;
+			outE <= Stop;	
 			outW <= Stop;
-			outE <= Stop;
 		end
 		else
 		begin
-			outS <= Stop;
-			outN <= Stop;
-			outW <= Stop;
 			outE <= Go;
-		end
-		if(sensor_light[0] == 1'b1 || sensor_light[1] == 1'b1 || sensor_light[2] == 1'b1 || sensor_light[3] == 1'b1)
-		begin
-			outN <= Stop;
 			outW <= Stop;
-			outE <= Stop;
+			outN <= Stop;
+			outS <= Go;
 		end
 	end
 end

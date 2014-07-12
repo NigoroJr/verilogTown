@@ -1,4 +1,4 @@
-module light1 (clk, rst, outN, outS, outE, outW, sensor_light, general_sensors);
+module light1 (clk, rst, outN, outS, outE, outW, sensor_light, general_sensors, debug_port);
 input clk, rst;
 
 output [29:0]debug_port;
@@ -26,63 +26,51 @@ parameter Stop = 3'b000,
 	  Right_only = 3'b011,
 	  Go = 3'b100;
 
+reg [7:0] count;
 reg [2:0]outN;
 reg [2:0]outS;
 reg [2:0]outE;
 reg [2:0]outW;
 
-assign debug_port = sensor_light;
+assign debug_port = count;
 
-always @(*)
+always @(posedge clk or negedge rst)
 begin
-	/* Check if anyone is in the center of the light (as in currently moving through the intersection */
-	if ((sensor_light[0] == 1'b0) && (sensor_light[1] == 1'b0) && (sensor_light[2] == 1'b0) && (sensor_light[3] == 1'b0))
+	if (rst == 1'b0)
 	begin
-		if (sensor_light[6] == 1'b1)
-		begin
-			/* If sensor going N has a car then let them through */
-			outN = Go;
-			outS = Stop;
-			outE = Stop;
-			outW = Stop;
-		end
-		else if (sensor_light[4] == 1'b1)
-		begin
-			outN = Stop;
-			outS = Go;
-			outE = Stop;
-			outW = Stop;
-		end
-		else if (sensor_light[5] == 1'b1)
-		begin
-			outN = Stop;
-			outS = Stop;
-			outE = Go;
-			outW = Stop;
-		end
-		else if (sensor_light[7] == 1'b1)
-		begin
-			outN = Stop;
-			outS = Stop;
-			outE = Stop;
-			outW = Go;
-		end
-		else
-		begin
-			outN = Go;
-			outS = Go;
-			outE = Go;
-			outW = Go;
-		end
+		count <= 8'd0;
+		outN <= Go;
+		outS <= Stop;
+		outE <= Stop;
+		outW <= Stop;
 	end
 	else
 	begin
-		outN = Stop;
-		outS = Stop;
-		outE = Stop;
-		outW = Stop;
+		count <= count + 1'b1;
+
+		case (count)
+			8'd0 :
+			begin
+				outN <= Stop;
+				outE <= Go;
+			end
+			8'd64:
+			begin
+				outE <= Stop;
+				outS <= Go;
+			end
+			8'd128:
+			begin
+				outS <= Stop;
+				outW <= Go;
+			end
+			8'd192:
+			begin
+				outW <= Stop;
+				outN <= Go;
+			end
+		endcase
 	end
 end
-
 
 endmodule
