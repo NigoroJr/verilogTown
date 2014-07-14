@@ -97,8 +97,6 @@ public class MapEditor extends JDialog
 		setGridSize();
 
 		mapDirectory = String.format("%s/Levels/Lv%d/map/", LevelEditor.getRootPath(), levelNumber);
-		// Create directory (if it doesn't exist)
-		new File(mapDirectory).mkdirs();
 		xmlFile = new File(String.format("%s/lv%02d.xml", mapDirectory, levelNumber));
 
 		initMapGridGroup();
@@ -505,6 +503,9 @@ public class MapEditor extends JDialog
 	 * @param xmlFile */
 	public void exportXML(File xmlFile)
 	{
+		// Create directory (if it doesn't exist)
+		new File(mapDirectory).mkdirs();
+
 		Document doc = null;
 		try
 		{
