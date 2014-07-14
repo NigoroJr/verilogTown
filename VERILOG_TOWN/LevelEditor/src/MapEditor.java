@@ -492,16 +492,38 @@ public class MapEditor extends JDialog
 	/** Generates the XML file and the PNG image file for the level. */
 	public void exportLevel()
 	{
-		exportXML(xmlFile);
+		// Export XML
+		try
+		{
+			exportXML(xmlFile);
+		}
+		catch (FileNotFoundException | TransformerException e)
+		{
+			JOptionPane.showMessageDialog(null, "Error when exporting XML file", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 
-		File imageFile = new File(String.format("%s/lv%02d.png", mapDirectory, levelNumber));
-		exportMapImage(imageFile);
+		// Export image
+		try
+		{
+			File imageFile = new File(String.format("%s/lv%02d.png", mapDirectory, levelNumber));
+			exportMapImage(imageFile);
+		}
+		catch (IOException e)
+		{
+			JOptionPane.showMessageDialog(null, "Error when exporting map image", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		JOptionPane.showMessageDialog(null, "Finished exporting", "Done", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/** Exports the current state of the map to the given XML file.
 	 * 
 	 * @param xmlFile */
 	public void exportXML(File xmlFile)
+			throws TransformerException,
+			FileNotFoundException
 	{
 		// Create directory (if it doesn't exist)
 		new File(mapDirectory).mkdirs();
@@ -561,14 +583,6 @@ public class MapEditor extends JDialog
 			e.printStackTrace();
 		}
 		catch (TransformerFactoryConfigurationError e)
-		{
-			e.printStackTrace();
-		}
-		catch (TransformerException e)
-		{
-			e.printStackTrace();
-		}
-		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
 		}
@@ -699,8 +713,9 @@ public class MapEditor extends JDialog
 	/** Exports the PNG image of the map.
 	 * 
 	 * @param imageFile
-	 *            File object to export the image to. */
-	public void exportMapImage(File imageFile)
+	 *            File object to export the image to.
+	 * @throws IOException */
+	public void exportMapImage(File imageFile) throws IOException
 	{
 		int imageSize = gridGroups[0][0].getImageSize();
 		BufferedImage mapImage = new BufferedImage(sizeX / 2 * imageSize, sizeY / 2 * imageSize, BufferedImage.TYPE_INT_RGB);
@@ -718,13 +733,6 @@ public class MapEditor extends JDialog
 			}
 		}
 
-		try
-		{
-			ImageIO.write(mapImage, "PNG", imageFile);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		ImageIO.write(mapImage, "PNG", imageFile);
 	}
 }
