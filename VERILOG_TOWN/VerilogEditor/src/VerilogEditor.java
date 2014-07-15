@@ -70,6 +70,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.*;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -101,6 +102,9 @@ public class VerilogEditor extends JFrame implements ActionListener
 											generalSensorInput6, generalSensorInput0;
 	private String 							newLine;
 	private Parse 							Compiler;
+	
+	private long							startTime;
+	private long							totalFocusTime;
 	/**
 	* @param args
 	*/
@@ -449,6 +453,23 @@ public class VerilogEditor extends JFrame implements ActionListener
 				else
 					closingPopFunction();
 			}
+		});
+		
+		this.addWindowFocusListener(new WindowFocusListener(){
+
+			@Override
+			public void windowGainedFocus(WindowEvent e)
+			{
+				startTime = System.currentTimeMillis();
+			}
+
+			@Override
+			public void windowLostFocus(WindowEvent e)
+			{
+				totalFocusTime += System.currentTimeMillis() - startTime;
+				System.out.println(totalFocusTime/1000);
+			}
+			
 		});
 	}
 	

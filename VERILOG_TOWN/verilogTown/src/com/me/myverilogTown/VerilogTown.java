@@ -24,8 +24,13 @@ THE SOFTWARE.
 
 package com.me.myverilogTown;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
 import com.badlogic.gdx.Game;
@@ -42,6 +47,9 @@ public class VerilogTown extends Game
 
 	public SpriteBatch			batch;
 	public BitmapFont			font;
+	private long				startTime;
+	private long				totalFocusTime;
+	private File				userIDFile;
 
 	@Override
 	public void create()
@@ -53,6 +61,39 @@ public class VerilogTown extends Game
 
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont();
+		startTime = System.currentTimeMillis();
+		userIDFile = new File(VerilogTown.getRootPath() + "/userID.txt");
+		if(!userIDFile.exists()){
+			try
+			{
+				userIDFile.createNewFile();
+				FileWriter out = new FileWriter(userIDFile);
+				out.write("" + System.currentTimeMillis());
+				out.close();
+			} catch (IOException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+		InputStreamReader reader;
+		try
+		{
+			reader = new InputStreamReader(new FileInputStream(userIDFile));
+			BufferedReader br = new BufferedReader(reader);
+			System.out.println(Long.parseLong(br.readLine()));
+			br.close();
+			reader.close();
+		}
+		catch (NumberFormatException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		this.setScreen(new MainMenu(this));
 	}
 
@@ -65,6 +106,8 @@ public class VerilogTown extends Game
 	@Override
 	public void dispose()
 	{
+		totalFocusTime = (System.currentTimeMillis() - startTime) / 1000;
+		//send this data to server
 		batch.dispose();
 		font.dispose();
 	}
