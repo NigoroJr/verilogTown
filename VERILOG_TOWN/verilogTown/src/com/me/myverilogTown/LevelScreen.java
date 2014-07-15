@@ -716,8 +716,13 @@ public class LevelScreen implements Screen
 				finishYPosition = 0;
 			}
 			thebatch.draw(level_finish, 0, finishYPosition, LEVEL_WIDTH, LEVEL_HEIGHT + SCORE_BAR_HEIGHT);
-
-			thebatch.draw(numbers_chiller[level_number % 10], 578, finishYPosition + 1088, 80, 80);
+			if(level_number < 10){
+				thebatch.draw(numbers_chiller[level_number % 10], 578, finishYPosition + 1088, 80, 80);
+			}
+			else{
+				thebatch.draw(numbers_chiller[level_number / 10], 545, finishYPosition + 1088, 80, 80);
+				thebatch.draw(numbers_chiller[level_number % 10], 595, finishYPosition + 1088, 80, 80);
+			}
 
 			thebatch.draw(numbers_chiller[success_cars / 100], 725, finishYPosition + 660, 75, 75);
 			thebatch.draw(numbers_chiller[(success_cars % 100) / 10], 800, finishYPosition + 660, 75, 75);

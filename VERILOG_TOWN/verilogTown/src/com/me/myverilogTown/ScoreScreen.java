@@ -240,9 +240,15 @@ public class ScoreScreen implements Screen
 		game.batch.begin();
 
 		game.batch.draw(background, 0, 0, SCORE_SCREEN_WIDTH, SCORE_SCREEN_HEIGHT);
-
-		game.batch.draw(numbers_chiller[level_number % 10], 578, 1088, 80, 80);
-
+		
+		if(level_number < 10){
+			game.batch.draw(numbers_chiller[level_number % 10], 578, 1088, 80, 80);
+		}
+		else{
+			game.batch.draw(numbers_chiller[level_number / 10], 545, 1088, 80, 80);
+			game.batch.draw(numbers_chiller[level_number % 10], 595, 1088, 80, 80);
+		}
+			
 		game.batch.draw(numbers_chiller[success_cars / 100], 725, 660, 75, 75);
 		game.batch.draw(numbers_chiller[(success_cars % 100) / 10], 800, 660, 75, 75);
 		game.batch.draw(numbers_chiller[success_cars % 10], 875, 660, 75, 75);
