@@ -27,7 +27,6 @@ package com.me.myverilogTown;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -44,12 +43,13 @@ public class VerilogTown extends Game
 	 * development mode. In development mode, the directory structure is
 	 * different. */
 	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
+	public static final String	USER_ID_FILE_NAME			= "userID.txt";
 
 	public SpriteBatch			batch;
 	public BitmapFont			font;
 	private long				startTime;
 	private long				totalFocusTime;
-	private File				userIDFile;
+	private long				id;
 
 	@Override
 	public void create()
@@ -61,39 +61,18 @@ public class VerilogTown extends Game
 
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont();
+
 		startTime = System.currentTimeMillis();
-		userIDFile = new File(VerilogTown.getRootPath() + "/userID.txt");
-		if(!userIDFile.exists()){
-			try
-			{
-				userIDFile.createNewFile();
-				FileWriter out = new FileWriter(userIDFile);
-				out.write("" + System.currentTimeMillis());
-				out.close();
-			} catch (IOException e1)
-			{
-				e1.printStackTrace();
-			}
-		}
-		InputStreamReader reader;
+
 		try
 		{
-			reader = new InputStreamReader(new FileInputStream(userIDFile));
-			BufferedReader br = new BufferedReader(reader);
-			System.out.println(Long.parseLong(br.readLine()));
-			br.close();
-			reader.close();
-		}
-		catch (NumberFormatException e)
-		{
-			e.printStackTrace();
+			readID();
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		this.setScreen(new MainMenu(this));
 	}
 
@@ -112,6 +91,32 @@ public class VerilogTown extends Game
 		font.dispose();
 	}
 
+	public void readID() throws IOException
+	{
+		File userIDFile = new File(String.format("%s/%s", VerilogTown.getRootPath(), USER_ID_FILE_NAME));
+
+		if (!userIDFile.exists())
+		{
+			userIDFile.createNewFile();
+			FileWriter out = new FileWriter(userIDFile);
+			id = System.currentTimeMillis();
+			out.write(Long.toString(id));
+			out.close();
+		}
+		else
+		{
+			InputStreamReader reader = new InputStreamReader(new FileInputStream(userIDFile));
+			BufferedReader br = new BufferedReader(reader);
+			id = Long.parseLong(br.readLine());
+			br.close();
+			reader.close();
+		}
+	}
+
+	public long getID()
+	{
+		return id;
+	}
 	/** Returns the root path of this program.
 	 * 
 	 * @return The root path of this program. */
