@@ -560,7 +560,7 @@ public class MapGrid extends JPanel implements MouseListener
 			{
 				Element intersection = doc.createElement("intersection");
 				// e.g. Change "FOUR_WAY_2" to "FOUR_WAY"
-				String intersectionType = this.type.replaceFirst("(?<=(FOUR|THREE)_WAY).*", "");
+				String intersectionType = this.type.replaceFirst("(?<=(FOUR_WAY|THREE_WAY_...).*", "");
 				intersection.appendChild(doc.createTextNode(intersectionType));
 
 				grid.appendChild(intersection);
