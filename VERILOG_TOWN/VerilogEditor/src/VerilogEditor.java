@@ -72,6 +72,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.*;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
@@ -448,8 +450,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 				System.out.println();
 				*/
 				
-				if(codeText.getText().equals(fileContent))
+				if(codeText.getText().equals(fileContent)){
+					trySendEditorTime(totalFocusTime);
 					System.exit(0);
+				}
 				else
 					closingPopFunction();
 			}
@@ -466,8 +470,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 			@Override
 			public void windowLostFocus(WindowEvent e)
 			{
-				totalFocusTime += System.currentTimeMillis() - startTime;
-				System.out.println(totalFocusTime/1000);
+				totalFocusTime += (System.currentTimeMillis() - startTime) / 1000;
+				
 			}
 			
 		});
@@ -810,8 +814,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 			e1.printStackTrace();
 		}
 		
-		if(codeText.getText().equals(fileContent))
+		if(codeText.getText().equals(fileContent)){
+			trySendEditorTime(totalFocusTime);
 			System.exit(0);
+		}
 		else
 			closingPopFunction();
 	}
@@ -931,10 +937,12 @@ public class VerilogEditor extends JFrame implements ActionListener
 		switch (selection){
 		case JOptionPane.YES_OPTION:{
 			saveButtonFunction();
+			trySendEditorTime(totalFocusTime);
 			System.exit(0);
 			break;
 		}
 		case JOptionPane.NO_OPTION:{
+			trySendEditorTime(totalFocusTime);
 			System.exit(0);
 			break;
 		}
@@ -962,6 +970,31 @@ public class VerilogEditor extends JFrame implements ActionListener
 			e1.printStackTrace();
 		}
 		return headerContent;
+	}
+	
+	public void trySendEditorTime(long editorTime){
+		try
+		{
+			sendEditorTime(totalFocusTime);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			String mes = "Error communicating with local server";
+			JOptionPane.showMessageDialog(null, mes, "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void sendEditorTime(long editorTime) throws IOException{
+		Socket socket = new Socket(InetAddress.getByName(LocalServer.LOCAL_IP_ADDRESS), LocalServer.LOCAL_PORT);
+		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
+		dos.writeInt(LocalServer.TYPE_USAGE_EDITOR);
+		dos.writeLong(totalFocusTime);
+		dos.flush();
+
+		dos.close();
+		socket.close();
 	}
 }
 

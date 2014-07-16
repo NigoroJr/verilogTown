@@ -42,6 +42,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeBitmapFontData;
+
 public class VerilogTown extends Game
 {
 	/** Environment variable set when developing. Non-zero value indicates
@@ -63,7 +66,7 @@ public class VerilogTown extends Game
 
 	@Override
 	public void create()
-	{
+	{		
 		batch = new SpriteBatch();
 
 		Texture.setEnforcePotImages(false); // turns off power of 2 restriction
