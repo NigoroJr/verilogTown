@@ -13,6 +13,7 @@ public class ConnectionHandler
 
 	public ConnectionHandler(Socket socket)
 	{
+		System.out.println("Handle connection with: " + socket.toString());
 		this.socket = socket;
 		try
 		{
@@ -96,6 +97,7 @@ public class ConnectionHandler
 	/** Closes the DataInputStream and the Socket. */
 	public void closeConnection()
 	{
+		System.out.println("Close connection");
 		try
 		{
 			if (dis != null)

@@ -949,10 +949,6 @@ public class VerilogEditor extends JFrame implements ActionListener
 				sendEditorTime(totalFocusTime);
 				dispose();
 			break;
-		}
-		case JOptionPane.NO_OPTION:{
-			System.exit(0);
-			break;
 			case JOptionPane.CANCEL_OPTION:
 				return;
 		}
@@ -992,7 +988,7 @@ public class VerilogEditor extends JFrame implements ActionListener
 			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 
 			dos.writeInt(TYPE_USAGE_EDITOR);
-			dos.writeLong(totalFocusTime);
+			dos.writeLong(editorTime);
 			dos.flush();
 
 			dos.close();
