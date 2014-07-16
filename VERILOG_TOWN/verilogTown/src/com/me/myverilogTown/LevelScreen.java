@@ -774,21 +774,19 @@ public class LevelScreen implements Screen
 			String verilogFileName = "Traffic_signal_set_" + counter;
 
 			jar_path = this.pathOfEditorJar + "verilogEditor.jar";
-			String OSName = System.getProperty("os.name");
 			List<String> list = new ArrayList<String>();
 			list.add("java");
 			list.add("-jar");
 			list.add(jar_path);
 			// list.add("D:/Program Files/eclipse-java/program/verilogTownStuff/myverilogTown/VerilogEditor.jar");
 			list.add(verilogFileName);
-			list.add(pathOfEditorJar);
 			list.add(rootPath);
 			list.add(Integer.toString(level_number));
 			try
 			{
 				ProcessBuilder proc = new ProcessBuilder(list);
 				// proc.directory(new File("C:\\"));
-				Process p = proc.start();
+				proc.start();
 			}
 			catch (Exception e)
 			{
