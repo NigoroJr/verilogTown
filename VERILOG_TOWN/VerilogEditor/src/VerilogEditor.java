@@ -450,9 +450,10 @@ public class VerilogEditor extends JFrame implements ActionListener
 				System.out.println();
 				*/
 				
-				if(codeText.getText().equals(fileContent)){
-					trySendEditorTime(totalFocusTime);
-					System.exit(0);
+				if (codeText.getText().equals(fileContent))
+				{
+					sendEditorTime(totalFocusTime);
+					dispose();
 				}
 				else
 					closingPopFunction();
@@ -934,18 +935,16 @@ public class VerilogEditor extends JFrame implements ActionListener
 		String[] str = {"Content changed.", "Do you want to save this file?"};
 		int selection = JOptionPane.showConfirmDialog(this, str, 
 													"Save this file?", JOptionPane.YES_NO_CANCEL_OPTION);
-		switch (selection){
-		case JOptionPane.YES_OPTION:{
-			saveButtonFunction();
-			trySendEditorTime(totalFocusTime);
-			System.exit(0);
+		switch (selection)
+		{
+			case JOptionPane.YES_OPTION:
+				saveButtonFunction();
+			case JOptionPane.NO_OPTION:
+				sendEditorTime(totalFocusTime);
+				dispose();
 			break;
-		}
-		case JOptionPane.NO_OPTION:{
-			trySendEditorTime(totalFocusTime);
-			System.exit(0);
-			break;
-		}
+			case JOptionPane.CANCEL_OPTION:
+				return;
 		}
 	}
 	
@@ -971,11 +970,20 @@ public class VerilogEditor extends JFrame implements ActionListener
 		}
 		return headerContent;
 	}
-	
-	public void trySendEditorTime(long editorTime){
+
+	public void sendEditorTime(long editorTime)
+	{
 		try
 		{
-			sendEditorTime(totalFocusTime);
+			Socket socket = new Socket(InetAddress.getByName(LOCAL_IP_ADDRESS), LOCAL_PORT);
+			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
+			dos.writeInt(TYPE_USAGE_EDITOR);
+			dos.writeLong(totalFocusTime);
+			dos.flush();
+
+			dos.close();
+			socket.close();
 		}
 		catch (IOException e)
 		{
@@ -984,17 +992,4 @@ public class VerilogEditor extends JFrame implements ActionListener
 			JOptionPane.showMessageDialog(null, mes, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
-	public void sendEditorTime(long editorTime) throws IOException{
-		Socket socket = new Socket(InetAddress.getByName(LocalServer.LOCAL_IP_ADDRESS), LocalServer.LOCAL_PORT);
-		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-
-		dos.writeInt(LocalServer.TYPE_USAGE_EDITOR);
-		dos.writeLong(totalFocusTime);
-		dos.flush();
-
-		dos.close();
-		socket.close();
-	}
 }
-
