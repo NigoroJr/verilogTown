@@ -814,10 +814,11 @@ public class VerilogEditor extends JFrame implements ActionListener
 		{
 			e1.printStackTrace();
 		}
-		
-		if(codeText.getText().equals(fileContent)){
-			trySendEditorTime(totalFocusTime);
-			System.exit(0);
+
+		if (codeText.getText().equals(fileContent))
+		{
+			sendEditorTime(totalFocusTime);
+			dispose();
 		}
 		else
 			closingPopFunction();
