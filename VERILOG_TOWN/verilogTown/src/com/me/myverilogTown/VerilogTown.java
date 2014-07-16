@@ -25,13 +25,17 @@ THE SOFTWARE.
 package com.me.myverilogTown;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URISyntaxException;
+
+import javax.swing.JOptionPane;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -44,12 +48,18 @@ public class VerilogTown extends Game
 	 * development mode. In development mode, the directory structure is
 	 * different. */
 	public static final String	VERILOG_TOWN_DEVELOPMENT	= "VERILOG_TOWN_DEVELOPMENT";
+	public static final String	USER_ID_FILE_NAME			= "userID.txt";
+	/** Whether or not to send results and usage of game to a remote server.
+	 * Sends data if true, otherwise false. */
+	public static final boolean	sendToServer				= true;
+
+	private LocalServer			localServer;
 
 	public SpriteBatch			batch;
 	public BitmapFont			font;
 	private long				startTime;
-	private long				totalFocusTime;
-	private File				userIDFile;
+	private long				totalTime;
+	private long				id;
 
 	@Override
 	public void create()
@@ -61,39 +71,25 @@ public class VerilogTown extends Game
 
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont();
+
 		startTime = System.currentTimeMillis();
-		userIDFile = new File(VerilogTown.getRootPath() + "/userID.txt");
-		if(!userIDFile.exists()){
-			try
-			{
-				userIDFile.createNewFile();
-				FileWriter out = new FileWriter(userIDFile);
-				out.write("" + System.currentTimeMillis());
-				out.close();
-			} catch (IOException e1)
-			{
-				e1.printStackTrace();
-			}
-		}
-		InputStreamReader reader;
+
 		try
 		{
-			reader = new InputStreamReader(new FileInputStream(userIDFile));
-			BufferedReader br = new BufferedReader(reader);
-			System.out.println(Long.parseLong(br.readLine()));
-			br.close();
-			reader.close();
-		}
-		catch (NumberFormatException e)
-		{
-			e.printStackTrace();
+			readID();
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		if (sendToServer)
+		{
+			localServer = new LocalServer(id);
+			// Start listening to LOCAL connections
+			localServer.start();
+		}
+
 		this.setScreen(new MainMenu(this));
 	}
 
@@ -106,10 +102,85 @@ public class VerilogTown extends Game
 	@Override
 	public void dispose()
 	{
-		totalFocusTime = (System.currentTimeMillis() - startTime) / 1000;
-		//send this data to server
+		// Send total time spent playing game to local server
+		if (sendToServer)
+		{
+			totalTime = (System.currentTimeMillis() - startTime) / 1000;
+
+			try
+			{
+				sendTotalTime(totalTime);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				String mes = "Error communicating with local server";
+				JOptionPane.showMessageDialog(null, mes, "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+		// Send usage to remote server
+		if (sendToServer)
+		{
+			try
+			{
+				localServer.sendUsage();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+
+			localServer.stopLocalServer();
+		}
+
 		batch.dispose();
 		font.dispose();
+	}
+
+	public void readID() throws IOException
+	{
+		File userIDFile = new File(String.format("%s/%s", VerilogTown.getRootPath(), USER_ID_FILE_NAME));
+
+		if (!userIDFile.exists())
+		{
+			userIDFile.createNewFile();
+			FileWriter out = new FileWriter(userIDFile);
+			id = System.currentTimeMillis();
+			out.write(Long.toString(id));
+			out.close();
+		}
+		else
+		{
+			InputStreamReader reader = new InputStreamReader(new FileInputStream(userIDFile));
+			BufferedReader br = new BufferedReader(reader);
+			id = Long.parseLong(br.readLine());
+			br.close();
+			reader.close();
+		}
+	}
+
+	public long getID()
+	{
+		return id;
+	}
+
+	/** Sends the total time that the game was running. This method sends to the
+	 * local server, which then sends data to the remote server.
+	 * 
+	 * @param totalTime
+	 *            The total time in seconds that the game was running. */
+	public void sendTotalTime(long totalTime) throws IOException
+	{
+		Socket socket = new Socket(InetAddress.getByName(LocalServer.LOCAL_IP_ADDRESS), LocalServer.LOCAL_PORT);
+		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
+		dos.writeInt(LocalServer.TYPE_USAGE_TOTAL);
+		dos.writeLong(totalTime);
+		dos.flush();
+
+		dos.close();
+		socket.close();
 	}
 
 	/** Returns the root path of this program.
