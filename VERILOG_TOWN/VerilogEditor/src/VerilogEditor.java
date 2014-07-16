@@ -971,11 +971,20 @@ public class VerilogEditor extends JFrame implements ActionListener
 		}
 		return headerContent;
 	}
-	
-	public void trySendEditorTime(long editorTime){
+
+	public void sendEditorTime(long editorTime)
+	{
 		try
 		{
-			sendEditorTime(totalFocusTime);
+			Socket socket = new Socket(InetAddress.getByName(LOCAL_IP_ADDRESS), LOCAL_PORT);
+			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
+			dos.writeInt(TYPE_USAGE_EDITOR);
+			dos.writeLong(totalFocusTime);
+			dos.flush();
+
+			dos.close();
+			socket.close();
 		}
 		catch (IOException e)
 		{
@@ -984,17 +993,4 @@ public class VerilogEditor extends JFrame implements ActionListener
 			JOptionPane.showMessageDialog(null, mes, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
-	public void sendEditorTime(long editorTime) throws IOException{
-		Socket socket = new Socket(InetAddress.getByName(LocalServer.LOCAL_IP_ADDRESS), LocalServer.LOCAL_PORT);
-		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-
-		dos.writeInt(LocalServer.TYPE_USAGE_EDITOR);
-		dos.writeLong(totalFocusTime);
-		dos.flush();
-
-		dos.close();
-		socket.close();
-	}
 }
-
