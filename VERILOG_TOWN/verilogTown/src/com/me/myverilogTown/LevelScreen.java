@@ -778,7 +778,6 @@ public class LevelScreen implements Screen
 			list.add("java");
 			list.add("-jar");
 			list.add(jar_path);
-			// list.add("D:/Program Files/eclipse-java/program/verilogTownStuff/myverilogTown/VerilogEditor.jar");
 			list.add(verilogFileName);
 			list.add(rootPath);
 			list.add(Integer.toString(level_number));

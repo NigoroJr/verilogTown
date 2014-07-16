@@ -1,5 +1,5 @@
 /*
-The MIT License (MIT)
+	The MIT License (MIT)
 
 Copyright (c) 2014 Peter Jamieson, Naoki Mizuno, and Boyu Zhang
 
@@ -223,7 +223,7 @@ public class MainMenu implements Screen
 			else if (wasPressed)
 			{
 				this.dispose();
-				// TODO: Show credits
+				game.setScreen(new CreditsScreen(game));
 			}
 			else
 				credits.drawTexture(TextureButton.HOVER);
