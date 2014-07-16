@@ -111,6 +111,11 @@ public class VerilogEditor extends JFrame implements ActionListener
 	* @param args
 	*/
 	
+
+	/* Constants from LocalServer class in verilogTown project */
+	public static final String			LOCAL_IP_ADDRESS	= "127.0.0.1";
+	public static final int				LOCAL_PORT			= 32151;
+	public static final int				TYPE_USAGE_EDITOR	= 3;
 	public static void main(String[] args)
 	{
 		// TODO Auto-generated method stub
