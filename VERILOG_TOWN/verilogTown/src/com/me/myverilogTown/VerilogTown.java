@@ -54,7 +54,7 @@ public class VerilogTown extends Game
 	public static final String	USER_ID_FILE_NAME			= "userID.txt";
 	/** Whether or not to send results and usage of game to a remote server.
 	 * Sends data if true, otherwise false. */
-	public static final boolean	sendToServer				= true;
+	public static boolean		SEND_TO_SERVER				= true;
 
 	private LocalServer			localServer;
 
@@ -66,7 +66,7 @@ public class VerilogTown extends Game
 
 	@Override
 	public void create()
-	{		
+	{
 		batch = new SpriteBatch();
 
 		Texture.setEnforcePotImages(false); // turns off power of 2 restriction
@@ -86,7 +86,7 @@ public class VerilogTown extends Game
 			e.printStackTrace();
 		}
 
-		if (sendToServer)
+		if (SEND_TO_SERVER)
 		{
 			localServer = new LocalServer(id);
 			// Start listening to LOCAL connections
@@ -106,7 +106,7 @@ public class VerilogTown extends Game
 	public void dispose()
 	{
 		// Send total time spent playing game to local server
-		if (sendToServer)
+		if (SEND_TO_SERVER)
 		{
 			totalTime = (System.currentTimeMillis() - startTime) / 1000;
 
@@ -123,7 +123,7 @@ public class VerilogTown extends Game
 		}
 
 		// Send usage to remote server
-		if (sendToServer)
+		if (SEND_TO_SERVER)
 		{
 			try
 			{

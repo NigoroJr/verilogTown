@@ -2,10 +2,13 @@ package com.me.myverilogTown;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 /** This class is a server that runs locally and sits between the game and the
  * remote server. This server/client is used to send level results and the game
@@ -21,11 +24,15 @@ public class LocalServer extends Thread
 	public static final int		REMOTE_PORT			= 32150;
 	public static final String	LOCAL_IP_ADDRESS	= "127.0.0.1";
 	public static final int		LOCAL_PORT			= 32151;
+	private String				remoteIP;
+	private int					remotePort;
 
 	public static final int		TYPE_RESULT			= 0;
 	public static final int		TYPE_USAGE			= 1;
 	public static final int		TYPE_USAGE_TOTAL	= 2;
 	public static final int		TYPE_USAGE_EDITOR	= 3;
+
+	public static final String	CONFIG_FILE_NAME	= "server.conf";
 
 	private long				id;
 	private boolean				localServerRunning;
@@ -40,6 +47,10 @@ public class LocalServer extends Thread
 		this.localServerRunning = true;
 		this.totalTime = 0;
 		this.editorTime = 0;
+		this.remoteIP = "";
+		this.remotePort = -1;
+
+		readConfig();
 
 		try
 		{
@@ -134,7 +145,11 @@ public class LocalServer extends Thread
 			int carsTotal,
 			int carsPassed) throws IOException
 	{
-		Socket s = new Socket(InetAddress.getByName(REMOTE_IP_ADDRESS), REMOTE_PORT);
+		if (remoteIP.equals(""))
+			remoteIP = REMOTE_IP_ADDRESS;
+		if (remotePort == -1)
+			remotePort = REMOTE_PORT;
+		Socket s = new Socket(InetAddress.getByName(remoteIP), remotePort);
 		DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 		dos.writeLong(id);
 		dos.writeInt(TYPE_RESULT);
@@ -144,6 +159,12 @@ public class LocalServer extends Thread
 		dos.writeInt(carsPassed);
 		dos.flush();
 		s.close();
+
+		System.out.println("Send following level result to remote server:");
+		System.out.println("Level Number: " + levelNumber);
+		System.out.println("Time: " + time);
+		System.out.println("Cars total: " + carsTotal);
+		System.out.println("Cars passed: " + carsPassed);
 	}
 
 	public void sendUsage() throws IOException
@@ -162,7 +183,11 @@ public class LocalServer extends Thread
 	 * @throws IOException */
 	public void sendUsage(long totalTime, long editorTime) throws IOException
 	{
-		Socket s = new Socket(InetAddress.getByName(REMOTE_IP_ADDRESS), REMOTE_PORT);
+		if (remoteIP.equals(""))
+			remoteIP = REMOTE_IP_ADDRESS;
+		if (remotePort == -1)
+			remotePort = REMOTE_PORT;
+		Socket s = new Socket(InetAddress.getByName(remoteIP), remotePort);
 		DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 		dos.writeLong(id);
 		dos.writeInt(TYPE_USAGE);
@@ -170,5 +195,66 @@ public class LocalServer extends Thread
 		dos.writeLong(editorTime);
 		dos.flush();
 		s.close();
+
+		System.out.println("Send following information to remote server:");
+		System.out.println("Total: " + totalTime);
+		System.out.println("Editor: " + editorTime);
+	}
+
+	/** Reads the configuration file in the root directory of the project. */
+	public void readConfig()
+	{
+		File configFile = new File(String.format("%s/%s", VerilogTown.getRootPath(), CONFIG_FILE_NAME));
+		try
+		{
+			Scanner scanner = new Scanner(configFile);
+
+			while (scanner.hasNext())
+			{
+				String line = scanner.nextLine();
+				try
+				{
+					processLine(line);
+				}
+				catch (ArrayIndexOutOfBoundsException e)
+				{
+					// Ignore
+				}
+			}
+
+			scanner.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/** Reads in a line and updates the variables according to the configuration.
+	 * Lines that start with '#' are skipped.
+	 * 
+	 * @param line
+	 *            Line from the configuration file.
+	 * @throws ArrayIndexOutOfBoundsException
+	 *             When the entry has a key but doesn't have a value. */
+	private void processLine(String line) throws ArrayIndexOutOfBoundsException
+	{
+		if (line.trim().isEmpty() || line.trim().startsWith("#"))
+			return;
+
+		String[] entry = line.split(":");
+		switch (entry[0])
+		{
+			case "IP":
+				remoteIP = entry[1];
+			break;
+			case "Port":
+				remotePort = Integer.parseInt(entry[1]);
+			break;
+			case "SendUsage":
+				if (entry[1].equals("false"))
+					VerilogTown.SEND_TO_SERVER = false;
+			break;
+		}
 	}
 }
