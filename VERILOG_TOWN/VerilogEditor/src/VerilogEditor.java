@@ -120,9 +120,9 @@ public class VerilogEditor extends JFrame implements ActionListener
 	{
 		// TODO Auto-generated method stub
 		name = args[0];
-		pathOfEditorJar = args[1];
-		rootPath = args[2];
-		level_number = args[3];
+		//pathOfEditorJar = args[1];
+		rootPath = args[1];
+		level_number = args[2];
 		new VerilogEditor();
 	}
 	
@@ -457,6 +457,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 				
 				if (codeText.getText().equals(fileContent))
 				{
+					totalFocusTime += (System.currentTimeMillis() - startTime) / 1000;
+					errorText.setText("" + totalFocusTime);
 					sendEditorTime(totalFocusTime);
 					dispose();
 				}
@@ -477,7 +479,6 @@ public class VerilogEditor extends JFrame implements ActionListener
 			public void windowLostFocus(WindowEvent e)
 			{
 				totalFocusTime += (System.currentTimeMillis() - startTime) / 1000;
-				
 			}
 			
 		});
@@ -690,7 +691,6 @@ public class VerilogEditor extends JFrame implements ActionListener
 	//distinguish which key is pressed
 	public void action(ActionEvent e)
 	{
-		System.out.println("test");
 		String str = e.getActionCommand();
 		if(str.equals("Save"))
 		{
@@ -822,6 +822,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 
 		if (codeText.getText().equals(fileContent))
 		{
+			totalFocusTime += (System.currentTimeMillis() - startTime) / 1000;
+			errorText.setText("" + totalFocusTime);
 			sendEditorTime(totalFocusTime);
 			dispose();
 		}
@@ -946,6 +948,8 @@ public class VerilogEditor extends JFrame implements ActionListener
 			case JOptionPane.YES_OPTION:
 				saveButtonFunction();
 			case JOptionPane.NO_OPTION:
+				totalFocusTime += (System.currentTimeMillis() - startTime) / 1000;
+				errorText.setText("" + totalFocusTime);
 				sendEditorTime(totalFocusTime);
 				dispose();
 			break;
