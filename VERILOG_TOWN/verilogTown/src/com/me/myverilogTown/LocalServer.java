@@ -47,8 +47,8 @@ public class LocalServer extends Thread
 		this.localServerRunning = true;
 		this.totalTime = 0;
 		this.editorTime = 0;
-		this.remoteIP = "";
-		this.remotePort = -1;
+		this.remoteIP = REMOTE_IP_ADDRESS;
+		this.remotePort = REMOTE_PORT;
 
 		readConfig();
 
@@ -145,10 +145,6 @@ public class LocalServer extends Thread
 			int carsTotal,
 			int carsPassed) throws IOException
 	{
-		if (remoteIP.equals(""))
-			remoteIP = REMOTE_IP_ADDRESS;
-		if (remotePort == -1)
-			remotePort = REMOTE_PORT;
 		Socket s = new Socket(InetAddress.getByName(remoteIP), remotePort);
 		DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 		dos.writeLong(id);
@@ -183,10 +179,6 @@ public class LocalServer extends Thread
 	 * @throws IOException */
 	public void sendUsage(long totalTime, long editorTime) throws IOException
 	{
-		if (remoteIP.equals(""))
-			remoteIP = REMOTE_IP_ADDRESS;
-		if (remotePort == -1)
-			remotePort = REMOTE_PORT;
 		Socket s = new Socket(InetAddress.getByName(remoteIP), remotePort);
 		DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 		dos.writeLong(id);
