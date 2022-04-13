@@ -15,9 +15,9 @@ of a traditional digital lab.
 Check out the [trailer](http://youtu.be/UNoLR8NG6EU) for a quick overview of the game.
 
 ## Quick start
-* [Download and Setting up the game](http://www.users.miamioh.edu/jamiespa/verilogTown/download.html)
-* [Playing the game](http://www.users.miamioh.edu/jamiespa/verilogTown/game.html)
-* [Understanding Verilog for verilogTown](http://www.users.miamioh.edu/jamiespa/verilogTown/verilog.html)
+* [Download and Setting up the game](http://drpeterjamieson.com/verilogTown/download.html)
+* [Playing the game](http://drpeterjamieson.com/verilogTown/game.html)
+* [Understanding Verilog for verilogTown](http://drpeterjamieson.com/verilog.html)
 
 [verilogTown]: http://www.users.miamioh.edu/jamiespa/verilogTown/ "verilogTown"
 
